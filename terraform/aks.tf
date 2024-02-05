@@ -120,8 +120,8 @@ module "gitops_bridge_bootstrap" {
 }
 
 resource "azurerm_resource_group" "this" {
-  name     = "aks-gitops"
-  location = "eastus"
+  name     = var.resource_group_name
+  location = var.region
 }
 
 module "network" {
@@ -130,11 +130,11 @@ module "network" {
   resource_group_name = azurerm_resource_group.this.name
   subnets = {
     aks = {
-      address_prefixes  = ["10.52.0.0/16"]
+      address_prefixes  = var.virtual_network_address_space
       service_endpoints = ["Microsoft.Storage"]
     }
   }
-  virtual_network_address_space = ["10.52.0.0/16"]
+  virtual_network_address_space = var.virtual_network_address_space
   virtual_network_location      = azurerm_resource_group.this.location
-  virtual_network_name          = "vnet1"
+  virtual_network_name          = var.virtual_network_name
 }

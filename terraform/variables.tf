@@ -3,6 +3,11 @@ variable "region" {
   default = "centralus"
 }
 
+variable "resource_group_name" {
+  type    = string
+  default = "aks-gitops"
+}
+
 variable "agents_size" {
   default     = "Standard_DS3_v2"
   description = "The default virtual machine size for the Kubernetes agents"
@@ -13,6 +18,18 @@ variable "kubernetes_version" {
   description = "Specify which Kubernetes release to use. The default used is the latest Kubernetes version available in the region"
   type        = string
   default     = null
+}
+
+variable "virtual_network_address_space" {
+  description = "The address space that is used the virtual network"
+  type        = list
+  default     = ["10.52.0.0/16"]
+}
+
+variable "virtual_network_name" {
+  description = "The name of the virtual network"
+  type        = string
+  default     = "vnet1"
 }
 
 variable "addons" {
