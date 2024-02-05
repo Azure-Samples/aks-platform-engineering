@@ -1,6 +1,6 @@
 variable "region" {
   type    = string
-  default = "eastus"
+  default = "centralus"
 }
 
 variable "agents_size" {
