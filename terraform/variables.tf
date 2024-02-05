@@ -4,7 +4,7 @@ variable "region" {
 }
 
 variable "agents_size" {
-  default     = "Standard_D8s_v3"
+  default     = "Standard_DS3_v2"
   description = "The default virtual machine size for the Kubernetes agents"
   type        = string
 }
