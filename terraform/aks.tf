@@ -12,7 +12,7 @@ locals {
 
   argocd_namespace = "argocd"
 
-  aws_addons = {
+  azure_addons = {
     enable_azure_crossplane_provider         = try(var.addons.enable_azure_crossplane_provider, false)
     enable_azure_crossplane_upbound_provider = try(var.addons.enable_azure_crossplane_upbound_provider, false)
   }
@@ -35,7 +35,7 @@ locals {
     enable_crossplane_kubernetes_provider    = try(var.addons.enable_crossplane_kubernetes_provider, false)
     enable_crossplane_helm_provider          = try(var.addons.enable_crossplane_helm_provider, false)
   }
-  addons = local.oss_addons
+  addons = merge(azure_addons, local.oss_addons)
 
   cluster_metadata = merge(local.addons_metadata, local.workloads_metadata)
 
@@ -156,8 +156,8 @@ module "gitops_bridge_bootstrap" {
     environment  = local.environment
     metadata     = merge(local.cluster_metadata,
       {
-        crossplane_service_principal_client_id = azuread_service_principal.crossplane_service_principal.client_id
-        crossplane_service_principal_password  = azuread_service_principal_password.crossplane_service_principal_password.value
+        service_principal_client_id = azuread_service_principal.service_principal.client_id
+        service_principal_password  = azuread_service_principal_password.service_principal_password.value
       }
     )       
     addons       = local.addons
@@ -169,35 +169,35 @@ module "gitops_bridge_bootstrap" {
 }
 
 ################################################################################
-# Crossplane: Service Principal
+# Service Principal: Creation
 ################################################################################
 data "azuread_client_config" "current" {}
 data "azurerm_subscription" "current" {}
 
-resource "azuread_application" "crossplane_application" {
-  display_name = var.crossplane_application_name
+resource "azuread_application" "registered_application" {
+  display_name = var.registered_application_name
   owners       = [data.azuread_client_config.current.object_id]
 }
 
-resource "azuread_service_principal" "crossplane_service_principal" {
-  client_id                    = azuread_application.crossplane_application.client_id
+resource "azuread_service_principal" "service_principal" {
+  client_id                    = azuread_application.registered_application.client_id
   app_role_assignment_required = true
   owners                       = [data.azuread_client_config.current.object_id]
 }
 
-resource "time_rotating" "crossplane_credentials_time_rotating" {
+resource "time_rotating" "service_principal_credentials_time_rotating" {
   rotation_years = 2
 }
 
-resource "azuread_service_principal_password" "crossplane_service_principal_password" {
-  service_principal_id = azuread_service_principal.crossplane_service_principal.object_id
+resource "azuread_service_principal_password" "service_principal_password" {
+  service_principal_id = azuread_service_principal.service_principal.object_id
   rotate_when_changed = {
-    rotation = time_rotating.crossplane_credentials_time_rotating.id
+    rotation = time_rotating.service_principal_credentials_time_rotating.id
   }
 }
-resource "azurerm_role_assignment" "crossplane_subscription_owner_role_assignment" {
+resource "azurerm_role_assignment" "service_principal_subscription_owner_role_assignment" {
   scope                            = data.azurerm_subscription.current.id
   role_definition_name             = "Owner"
-  principal_id                     = azuread_service_principal.crossplane_service_principal.object_id
+  principal_id                     = azuread_service_principal.service_principal.object_id
   skip_service_principal_aad_check = true
 }

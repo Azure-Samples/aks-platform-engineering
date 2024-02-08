@@ -12,7 +12,7 @@ variable "location" {
 
 variable "agents_size" {
   description = "Specifies the default virtual machine size for the Kubernetes agents"
-  default     = "Standard_D8s_v3"
+  default     = "Standard_DS3_v2"
   type        = string
 }
 
@@ -206,8 +206,8 @@ variable "net_profile_service_cidr" {
   type        = string
 }
 
-variable "crossplane_application_name" {
-  description = "Specifies the name of the Crossplane Microsoft Entra ID registered application."
+variable "registered_application_name" {
+  description = "Specifies the name of the Microsoft Entra ID registered application."
   default     = "crossplane"
   type        = string
 }
