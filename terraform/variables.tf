@@ -64,12 +64,12 @@ variable "gitops_addons_path" {
 variable "gitops_workload_org" {
   description = "Git repository org/user contains for workload."
   type        = string
-  default     = "https://github.com/zioproto"
+  default     = "https://github.com/azure-samples"
 }
 variable "gitops_workload_repo" {
   description = "Specifies the Git repository contains for workload."
   type        = string
-  default     = "aks-gitops-bridge-sandbox"
+  default     = "aks-platform-engineering"
 }
 variable "gitops_workload_revision" {
   description = "Specifies the Git repository revision/branch/ref for workload."
