@@ -28,7 +28,7 @@ spec:
           - clusters:
               selector:
                 matchLabels:
-                  environment: staging
+                  environment: control-plane
               values:
                 addonChartVersion: 5.51.6
           - clusters:
