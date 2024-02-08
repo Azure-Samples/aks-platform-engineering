@@ -1,5 +1,9 @@
 terraform {
   required_providers {
+    azuread = {
+      source  = "hashicorp/azuread"
+      version = "~> 2.47.0"
+    }
     azurerm = {
       source  = "hashicorp/azurerm"
       version = "~> 3.56"
@@ -16,6 +20,12 @@ terraform {
   required_version = ">= 1.1.0"
 }
 
+data "azurerm_client_config" "current" {}
+
+provider "azuread" {
+  tenant_id = data.azurerm_client_config.current.tenant_id
+}
+
 provider "azurerm" {
   features {
     resource_group {
@@ -30,7 +40,7 @@ resource "local_file" "kubeconfig" {
 }
 
 provider "kubernetes" {
-  config_path = local_file.kubeconfig.filename
+    config_path = local_file.kubeconfig.filename
 
 }
 
