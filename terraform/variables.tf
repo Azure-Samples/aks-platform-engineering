@@ -37,12 +37,12 @@ variable "addons" {
 variable "gitops_addons_org" {
   description = "Specifies the Git repository org/user contains for addons."
   type        = string
-  default     = "https://github.com/zioproto"
+  default     = "https://github.com/azure-samples"
 }
 variable "gitops_addons_repo" {
   description = "Specifies the Git repository contains for addons."
   type        = string
-  default     = "aks-gitops-bridge-sandbox"
+  default     = "aks-platform-engineering"
 }
 variable "gitops_addons_revision" {
   description = "Specifies the Git repository revision/branch/ref for addons."
