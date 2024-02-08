@@ -27,9 +27,6 @@ variable "addons" {
   type        = any
   default = {
     enable_argocd                            = true # installs argocd
-    enable_ingress_nginx                     = true # installs ingress-nginx
-    enable_crossplane_kubernetes_provider    = true # installs kubernetes provider
-    enable_crossplane_helm_provider          = true # installs helm provider
     enable_crossplane                        = true # installs crossplane core
     enable_azure_crossplane_provider         = true # installs azure contrib provider
     enable_azure_crossplane_upbound_provider = true # installs azure upbound provider
