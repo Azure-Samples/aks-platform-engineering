@@ -33,7 +33,7 @@ locals {
     enable_vpa                               = try(var.addons.enable_vpa, false)
     enable_crossplane                        = try(var.addons.enable_crossplane, false)
   }
-  addons = merge(azure_addons, local.oss_addons)
+  addons = merge(local.azure_addons, local.oss_addons)
 
   cluster_metadata = merge(local.addons_metadata, local.workloads_metadata)
 
