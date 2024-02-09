@@ -1,57 +1,21 @@
-# Project Name
-
-(short, 1-3 sentenced, description of the project)
-
-## Features
-
-This project framework provides the following features:
-
-* Feature 1
-* Feature 2
-* ...
-
 ## Getting Started
 
-### Prerequisites
+Until the repo is private you need a ssh deploy key for ArgoCD to clone this repo.
+Obtain the key from the team and place it in `terraform/private_ssh_deploy_key`
 
-(ideally very short, if any)
+Run Terraform:
 
-- OS
-- Library version
-- ...
+```
+cd terraform
+terraform init -upgrade
+# the gitops_addons_org needs to be in the git format to use the SSH key until the repo is private
+terraform apply -var gitops_addons_org=git@github.com:Azure-Samples
+```
 
-### Installation
+Get the initial admin password and the IP address of the ArgoCD web interface.
+(Wait a few minutes for the LoadBalancer to be created after the Terraform apply)
 
-(ideally very short)
-
-- npm install [package name]
-- mvn install
-- ...
-
-### Quickstart
-(Add steps to get up and running quickly)
-
-1. git clone [repository clone url]
-2. cd [repository name]
-3. ...
-
-
-## Demo
-
-A demo app is included to show how to use the project.
-
-To run the demo, follow these steps:
-
-(Add steps to start up the demo)
-
-1.
-2.
-3.
-
-## Resources
-
-(Any additional resources or related projects)
-
-- Link to supporting information
-- Link to similar sample
-- ...
+```
+kubectl --kubeconfig=kubeconfig get secrets argocd-initial-admin-secret -n argocd --template="{{index .data.password | base64decode}}
+kubectl get svc -n argocd argo-cd-argocd-server
+```

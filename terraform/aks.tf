@@ -17,21 +17,21 @@ locals {
     enable_azure_crossplane_upbound_provider = try(var.addons.enable_azure_crossplane_upbound_provider, false)
   }
   oss_addons = {
-    enable_argocd                            = try(var.addons.enable_argocd, false)
-    enable_argo_rollouts                     = try(var.addons.enable_argo_rollouts, false)
-    enable_argo_events                       = try(var.addons.enable_argo_events, false)
-    enable_argo_workflows                    = try(var.addons.enable_argo_workflows, false)
-    enable_cluster_proportional_autoscaler   = try(var.addons.enable_cluster_proportional_autoscaler, false)
-    enable_gatekeeper                        = try(var.addons.enable_gatekeeper, false)
-    enable_gpu_operator                      = try(var.addons.enable_gpu_operator, false)
-    enable_ingress_nginx                     = try(var.addons.enable_ingress_nginx, false)
-    enable_kyverno                           = try(var.addons.enable_kyverno, false)
-    enable_kube_prometheus_stack             = try(var.addons.enable_kube_prometheus_stack, false)
-    enable_metrics_server                    = try(var.addons.enable_metrics_server, false)
-    enable_prometheus_adapter                = try(var.addons.enable_prometheus_adapter, false)
-    enable_secrets_store_csi_driver          = try(var.addons.enable_secrets_store_csi_driver, false)
-    enable_vpa                               = try(var.addons.enable_vpa, false)
-    enable_crossplane                        = try(var.addons.enable_crossplane, false)
+    enable_argocd                          = try(var.addons.enable_argocd, false)
+    enable_argo_rollouts                   = try(var.addons.enable_argo_rollouts, false)
+    enable_argo_events                     = try(var.addons.enable_argo_events, false)
+    enable_argo_workflows                  = try(var.addons.enable_argo_workflows, false)
+    enable_cluster_proportional_autoscaler = try(var.addons.enable_cluster_proportional_autoscaler, false)
+    enable_gatekeeper                      = try(var.addons.enable_gatekeeper, false)
+    enable_gpu_operator                    = try(var.addons.enable_gpu_operator, false)
+    enable_ingress_nginx                   = try(var.addons.enable_ingress_nginx, false)
+    enable_kyverno                         = try(var.addons.enable_kyverno, false)
+    enable_kube_prometheus_stack           = try(var.addons.enable_kube_prometheus_stack, false)
+    enable_metrics_server                  = try(var.addons.enable_metrics_server, false)
+    enable_prometheus_adapter              = try(var.addons.enable_prometheus_adapter, false)
+    enable_secrets_store_csi_driver        = try(var.addons.enable_secrets_store_csi_driver, false)
+    enable_vpa                             = try(var.addons.enable_vpa, false)
+    enable_crossplane                      = try(var.addons.enable_crossplane, false)
   }
   addons = merge(local.azure_addons, local.oss_addons)
 
@@ -141,6 +141,39 @@ module "aks" {
 
   depends_on = [module.network]
 }
+################################################################################
+# GitOps Bridge: Private ssh keys for git
+################################################################################
+resource "kubernetes_namespace" "argocd" {
+  depends_on = [module.aks]
+  metadata {
+    name = "argocd"
+  }
+}
+
+resource "kubernetes_secret" "git_secrets" {
+  depends_on = [kubernetes_namespace.argocd]
+  for_each = {
+    git-addons = {
+      type          = "git"
+      url           = var.gitops_addons_org
+      sshPrivateKey = file(pathexpand(var.git_private_ssh_key))
+    }
+    git-workloads = {
+      type          = "git"
+      url           = var.gitops_workload_org
+      sshPrivateKey = file(pathexpand(var.git_private_ssh_key))
+    }
+  }
+  metadata {
+    name      = each.key
+    namespace = kubernetes_namespace.argocd.metadata[0].name
+    labels = {
+      "argocd.argoproj.io/secret-type" = "repo-creds"
+    }
+  }
+  data = each.value
+}
 
 ################################################################################
 # GitOps Bridge: Bootstrap
@@ -152,13 +185,13 @@ module "gitops_bridge_bootstrap" {
   cluster = {
     cluster_name = module.aks.aks_name
     environment  = local.environment
-    metadata     = merge(local.cluster_metadata,
+    metadata = merge(local.cluster_metadata,
       {
         service_principal_client_id = azuread_service_principal.service_principal.client_id
         service_principal_password  = azuread_service_principal_password.service_principal_password.value
       }
-    )       
-    addons       = local.addons
+    )
+    addons = local.addons
   }
   apps = local.argocd_apps
   argocd = {
