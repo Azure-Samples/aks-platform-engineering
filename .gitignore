@@ -1,3 +1,6 @@
+# Private SSH Deploy Key
+private_ssh_deploy_key
+
 # Local .terraform directories
 **/.terraform/*
 

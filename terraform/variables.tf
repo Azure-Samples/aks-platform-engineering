@@ -6,8 +6,8 @@ variable "resource_group_name" {
 
 variable "location" {
   description = "Specifies the the location for the Azure resources."
-  type    = string
-  default = "eastus"
+  type        = string
+  default     = "eastus"
 }
 
 variable "agents_size" {
@@ -31,6 +31,12 @@ variable "addons" {
     enable_azure_crossplane_provider         = true # installs azure contrib provider
     enable_azure_crossplane_upbound_provider = true # installs azure upbound provider
   }
+}
+
+variable "git_private_ssh_key" {
+  description = "SSH key path for git access"
+  type        = string
+  default     = "./private_ssh_deploy_key"
 }
 
 # Addons Git
@@ -89,7 +95,7 @@ variable "gitops_workload_path" {
 
 variable "tags" {
   description = "Specifies tags for all the resources."
-  default     = {
+  default = {
     createdWith = "Terraform"
     pattern     = "GitOpsBridge"
   }
@@ -139,38 +145,38 @@ variable "private_cluster_enabled" {
 
 variable "enable_auto_scaling" {
   description = "Specifies whether to enable auto-scaler. Defaults to false."
-  type          = bool
-  default       = true
+  type        = bool
+  default     = true
 }
 
 variable "enable_host_encryption" {
   description = "Specifies whether the nodes in this Node Pool have host encryption enabled. Defaults to false."
-  type          = bool
-  default       = false
-} 
+  type        = bool
+  default     = false
+}
 
 variable "log_analytics_workspace_enabled" {
   description = "Specifies whether Log Analytics is enabled"
-  type          = bool
-  default       = true
-} 
+  type        = bool
+  default     = true
+}
 
 variable "agents_min_count" {
   description = "Specifies the minimum number of nodes which should exist within this Node Pool. Valid values are between 0 and 1000 and must be less than or equal to max_count."
-  type          = number
-  default       = 1
+  type        = number
+  default     = 1
 }
 
 variable "agents_max_count" {
   description = "Specifies the maximum number of nodes which should exist within this Node Pool. Valid values are between 0 and 1000 and must be greater than or equal to min_count."
-  type          = number
-  default       = 5
+  type        = number
+  default     = 5
 }
 
 variable "agents_max_pods" {
   description = "Specifies the maximum number of pods that can run on each agent. Changing this forces a new resource to be created."
-  type          = number
-  default       = 50
+  type        = number
+  default     = 50
 }
 
 variable "azure_policy_enabled" {
