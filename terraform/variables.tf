@@ -214,3 +214,15 @@ variable "registered_application_name" {
   default     = "crossplane"
   type        = string
 }
+
+variable "use_service_principal" {
+  description = "Specifies whether to use a new service principal or not."
+  default     = true
+  type        = bool
+} 
+
+variable "use_kubelet_managed_identity" {
+  description = "Specifies whether to use kubelet user-assigned managed identity or not."
+  default     = true
+  type        = bool
+} 
