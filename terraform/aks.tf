@@ -185,12 +185,25 @@ module "gitops_bridge_bootstrap" {
   cluster = {
     cluster_name = module.aks.aks_name
     environment  = local.environment
-    metadata = merge(local.cluster_metadata,
+    metadata     = var.use_service_principal && var.use_kubelet_managed_identity ? merge(local.cluster_metadata,
       {
-        service_principal_client_id = azuread_service_principal.service_principal.client_id
-        service_principal_password  = azuread_service_principal_password.service_principal_password.value
-      }
-    )
+        service_principal_client_id = azuread_service_principal.service_principal[0].client_id
+        service_principal_password  = azuread_service_principal_password.service_principal_password[0].value
+        kubelet_identity_client_id  = module.aks.kubelet_identity[0].client_id
+        subscription_id             = data.azurerm_subscription.current.subscription_id
+        tenant_id                   = data.azurerm_subscription.current.tenant_id
+      }) : var.use_service_principal ? merge(local.cluster_metadata,
+      {
+        service_principal_client_id = azuread_service_principal.service_principal[0].client_id
+        service_principal_password  = azuread_service_principal_password.service_principal_password[0].value
+        subscription_id             = data.azurerm_subscription.current.subscription_id
+        tenant_id                   = data.azurerm_subscription.current.tenant_id
+      }) : var.use_kubelet_managed_identity ? merge(local.cluster_metadata,
+      {
+        kubelet_identity_client_id = module.aks.kubelet_identity[0].client_id
+        subscription_id            = data.azurerm_subscription.current.subscription_id
+        tenant_id                  = data.azurerm_subscription.current.tenant_id
+      }) : local.cluster_metadata
     addons = local.addons
   }
   apps = local.argocd_apps
@@ -206,29 +219,74 @@ data "azuread_client_config" "current" {}
 data "azurerm_subscription" "current" {}
 
 resource "azuread_application" "registered_application" {
+  count        = var.use_service_principal ? 1 : 0
   display_name = var.registered_application_name
   owners       = [data.azuread_client_config.current.object_id]
 }
 
 resource "azuread_service_principal" "service_principal" {
-  client_id                    = azuread_application.registered_application.client_id
+  count                        = var.use_service_principal ? 1 : 0
+  client_id                    = azuread_application.registered_application[0].client_id
   app_role_assignment_required = true
   owners                       = [data.azuread_client_config.current.object_id]
 }
 
 resource "time_rotating" "service_principal_credentials_time_rotating" {
+  count                        = var.use_service_principal ? 1 : 0
   rotation_years = 2
 }
 
 resource "azuread_service_principal_password" "service_principal_password" {
-  service_principal_id = azuread_service_principal.service_principal.object_id
+  count                        = var.use_service_principal ? 1 : 0
+  service_principal_id = azuread_service_principal.service_principal[0].object_id
   rotate_when_changed = {
-    rotation = time_rotating.service_principal_credentials_time_rotating.id
+    rotation = time_rotating.service_principal_credentials_time_rotating[0].id
   }
 }
 resource "azurerm_role_assignment" "service_principal_subscription_owner_role_assignment" {
+  count                        = var.use_service_principal ? 1 : 0
   scope                            = data.azurerm_subscription.current.id
   role_definition_name             = "Owner"
-  principal_id                     = azuread_service_principal.service_principal.object_id
+  principal_id                     = azuread_service_principal.service_principal[0].object_id
+  skip_service_principal_aad_check = true
+}
+
+################################################################################
+# Crossplane: Secret
+################################################################################
+resource "kubernetes_secret" "crossplane_secret" {
+  count                              = var.use_service_principal ? 1 : 0
+  type                               = "Opaque"
+
+  metadata {
+    name                             = "azure-secret"
+    namespace                        = "crossplane-system"
+  }
+
+  data = {
+    creds = jsonencode({
+    "clientId"                       = "${azuread_service_principal.service_principal[0].client_id}"
+    "clientSecret"                   = "${azuread_service_principal_password.service_principal_password[0].value}"
+    "subscriptionId"                 = "${data.azurerm_subscription.current.subscription_id}"
+    "tenantId"                       = "${data.azurerm_subscription.current.tenant_id}"
+    "activeDirectoryEndpointUrl"     = "https://login.microsoftonline.com"
+    "resourceManagerEndpointUrl"     = "https://management.azure.com/"
+    "activeDirectoryGraphResourceId" = "https://graph.windows.net/"
+    "sqlManagementEndpointUrl"       = "https://management.core.windows.net:8443/"
+    "galleryEndpointUrl"             = "https://gallery.azure.com/"
+    "managementEndpointUrl"          = "https://management.core.windows.net/"
+    })
+  }
+  depends_on = [module.gitops_bridge_bootstrap]
+}
+
+################################################################################
+# Kubelet User-assigned Managed Identity: Role Assignment
+################################################################################
+resource "azurerm_role_assignment" "managed_identity_role_assignment" {
+  count                            = var.use_kubelet_managed_identity ? 1 : 0
+  scope                            = data.azurerm_subscription.current.id
+  role_definition_name             = "Owner"
+  principal_id                     = module.aks.kubelet_identity[0].object_id
   skip_service_principal_aad_check = true
 }
