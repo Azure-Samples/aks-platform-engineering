@@ -1,0 +1,7 @@
+addon: helm
+infrastructure: "azure:v1.13.0"
+manager:
+  featuresGates:
+    EXP_MACHINE_POOL: true
+    CLUSTER_TOPOLOGY: true
+    EXP_CLUSTER_RESOURCE_SET: true

@@ -15,6 +15,7 @@ locals {
   azure_addons = {
     enable_azure_crossplane_provider         = try(var.addons.enable_azure_crossplane_provider, false)
     enable_azure_crossplane_upbound_provider = try(var.addons.enable_azure_crossplane_upbound_provider, false)
+    enable_cluster_api_operator              = try(var.addons.enable_cluster_api_operator, false)
   }
   oss_addons = {
     enable_argocd                          = try(var.addons.enable_argocd, false)
