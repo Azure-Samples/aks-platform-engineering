@@ -222,12 +222,12 @@ variable "create_service_principal" {
 }
 
 variable "service_principal_client_id" {
-  description = "Specifies whether the client id of an existing service principal with the Owner role on the subscription."
+  description = "Specifies the client id of an existing service principal with the Owner role on the subscription."
   type        = string
 }
 
 variable "service_principal_client_secret" {
-  description = "Specifies whether the client secret of an existing service principal with the Owner role on the subscription."
+  description = "Specifies the client secret of an existing service principal with the Owner role on the subscription."
   type        = string
 }
 
