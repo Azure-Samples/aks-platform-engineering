@@ -1,0 +1,36 @@
+{{- if and .Values.global.enabled_azure_upbound .Values.deploymentRuntimeConfig.enabled }}
+{{- with .Values.deploymentRuntimeConfig }}
+apiVersion: pkg.crossplane.io/v1beta1
+kind: DeploymentRuntimeConfig
+metadata:
+  name: {{ .metadata.name }}
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+    {{- range $key, $value := .metadata.annotations }}
+    {{ $key }}: {{ $value | quote }}
+    {{- end }}
+
+  {{- if .metadata.labels }}
+  labels:
+    {{- range $key, $value := .metadata.labels }}
+    {{ $key }}: {{ $value | quote }}
+    {{- end }}
+  {{- end }}
+spec:
+  serviceAccountTemplate:
+    metadata:
+      {{- if .spec.serviceAccountTemplate.metadata.labels }}
+      labels:
+        {{- range $key, $value := .spec.serviceAccountTemplate.metadata.labels }}
+        {{ $key }}: {{ $value | quote }}
+        {{- end }}
+      {{- end }}
+      annotations:
+        {{- range $key, $value := .spec.serviceAccountTemplate.metadata.annotations }}
+        {{ $key }}: {{ $value | quote }}
+        {{- end }}
+      name: {{ .spec.serviceAccountTemplate.metadata.name }}
+  deploymentTemplate:
+  {{- .spec.deploymentTemplate | toYaml | nindent 4 }}
+{{- end }}
+{{- end }}
