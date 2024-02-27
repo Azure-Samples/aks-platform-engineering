@@ -255,7 +255,7 @@ resource "azurerm_role_assignment" "service_principal_subscription_owner_role_as
 # Crossplane Secret is created only when using a Service Principal as Crossplane Credentials
 #############################################################################################
 resource "kubernetes_namespace" "crossplane_namespace" {
-  count = var.crossplane_credentials_type == "servicePrincipal" ? 1 : 0
+  count      = var.crossplane_credentials_type == "servicePrincipal" ? 1 : 0
   depends_on = [module.aks]
   metadata {
     name = "crossplane-system"
