@@ -243,6 +243,7 @@ resource "azuread_service_principal_password" "service_principal_password" {
     rotation = time_rotating.service_principal_credentials_time_rotating[0].id
   }
 }
+
 resource "azurerm_role_assignment" "service_principal_subscription_owner_role_assignment" {
   count                            = var.create_service_principal ? 1 : 0
   scope                            = data.azurerm_subscription.current.id
@@ -250,6 +251,20 @@ resource "azurerm_role_assignment" "service_principal_subscription_owner_role_as
   principal_id                     = azuread_service_principal.service_principal[0].object_id
   skip_service_principal_aad_check = true
 }
+
+data "azuread_service_principal" "existing_service_principal" {
+  count                            = var.crossplane_credentials_type == "servicePrincipal" && !var.create_service_principal ? 1 : 0
+  client_id                        = var.service_principal_client_id
+}
+
+resource "azurerm_role_assignment" "existing_service_principal_subscription_owner_role_assignment" {
+  count                            = var.crossplane_credentials_type == "servicePrincipal" && !var.create_service_principal ? 1 : 0
+  scope                            = data.azurerm_subscription.current.id
+  role_definition_name             = "Owner"
+  principal_id                     = data.azuread_service_principal.existing_service_principal[0].object_id
+  skip_service_principal_aad_check = true
+}
+
 
 #############################################################################################
 # Crossplane Secret is created only when using a Service Principal as Crossplane Credentials
