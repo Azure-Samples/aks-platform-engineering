@@ -185,25 +185,12 @@ module "gitops_bridge_bootstrap" {
   cluster = {
     cluster_name = module.aks.aks_name
     environment  = local.environment
-    metadata = var.create_service_principal && var.crossplane_credentials_type == "managedIdentity" ? merge(local.cluster_metadata,
+    metadata = var.crossplane_credentials_type == "managedIdentity" ? merge(local.cluster_metadata,
       {
-        service_principal_client_id = azuread_service_principal.service_principal[0].client_id
-        service_principal_password  = azuread_service_principal_password.service_principal_password[0].value
         kubelet_identity_client_id  = module.aks.kubelet_identity[0].client_id
         subscription_id             = data.azurerm_subscription.current.subscription_id
         tenant_id                   = data.azurerm_subscription.current.tenant_id
-      }) : var.create_service_principal ? merge(local.cluster_metadata,
-      {
-        service_principal_client_id = azuread_service_principal.service_principal[0].client_id
-        service_principal_password  = azuread_service_principal_password.service_principal_password[0].value
-        subscription_id             = data.azurerm_subscription.current.subscription_id
-        tenant_id                   = data.azurerm_subscription.current.tenant_id
-      }) : var.crossplane_credentials_type == "managedIdentity" ? merge(local.cluster_metadata,
-      {
-        kubelet_identity_client_id = module.aks.kubelet_identity[0].client_id
-        subscription_id            = data.azurerm_subscription.current.subscription_id
-        tenant_id                  = data.azurerm_subscription.current.tenant_id
-    }) : local.cluster_metadata
+      }) : local.cluster_metadata
     addons = local.addons
   }
   apps = local.argocd_apps
