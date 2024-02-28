@@ -20,7 +20,6 @@ spec:
         repoURL: '{{metadata.annotations.workload_repo_url}}'
         targetRevision: '{{metadata.annotations.workload_repo_revision}}'
         path: gitops/clusters
-        ref: values
       destination:
         server: '{{.server}}'
         namespace: clusters
@@ -28,4 +27,3 @@ spec:
         automated: {}
         syncOptions:
           - CreateNamespace=true
-          - ServerSideApply=true  # Big CRDs
