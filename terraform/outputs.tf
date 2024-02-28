@@ -1,6 +1,6 @@
 output "subscription_id" {
   description = "Specifies the subscription id."
-  value = data.azurerm_subscription.current.id
+  value       = data.azurerm_subscription.current.id
 }
 
 output "tenant" {
