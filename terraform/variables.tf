@@ -214,3 +214,30 @@ variable "registered_application_name" {
   default     = "crossplane"
   type        = string
 }
+
+variable "create_service_principal" {
+  description = "Specifies whether to use a new service principal or not."
+  default     = false
+  type        = bool
+}
+
+variable "service_principal_client_id" {
+  description = "Specifies the client id of an existing service principal with the Owner role on the subscription."
+  type        = string
+}
+
+variable "service_principal_client_secret" {
+  description = "Specifies the client secret of an existing service principal with the Owner role on the subscription."
+  type        = string
+}
+
+variable "crossplane_credentials_type" {
+  description = "Specifies whether to use a new service principal or kubelet user-assigned managed identity as Crossplane credentials."
+  default     = "servicePrincipal"
+  type        = string
+
+  validation {
+    condition     = contains(["servicePrincipal", "managedIdentity"], var.crossplane_credentials_type)
+    error_message = "The value of the crossplane_credentials_type parameter is invalid. It must be either servicePrincipal or managedIdentity."
+  }
+}
