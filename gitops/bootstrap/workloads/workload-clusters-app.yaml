@@ -12,12 +12,6 @@ spec:
         generators:
           - clusters:
               selector:
-                matchExpressions:
-                  - key: akuity.io/argo-cd-cluster-name
-                    operator: NotIn
-                    values: [in-cluster]
-          - clusters:
-              selector:
                 matchLabels:
                   environment: control-plane
   template:
@@ -29,9 +23,12 @@ spec:
         repoURL: '{{metadata.annotations.workload_repo_url}}'
         targetRevision: '{{metadata.annotations.workload_repo_revision}}'
         path: gitops/clusters
+        directory:
+          recurse: true
+          exclude: exclude/*
       destination:
-        server: '{{.server}}'
-        namespace: clusters
+        name: '{{name}}'
+        namespace: workloads
       syncPolicy:
         automated: {}
         syncOptions:
