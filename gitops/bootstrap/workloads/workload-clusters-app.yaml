@@ -21,9 +21,6 @@ spec:
         repoURL: '{{metadata.annotations.workload_repo_url}}'
         targetRevision: '{{metadata.annotations.workload_repo_revision}}'
         path: gitops/clusters
-        directory:
-          recurse: true
-          exclude: exclude/*
       destination:
         name: '{{name}}'
         namespace: workloads
