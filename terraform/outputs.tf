@@ -5,7 +5,7 @@ output "subscription_id" {
 
 output "tenant" {
   description = "Specifies the tenant id."
-  value       = data.azurerm_client_config.current.tenant_id 
+  value       = data.azurerm_client_config.current.tenant_id
 }
 
 output "service_principal_client_id" {
