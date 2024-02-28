@@ -21,7 +21,6 @@ spec:
         targetRevision: '{{metadata.annotations.workload_repo_revision}}'
         path: gitops/clusters
       destination:
-        server: '{{.server}}'
         namespace: clusters
       syncPolicy:
         automated: {}
