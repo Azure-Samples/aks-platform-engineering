@@ -13,18 +13,18 @@ spec:
             - key: akuity.io/argo-cd-cluster-name
               operator: NotIn
               values: [in-cluster]
-            - key: environment
-              operator: NotIn
-              values: [control-plane]
   template:
     metadata:
-      name: 'workload-{{metadata.labels.environment}}'
+      name: 'cluster-workloads'
     spec:
       project: default
       source:
         repoURL: '{{metadata.annotations.workload_repo_url}}'
         path: '{{metadata.annotations.workload_repo_basepath}}{{metadata.annotations.workload_repo_path}}'
         targetRevision: '{{metadata.annotations.workload_repo_revision}}'
+        directory:
+          recurse: true
+          exclude: exclude/*
       destination:
         namespace: 'workload'
         name: '{{name}}'
