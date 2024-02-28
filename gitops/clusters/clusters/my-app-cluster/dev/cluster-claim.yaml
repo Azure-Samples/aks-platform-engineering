@@ -1,0 +1,17 @@
+
+apiVersion: kubernetes.example.com/v1alpha1
+kind: AksClusterClaim
+metadata:
+  name: sandokan
+  annotations:
+    crossplane.io/external-name: Sandokan-dev  
+spec:
+  location: "North Europe"
+  aks:
+    tags:
+      environment: dev
+  virtualNetwork:
+    addressSpace:
+      - 10.0.0.0/8
+    tags:
+      environment: dev    

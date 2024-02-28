@@ -1,0 +1,72 @@
+apiVersion: kubernetes.example.com/v1alpha1
+kind: AksClusterClaim
+metadata:
+  name: sandokan
+  annotations:
+    crossplane.io/external-name: Sandokan  
+    argocd.argoproj.io/sync-wave: "2"    
+spec:
+  location: "North Europe"
+  aks:
+    defaultNodePool:
+      name: system
+      vmSize: Standard_F8s_v2
+      enableAutoScaling: true
+      nodeCount: 3
+      minCount: 3
+      maxCount: 20
+      maxPods: 30
+      nodeLabels:
+        mode: system
+      onlyCriticalAddonsEnabled: false
+      osDiskSizeGb: 128
+      osDiskType: Ephemeral
+    kubernetesVersion: "1.28.3"
+    roleBasedAccessControlEnabled: true
+    oidcIssuerEnabled: true
+    workloadIdentityEnabled: true
+    privateClusterEnabled: false
+    azureActiveDirectoryRoleBasedAccessControl:
+      - adminGroupObjectIds:
+          - 4e4d0501-e693-4f3e-965b-5bec6c410c03
+        azureRbacEnabled: true
+        managed: true
+    azurePolicyEnabled: true
+    networkProfile:    
+      - networkPlugin: azure
+        networkPolicy: azure
+        outboundType: loadBalancer
+        dnsServiceIp: 172.16.0.10
+        serviceCidr: 172.16.0.0/16
+    workloadAutoscalerProfile:
+      - kedaEnabled: true
+        verticalPodAutoscalerEnabled: true
+    tags:
+      environment: Test
+      provisionedBy: Crossplane
+  userNodePool:
+    name: user
+    vmSize: Standard_F8s_v2
+    enableAutoScaling: true
+    nodeCount: 3
+    minCount: 3
+    maxCount: 20
+    maxPods: 30
+    nodeLabels:
+      mode: user
+    osDiskSizeGb: 128
+    osDiskType: Ephemeral
+    osSku: AzureLinux
+    osType: Linux
+  subnet:
+    name: MainSubnet
+    privateEndpointNetworkPoliciesEnabled: true
+    privateLinkServiceNetworkPoliciesEnabled: false
+    addressPrefixes:
+      - 10.0.0.0/16
+  virtualNetwork:
+    addressSpace:
+      - 10.0.0.0/8
+    tags:
+      environment: Test
+      provisionedBy: Crossplane

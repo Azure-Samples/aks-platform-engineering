@@ -1,0 +1,17 @@
+
+apiVersion: kubernetes.example.com/v1alpha1
+kind: AksClusterClaim
+metadata:
+  name: sandokan
+  annotations:
+    crossplane.io/external-name: Sandokan-stage  
+spec:
+  location: "EastUs"
+  aks:
+    tags:
+      environment: stage
+  virtualNetwork:
+    addressSpace:
+      - 10.0.0.0/8
+    tags:
+      environment: stage    
