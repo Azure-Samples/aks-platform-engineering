@@ -7,10 +7,7 @@ spec:
   syncPolicy:
     preserveResourcesOnDeletion: true
   generators:
-  - clusters:
-      selector:
-        matchLabels:
-          environment: control-plane
+  - clusters: {}
   template:
     metadata:
       name: workload-clusters-app
@@ -21,6 +18,7 @@ spec:
         targetRevision: '{{metadata.annotations.workload_repo_revision}}'
         path: gitops/clusters
       destination:
+        server: '{{.server}}'
         namespace: clusters
       syncPolicy:
         automated: {}
