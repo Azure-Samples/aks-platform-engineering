@@ -15,7 +15,7 @@ spec:
                 addonChart: crossplane-azure-upbound
                 addonChartNamespace: crossplane-system
                 # anything not staging or prod use this version
-                addonChartVersion: 2.0.0
+                addonChartVersion: 2.0.2
                 addonChartRepository: https://paolosalvatori.github.io/gitops-bridge-helm-charts
               selector:
                 matchExpressions:
@@ -30,13 +30,13 @@ spec:
                 matchLabels:
                   environment: control-plane
               values:
-                addonChartVersion: 2.0.0
+                addonChartVersion: 2.0.2
           - clusters:
               selector:
                 matchLabels:
                   environment: prod
               values:
-                addonChartVersion: 2.0.0
+                addonChartVersion: 2.0.2
   template:
     metadata:
       name: addon-{{name}}-{{values.addonChart}}
@@ -52,6 +52,13 @@ spec:
           helm:
             releaseName: '{{values.addonChart}}'
             ignoreMissingValueFiles: true
+            parameters:
+            - name: "providerConfig.spec.clientID"
+              value: '{{metadata.annotations.kubelet_identity_client_id}}'
+            - name: "providerConfig.spec.subscriptionID"
+              value: '{{metadata.annotations.subscription_id}}'
+            - name: "providerConfig.spec.tenantID"
+              value: '{{metadata.annotations.tenant_id}}'
             valueFiles:
               - $values/{{metadata.annotations.addons_repo_basepath}}environments/default/addons/{{values.addonChart}}/values.yaml
               - $values/{{metadata.annotations.addons_repo_basepath}}environments/{{metadata.labels.environment}}/addons/{{values.addonChart}}/values.yaml
