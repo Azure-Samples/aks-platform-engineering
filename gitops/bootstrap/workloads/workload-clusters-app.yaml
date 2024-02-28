@@ -27,3 +27,5 @@ spec:
       destination:
         name: '{{name}}'
         namespace: workloads
+      syncPolicy:
+        automated: {}
