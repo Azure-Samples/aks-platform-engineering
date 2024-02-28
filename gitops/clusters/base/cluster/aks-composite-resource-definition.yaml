@@ -2,8 +2,8 @@ apiVersion: apiextensions.crossplane.io/v1
 kind: CompositeResourceDefinition
 metadata:
   name: xaksclusters.kubernetes.example.com
-annotations:
-  argocd.argoproj.io/sync-wave: "1"  
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"  
 spec:
   group: kubernetes.example.com
   names:

@@ -3,8 +3,8 @@ apiVersion: apiextensions.crossplane.io/v1
 kind: Composition
 metadata:
   name: aks-with-virtual-network
-annotations:
-  argocd.argoproj.io/sync-wave: "1"    
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"    
 spec:
   patchSets:
     - name: location-patch
