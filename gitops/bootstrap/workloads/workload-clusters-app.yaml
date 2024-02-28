@@ -7,7 +7,7 @@ spec:
   syncPolicy:
     preserveResourcesOnDeletion: true
   generators:
-    - clusters:
+  - clusters:
       selector:
         matchLabels:
           environment: control-plane

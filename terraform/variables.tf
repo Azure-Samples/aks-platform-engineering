@@ -90,7 +90,7 @@ variable "gitops_workload_basepath" {
 variable "gitops_workload_path" {
   description = "Specifies the Git repository path for workload."
   type        = string
-  default     = "bootstrap/control-plane/workloads"
+  default     = "bootstrap/workloads"
 }
 
 variable "tags" {
