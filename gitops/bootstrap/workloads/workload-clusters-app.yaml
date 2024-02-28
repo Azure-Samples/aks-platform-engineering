@@ -7,7 +7,19 @@ spec:
   syncPolicy:
     preserveResourcesOnDeletion: true
   generators:
-  - clusters: {}
+    - merge:
+        mergeKeys: [server]
+        generators:
+          - clusters:
+              selector:
+                matchExpressions:
+                  - key: akuity.io/argo-cd-cluster-name
+                    operator: NotIn
+                    values: [in-cluster]
+          - clusters:
+              selector:
+                matchLabels:
+                  environment: control-plane
   template:
     metadata:
       name: workload-clusters-app
