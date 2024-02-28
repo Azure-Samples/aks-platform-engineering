@@ -2,21 +2,19 @@
 apiVersion: argoproj.io/v1alpha1
 kind: ApplicationSet
 metadata:
-  name: workloads-clusters
+  name: clusters
+  namespace: argocd
 spec:
   syncPolicy:
     preserveResourcesOnDeletion: true
   generators:
-    - merge:
-        mergeKeys: [server]
-        generators:
-          - clusters:
-              selector:
-                matchLabels:
-                  environment: control-plane
+  - clusters:
+      selector:
+        matchLabels:
+          environment: control-plane
   template:
     metadata:
-      name: workload-clusters-app
+      name: clusters
     spec:
       project: default
       source:
@@ -29,7 +27,3 @@ spec:
       destination:
         name: '{{name}}'
         namespace: workloads
-      syncPolicy:
-        automated: {}
-        syncOptions:
-          - CreateNamespace=true
