@@ -25,4 +25,8 @@ spec:
         name: '{{name}}'
         namespace: workloads
       syncPolicy:
+        retry:
+          limit: 10
         automated: {}
+        syncOptions:
+          - CreateNamespace=true
