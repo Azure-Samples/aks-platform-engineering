@@ -13,7 +13,7 @@ spec:
       - name: sleep
         image: busybox
         command:
-          - sleep
-          - 120 #Wait 2 minutes cert-manager to be ready
+          - "sleep"
+          - "120"
       restartPolicy: Never
   backoffLimit: 2
