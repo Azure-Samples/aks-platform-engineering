@@ -3,8 +3,9 @@ kind: AksClusterClaim
 metadata:
   name: sandokan
   annotations:
-    crossplane.io/external-name: Sandokan  
-    argocd.argoproj.io/sync-wave: "2"    
+    crossplane.io/external-name: Sandokan
+    argocd.argoproj.io/sync-wave: "3"
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
 spec:
   location: "North Europe"
   aks:

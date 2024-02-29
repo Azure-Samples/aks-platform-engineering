@@ -3,7 +3,8 @@ kind: CompositeResourceDefinition
 metadata:
   name: xaksclusters.kubernetes.example.com
   annotations:
-    argocd.argoproj.io/sync-wave: "1"  
+    argocd.argoproj.io/sync-wave: "1"
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
 spec:
   group: kubernetes.example.com
   names:

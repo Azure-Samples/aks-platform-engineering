@@ -4,7 +4,8 @@ kind: Composition
 metadata:
   name: aks-with-virtual-network
   annotations:
-    argocd.argoproj.io/sync-wave: "1"    
+    argocd.argoproj.io/sync-wave: "2"
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
 spec:
   patchSets:
     - name: location-patch
