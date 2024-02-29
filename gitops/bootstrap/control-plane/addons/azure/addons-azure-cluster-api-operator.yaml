@@ -46,7 +46,7 @@ spec:
       sources:
         - repoURL: '{{metadata.annotations.addons_repo_url}}'
           targetRevision: '{{metadata.annotations.addons_repo_revision}}'
-          path: '{{metadata.annotations.addons_repo_basepath}}/hooks/sleep'
+          path: '{{metadata.annotations.addons_repo_basepath}}hooks/sleep'
         - repoURL: '{{metadata.annotations.addons_repo_url}}'
           targetRevision: '{{metadata.annotations.addons_repo_revision}}'
           ref: values
