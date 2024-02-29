@@ -39,9 +39,14 @@ spec:
   template:
     metadata:
       name: addon-{{name}}-{{values.addonChart}}
+      annotations:
+        argocd.argoproj.io/hook: PreSync
     spec:
       project: default
       sources:
+        - repoURL: '{{metadata.annotations.addons_repo_url}}'
+          targetRevision: '{{metadata.annotations.addons_repo_revision}}'
+          path: '{{metadata.annotations.addons_repo_basepath}}/hooks/sleep'
         - repoURL: '{{metadata.annotations.addons_repo_url}}'
           targetRevision: '{{metadata.annotations.addons_repo_revision}}'
           ref: values
