@@ -226,11 +226,13 @@ variable "create_service_principal" {
 variable "service_principal_client_id" {
   description = "Specifies the client id of an existing service principal with the Owner role on the subscription."
   type        = string
+  default     = null
 }
 
 variable "service_principal_client_secret" {
   description = "Specifies the client secret of an existing service principal with the Owner role on the subscription."
   type        = string
+  default     = null
 }
 
 variable "crossplane_credentials_type" {

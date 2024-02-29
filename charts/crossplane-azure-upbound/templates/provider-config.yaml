@@ -18,6 +18,19 @@ metadata:
     {{- end }}
   {{- end }}
 spec:
-  {{- .spec | toYaml | nindent 2 }}
+  {{- if and .spec.clientID .spec.tenantID .spec.subscriptionID }}
+  credentials:
+    source: UserAssignedManagedIdentity
+  clientID: {{ .spec.clientID }}
+  subscriptionID: {{ .spec.subscriptionID }}
+  tenantID: {{ .spec.tenantID }}
+  {{- else }}
+  credentials:
+    source: Secret
+    secretRef:
+      namespace: {{ .spec.credentials.secretRef.namespace }}
+      name: {{ .spec.credentials.secretRef.name }}
+      key: {{ .spec.credentials.secretRef.key }}
+  {{- end }}
 {{- end }}
 {{- end }}

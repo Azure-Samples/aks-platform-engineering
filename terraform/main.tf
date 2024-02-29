@@ -187,12 +187,12 @@ module "gitops_bridge_bootstrap" {
   cluster = {
     cluster_name = module.aks.aks_name
     environment  = local.environment
-    metadata = var.crossplane_credentials_type == "managedIdentity" ? merge(local.cluster_metadata,
+    metadata = merge(local.cluster_metadata,
       {
-        kubelet_identity_client_id  = module.aks.kubelet_identity[0].client_id
-        subscription_id             = data.azurerm_subscription.current.subscription_id
-        tenant_id                   = data.azurerm_subscription.current.tenant_id
-      }) : local.cluster_metadata
+        kubelet_identity_client_id  = var.crossplane_credentials_type == "managedIdentity" ? module.aks.kubelet_identity[0].client_id : ""
+        subscription_id             = var.crossplane_credentials_type == "managedIdentity" ? data.azurerm_subscription.current.subscription_id : ""
+        tenant_id                   = var.crossplane_credentials_type == "managedIdentity" ? data.azurerm_subscription.current.tenant_id : ""
+      })
     addons = local.addons
   }
   apps = local.argocd_apps
