@@ -3,8 +3,6 @@ apiVersion: argoproj.io/v1alpha1
 kind: ApplicationSet
 metadata:
   name: addons-cert-manager
-  annotations:
-    argocd.argoproj.io/sync-wave: "0"
 spec:
   syncPolicy:
     preserveResourcesOnDeletion: true
@@ -41,8 +39,6 @@ spec:
   template:
     metadata:
       name: addon-{{name}}-{{values.addonChart}}
-      annotations:
-        argocd.argoproj.io/sync-wave: "-1"
     spec:
       project: default
       sources:
