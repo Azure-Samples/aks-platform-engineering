@@ -58,7 +58,7 @@ spec:
             - name: "providerConfig.spec.subscriptionID"
               value: '{{metadata.annotations.subscription_id}}'
             - name: "providerConfig.spec.tenantID"
-              value: '{{metadata.annotations.tenant_id}}'            
+              value: '{{metadata.annotations.tenant_id}}'
             valueFiles:
               - $values/{{metadata.annotations.addons_repo_basepath}}environments/default/addons/{{values.addonChart}}/values.yaml
               - $values/{{metadata.annotations.addons_repo_basepath}}environments/{{metadata.labels.environment}}/addons/{{values.addonChart}}/values.yaml
