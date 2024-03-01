@@ -184,7 +184,6 @@ module "gitops_bridge_bootstrap" {
   depends_on = [module.aks]
   source     = "gitops-bridge-dev/gitops-bridge/helm"
 
-
   cluster = {
     cluster_name = module.aks.aks_name
     environment  = local.environment
