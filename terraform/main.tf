@@ -184,6 +184,7 @@ module "gitops_bridge_bootstrap" {
   depends_on = [module.aks]
   source     = "gitops-bridge-dev/gitops-bridge/helm"
 
+
   cluster = {
     cluster_name = module.aks.aks_name
     environment  = local.environment
@@ -198,6 +199,7 @@ module "gitops_bridge_bootstrap" {
   apps = local.argocd_apps
   argocd = {
     namespace = local.argocd_namespace
+    chart_version = "6.5.0"
   }
 }
 
