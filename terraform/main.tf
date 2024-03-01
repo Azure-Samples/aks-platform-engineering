@@ -196,6 +196,7 @@ module "gitops_bridge_bootstrap" {
   apps = local.argocd_apps
   argocd = {
     namespace = local.argocd_namespace
+    chart_version = "6.5.0"
   }
 }
 
