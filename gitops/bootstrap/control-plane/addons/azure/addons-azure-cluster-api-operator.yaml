@@ -39,8 +39,6 @@ spec:
   template:
     metadata:
       name: addon-{{name}}-{{values.addonChart}}
-      annotations:
-        argocd.argoproj.io/hook: PreSync
     spec:
       project: default
       sources:
