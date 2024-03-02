@@ -1,9 +1,9 @@
 apiVersion: kubernetes.example.com/v1alpha1
 kind: AksClusterClaim
 metadata:
-  name: sandokan
+  name: my-app-cluster
   annotations:
-    crossplane.io/external-name: Sandokan
+    crossplane.io/external-name: my-app-cluster
     argocd.argoproj.io/sync-wave: "3"
     argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
 spec:

@@ -10,10 +10,10 @@ patches:
     group: kubernetes.example.com
     version: v1alpha1
     kind: AksClusterClaim
-    name: sandokan
+    name: my-app-cluster
 - patch: |-
     - op: replace
       path: /metadata/name
-      value: sandokan-dev  
+      value: my-app-cluster-dev  
   target:
     kind: AksClusterClaim     

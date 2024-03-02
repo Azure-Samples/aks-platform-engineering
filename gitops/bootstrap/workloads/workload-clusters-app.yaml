@@ -20,7 +20,7 @@ spec:
       source:
         repoURL: '{{metadata.annotations.workload_repo_url}}'
         targetRevision: '{{metadata.annotations.workload_repo_revision}}'
-        path: gitops/clusters
+        path: 'gitops/clusters/{{metadata.annotations.infrastructure_provider}}'
       destination:
         name: '{{name}}'
         namespace: workloads

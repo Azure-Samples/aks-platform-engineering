@@ -35,7 +35,11 @@ locals {
   }
   addons = merge(local.azure_addons, local.oss_addons)
 
-  cluster_metadata = merge(local.addons_metadata, local.workloads_metadata)
+  cluster_metadata = merge(local.environment_metadata, local.addons_metadata, local.workloads_metadata)
+
+  environment_metadata = {
+    infrastructe_provider = var.infrastructure_provider
+  }
 
   addons_metadata = {
     addons_repo_url      = local.gitops_addons_url
