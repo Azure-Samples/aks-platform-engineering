@@ -14,4 +14,6 @@ spec:
     addressSpace:
       - 10.0.0.0/8
     tags:
-      environment: stage    
+      environment: stage
+  writeConnectionSecretToRef:
+    name: my-app-cluster-stage-secret      

@@ -42,7 +42,7 @@ spec:
           transforms:
           - type: string
             string:
-              fmt: "%sAks"
+              fmt: "%s-aks"
         - type: FromCompositeFieldPath
           fromFieldPath: metadata.annotations[crossplane.io/external-name]
           toFieldPath: spec.forProvider.dnsPrefix
@@ -254,7 +254,7 @@ spec:
           transforms:
           - type: string
             string:
-              fmt: "%sRG"
+              fmt: "%s-rg"
         - type: FromCompositeFieldPath
           fromFieldPath: spec.resourceGroup.tags
           toFieldPath: spec.forProvider.tags

@@ -38,7 +38,7 @@ locals {
   cluster_metadata = merge(local.environment_metadata, local.addons_metadata, local.workloads_metadata)
 
   environment_metadata = {
-    infrastructe_provider = var.infrastructure_provider
+    infrastructure_provider = var.infrastructure_provider
   }
 
   addons_metadata = {
