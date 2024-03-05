@@ -13,7 +13,7 @@ spec:
           - clusters:
               values:
                 addonChart: crossplane-argo-cd-provider
-                addonChartNamespace: crossplane-system
+                addonChartNamespace: argocd
                 # anything not staging or prod use this version
                 addonChartVersion: 1.0.0
                 addonChartRepository: https://seenu433.github.io/gitops-bridge-helm-charts/

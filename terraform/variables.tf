@@ -36,6 +36,7 @@ variable "addons" {
     enable_crossplane                        = true # installs crossplane core
     enable_azure_crossplane_provider         = true # installs azure contrib provider
     enable_azure_crossplane_upbound_provider = true # installs azure upbound provider
+    enable_crossplane_argocd_provider        = true
   }
 }
 
