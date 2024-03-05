@@ -32,6 +32,8 @@ spec:
                   matchControllerRef: true
             resourceGroupNameSelector:
               matchControllerRef: true
+      connectionDetails:
+        - fromConnectionSecretKey: kubeconfig              
       patches:
         - type: PatchSet
           patchSetName: location-patch
