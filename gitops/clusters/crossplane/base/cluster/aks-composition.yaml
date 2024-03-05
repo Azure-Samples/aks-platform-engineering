@@ -7,6 +7,7 @@ metadata:
     argocd.argoproj.io/sync-wave: "2"
     argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
 spec:
+  writeConnectionSecretsToNamespace: crossplane-system
   patchSets:
     - name: location-patch
       patches:
@@ -17,7 +18,7 @@ spec:
       patches:
       - type: FromCompositeFieldPath
         fromFieldPath: metadata.annotations
-        toFieldPath: metadata.annotations
+        toFieldPath: metadata.annotations     
   resources:
     - name: aks-cluster
       base:
@@ -36,6 +37,14 @@ spec:
           patchSetName: location-patch
         - type: PatchSet
           patchSetName: metadata-patch
+        - fromFieldPath: spec.id
+          toFieldPath: spec.writeConnectionSecretToRef.name
+          transforms:
+            - type: string
+              string:
+                fmt: "%s-cluster"     
+        - fromFieldPath: spec.writeConnectionSecretToRef.namespace
+          toFieldPath: spec.writeConnectionSecretToRef.namespace                     
         - type: FromCompositeFieldPath
           fromFieldPath: metadata.annotations[crossplane.io/external-name]
           toFieldPath: metadata.annotations[crossplane.io/external-name]
