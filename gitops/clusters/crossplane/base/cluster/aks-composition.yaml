@@ -39,14 +39,8 @@ spec:
           patchSetName: location-patch
         - type: PatchSet
           patchSetName: metadata-patch
-        - fromFieldPath: spec.id
-          toFieldPath: spec.writeConnectionSecretToRef.name
-          transforms:
-            - type: string
-              string:
-                fmt: "%s-cluster"     
-        - fromFieldPath: spec.writeConnectionSecretToRef.namespace
-          toFieldPath: spec.writeConnectionSecretToRef.namespace                     
+        - fromFieldPath: spec.writeConnectionSecretToRef.name
+          toFieldPath: spec.writeConnectionSecretToRef.name                         
         - type: FromCompositeFieldPath
           fromFieldPath: metadata.annotations[crossplane.io/external-name]
           toFieldPath: metadata.annotations[crossplane.io/external-name]
