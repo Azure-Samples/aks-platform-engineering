@@ -13,7 +13,6 @@ locals {
   argocd_namespace = "argocd"
 
   azure_addons = {
-    enable_azure_crossplane_provider         = try(var.addons.enable_azure_crossplane_provider, false)
     enable_azure_crossplane_upbound_provider = try(var.addons.enable_azure_crossplane_upbound_provider, false)
     enable_cluster_api_operator              = try(var.addons.enable_cluster_api_operator, false)
   }
@@ -98,7 +97,8 @@ module "network" {
 ################################################################################
 
 module "aks" {
-  source                            = "github.com/Azure/terraform-azurerm-aks.git?ref=632deec"
+  source                            = "Azure/aks/azurerm"
+  version                           = "8.0.0"
   resource_group_name               = azurerm_resource_group.this.name
   location                          = var.location
   kubernetes_version                = var.kubernetes_version
@@ -126,6 +126,9 @@ module "aks" {
   azure_policy_enabled              = var.azure_policy_enabled
   microsoft_defender_enabled        = var.microsoft_defender_enabled
   tags                              = var.tags
+
+  workload_identity_enabled = true
+  oidc_issuer_enabled       = true
 
   agents_labels = {
     "nodepool" : "defaultnodepool"
@@ -189,15 +192,15 @@ module "gitops_bridge_bootstrap" {
     environment  = local.environment
     metadata = merge(local.cluster_metadata,
       {
-        kubelet_identity_client_id  = var.crossplane_credentials_type == "managedIdentity" ? module.aks.kubelet_identity[0].client_id : ""
-        subscription_id             = var.crossplane_credentials_type == "managedIdentity" ? data.azurerm_subscription.current.subscription_id : ""
-        tenant_id                   = var.crossplane_credentials_type == "managedIdentity" ? data.azurerm_subscription.current.tenant_id : ""
-      })
+        kubelet_identity_client_id = var.crossplane_credentials_type == "managedIdentity" ? module.aks.kubelet_identity[0].client_id : ""
+        subscription_id            = var.crossplane_credentials_type == "managedIdentity" ? data.azurerm_subscription.current.subscription_id : ""
+        tenant_id                  = var.crossplane_credentials_type == "managedIdentity" ? data.azurerm_subscription.current.tenant_id : ""
+    })
     addons = local.addons
   }
   apps = local.argocd_apps
   argocd = {
-    namespace = local.argocd_namespace
+    namespace     = local.argocd_namespace
     chart_version = "6.5.0"
   }
 }

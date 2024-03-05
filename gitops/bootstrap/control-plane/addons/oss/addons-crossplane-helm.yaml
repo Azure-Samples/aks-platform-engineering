@@ -2,7 +2,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: ApplicationSet
 metadata:
-  name: addons-crossplane
+  name: addons-crossplane-helm
 spec:
   syncPolicy:
     preserveResourcesOnDeletion: true
@@ -12,17 +12,17 @@ spec:
         generators:
           - clusters:
               values:
-                addonChart: crossplane
+                addonChart: crossplane-helm
                 addonChartNamespace: crossplane-system
                 # anything not staging or prod use this version
-                addonChartVersion: 1.14.5
-                addonChartRepository: https://charts.crossplane.io/stable
+                addonChartVersion: 1.0.0
+                addonChartRepository: https://gitops-bridge-dev.github.io/gitops-bridge-helm-charts
               selector:
                 matchExpressions:
                   - key: akuity.io/argo-cd-cluster-name
                     operator: NotIn
                     values: [in-cluster]
-                  - key: enable_crossplane
+                  - key: enable_crossplane_helm_provider
                     operator: In
                     values: ['true']
           - clusters:
@@ -30,13 +30,13 @@ spec:
                 matchLabels:
                   environment: control-plane
               values:
-                addonChartVersion: 1.14.5
+                addonChartVersion: 1.0.0
           - clusters:
               selector:
                 matchLabels:
                   environment: prod
               values:
-                addonChartVersion: 1.14.5
+                addonChartVersion: 1.0.0
   template:
     metadata:
       name: addon-{{name}}-{{values.addonChart}}
@@ -56,7 +56,11 @@ spec:
               - $values/{{metadata.annotations.addons_repo_basepath}}environments/default/addons/{{values.addonChart}}/values.yaml
               - $values/{{metadata.annotations.addons_repo_basepath}}environments/{{metadata.labels.environment}}/addons/{{values.addonChart}}/values.yaml
               - $values/{{metadata.annotations.addons_repo_basepath}}environments/clusters/{{name}}/addons/{{values.addonChart}}/values.yaml
-          # values: |
+            values: |
+              provider:
+                package:
+                  registry: xpkg.upbound.io/crossplane-contrib/provider-helm
+                  version: "v0.16.0"
           # fileParameters:
           #  - name:
           #    path:
@@ -66,13 +70,9 @@ spec:
         namespace: '{{values.addonChartNamespace}}'
         name: '{{name}}'
       syncPolicy:
+        retry:
+          limit: 100
         automated: {}
         syncOptions:
           - CreateNamespace=true
           - ServerSideApply=true  # Big CRDs.
-      ignoreDifferences:
-        - kind: Deployment
-          group: apps
-          jqPathExpressions:
-            - .spec.template.spec.containers[].env[].valueFrom.resourceFieldRef.divisor
-            - .spec.template.spec.initContainers[].env[].valueFrom.resourceFieldRef.divisor
