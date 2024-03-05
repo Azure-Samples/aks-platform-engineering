@@ -71,3 +71,9 @@ spec:
         syncOptions:
           - CreateNamespace=true
           - ServerSideApply=true  # Big CRDs.
+      ignoreDifferences:
+      - group: admissionregistration.k8s.io
+        kind: ValidatingWebhookConfiguration
+        # Azure adding "control-plane" and "kubernetes.azure.com/managedby" keys to the webhook configuration.
+        jqPathExpressions:
+        - '.webhooks[].namespaceSelector.matchExpressions'
