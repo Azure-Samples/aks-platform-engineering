@@ -39,8 +39,12 @@ spec:
           patchSetName: location-patch
         - type: PatchSet
           patchSetName: metadata-patch
-        - fromFieldPath: spec.writeConnectionSecretToRef.name
-          toFieldPath: spec.writeConnectionSecretToRef.name                         
+        - type: FromCompositeFieldPath
+          fromFieldPath: spec.writeConnectionSecretToRef.name
+          toFieldPath: spec.writeConnectionSecretToRef.name  
+        - type: FromCompositeFieldPath
+          fromFieldPath: spec.writeConnectionSecretToRef.namespace
+          toFieldPath: spec.writeConnectionSecretToRef.namespace                                  
         - type: FromCompositeFieldPath
           fromFieldPath: metadata.annotations[crossplane.io/external-name]
           toFieldPath: metadata.annotations[crossplane.io/external-name]
