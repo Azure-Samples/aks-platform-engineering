@@ -234,7 +234,7 @@ spec:
           transforms:
           - type: string
             string:
-              fmt: "%sVNet"
+              fmt: "%s-vnet"
         - type: FromCompositeFieldPath
           fromFieldPath: spec.virtualNetwork.addressSpace
           toFieldPath: spec.forProvider.addressSpace
