@@ -28,7 +28,6 @@ variable "addons" {
   default = {
     enable_argocd                            = true # installs argocd
     enable_crossplane                        = true # installs crossplane core
-    enable_azure_crossplane_provider         = true # installs azure contrib provider
     enable_azure_crossplane_upbound_provider = true # installs azure upbound provider
   }
 }

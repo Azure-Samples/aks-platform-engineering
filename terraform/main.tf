@@ -13,7 +13,6 @@ locals {
   argocd_namespace = "argocd"
 
   azure_addons = {
-    enable_azure_crossplane_provider         = try(var.addons.enable_azure_crossplane_provider, false)
     enable_azure_crossplane_upbound_provider = try(var.addons.enable_azure_crossplane_upbound_provider, false)
   }
   oss_addons = {
