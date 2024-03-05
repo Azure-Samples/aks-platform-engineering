@@ -1,0 +1,57 @@
+global:
+  enabled_argocd_provider: true
+
+provider:
+  enabled: true
+  metadata:
+    annotations: {}
+    labels:
+      app.kubernetes.io/managed-by: Helm
+  package:
+    name: xpkg.upbound.io/crossplane-contrib/provider-argocd
+    version: v0.6.0
+
+accountTokenGenerator:
+
+  # -- account-token generator accounts list to generate
+  accounts:
+  - provider-argocd
+
+  job:
+    # -- account-token generator job version to bump gitops resources
+    version: 1
+    # -- account-token generator job extra annotations
+    annotations: {}
+    # -- account-token generator job extra spec
+    extraSpec: {}
+
+  container:
+    # -- account-token generator job argocd container image
+    image:
+      repository: argoproj/argocd-cli
+      tag: v0.10.6
+      pullPolicy: IfNotPresent
+
+    # -- account-token generator container security container
+    securityContext:
+      capabilities:
+        drop:
+        - ALL
+      readOnlyRootFilesystem: true
+      runAsNonRoot: true
+      runAsUser: 1000
+
+providerConfig:
+  enabled: true
+  metadata:
+    name: argocd-provider
+    annotations: {}
+    labels:
+      app.kubernetes.io/managed-by: Helm
+  spec:
+    credentials:
+      source: Secret
+      secretRef:
+        namespace: argocd
+        name: account-token-provider-argocd
+        key: authToken  

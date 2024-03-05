@@ -1,0 +1,31 @@
+{{- if and .Values.global.enabled_argocd_provider .Values.providerConfig.enabled }}
+{{- with .Values.providerConfig }}
+apiVersion: azure.upbound.io/v1beta1
+kind: ProviderConfig
+metadata:
+  name: {{ .metadata.name }}   
+  annotations:
+    argocd.argoproj.io/sync-wave: "4"
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
+    helm.sh/hook: post-install
+    {{- range $key, $value := .metadata.annotations }}
+    {{ $key }}: {{ $value | quote }}
+    {{- end }}
+  {{- if .metadata.labels }}
+  labels:
+    {{- range $key, $value := .metadata.labels }}
+    {{ $key }}: {{ $value | quote }}
+    {{- end }}
+  {{- end }}
+spec:
+  serverAddr: argocd-server.argocd.svc:443
+  insecure: true
+  plainText: false
+  credentials:
+    source: Secret
+    secretRef:
+      namespace: {{ .spec.credentials.secretRef.namespace }}
+      name: {{ .spec.credentials.secretRef.name }}
+      key: {{ .spec.credentials.secretRef.key }}  
+{{- end }}
+{{- end }}

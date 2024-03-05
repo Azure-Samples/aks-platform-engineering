@@ -1,0 +1,9 @@
+apiVersion: v2
+name: crossplane-argo-cd-provider
+description: A Helm chart for the ArgoCD Provider for Crossplane
+
+type: application
+
+version: 1.0.0
+
+appVersion: "v0.2.0"

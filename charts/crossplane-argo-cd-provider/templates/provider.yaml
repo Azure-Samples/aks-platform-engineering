@@ -1,0 +1,19 @@
+{{- if and .Values.global.enabled_argocd_provider .Values.provider.enabled }}
+apiVersion: pkg.crossplane.io/v1
+kind: Provider
+metadata:
+  name: provider-argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "3"
+    {{- range $key, $value := $.Values.provider.metadata.annotations }}
+    {{ $key }}: {{ $value | quote }}
+    {{- end }}
+  {{- if $.Values.provider.metadata.labels }}
+  labels:
+    {{- range $key, $value := $.Values.provider.metadata.labels }}
+    {{ $key }}: {{ $value | quote }}
+    {{- end }}
+  {{- end }}  
+spec:
+  package: {{ $.Values.provider.package.name }}:{{ $.Values.provider.package.version }}
+{{- end }}
