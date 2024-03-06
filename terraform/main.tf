@@ -13,8 +13,8 @@ locals {
   argocd_namespace = "argocd"
 
   azure_addons = {
-    enable_azure_crossplane_provider         = "${var.infrastructure_provider == "crossplane" ? true : false}"
-    enable_azure_crossplane_upbound_provider = "${var.infrastructure_provider == "crossplane" ? true : false}"
+    enable_azure_crossplane_provider         = var.infrastructure_provider == "crossplane" ? true : false
+    enable_azure_crossplane_upbound_provider = var.infrastructure_provider == "crossplane" ? true : false
   }
 
   oss_addons = {
@@ -32,7 +32,7 @@ locals {
     enable_prometheus_adapter              = try(var.addons.enable_prometheus_adapter, false)
     enable_secrets_store_csi_driver        = try(var.addons.enable_secrets_store_csi_driver, false)
     enable_vpa                             = try(var.addons.enable_vpa, false)
-    enable_crossplane                      = "${var.infrastructure_provider == "crossplane" ? true : false}"
+    enable_crossplane                      = var.infrastructure_provider == "crossplane" ? true : false
   }
   addons = merge(local.azure_addons, local.oss_addons)
 
