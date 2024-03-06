@@ -3,7 +3,7 @@ namespace: my-app-cluster-dev
 resources:
   - ../base
   - namespace.yaml
-  - argocd-remote-cluster.yaml  
+#  - argocd-remote-cluster.yaml  
 
 patches:
 - path: cluster-claim.yaml 
