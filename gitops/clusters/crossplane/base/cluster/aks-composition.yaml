@@ -26,6 +26,7 @@ spec:
         kind: KubernetesCluster
         spec:
           writeConnectionSecretToRef:
+            name: example-kubeconfig
             namespace: crossplane-system
           forProvider:
             defaultNodePool:
@@ -35,6 +36,13 @@ spec:
             resourceGroupNameSelector:
               matchControllerRef: true
       patches:
+        - type: FromCompositeFieldPath
+          fromFieldPath: "metadata.uid"
+          toFieldPath: "spec.writeConnectionSecretToRef.name"
+          transforms:
+            - type: string
+              string:
+                fmt: "%s-secret"
         - type: PatchSet
           patchSetName: location-patch
         - type: PatchSet
