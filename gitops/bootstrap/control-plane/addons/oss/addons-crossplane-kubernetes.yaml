@@ -2,7 +2,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: ApplicationSet
 metadata:
-  name: addons-argocd
+  name: addons-crossplane-kubernetes
 spec:
   syncPolicy:
     preserveResourcesOnDeletion: true
@@ -12,17 +12,17 @@ spec:
         generators:
           - clusters:
               values:
-                addonChart: argo-cd
+                addonChart: crossplane-kubernetes
+                addonChartNamespace: crossplane-system
                 # anything not staging or prod use this version
-                addonChartVersion: 6.5.0
-                addonChartRepositoryNamespace: argocd
-                addonChartRepository: https://argoproj.github.io/argo-helm
+                addonChartVersion: 1.0.0
+                addonChartRepository: https://gitops-bridge-dev.github.io/gitops-bridge-helm-charts
               selector:
                 matchExpressions:
                   - key: akuity.io/argo-cd-cluster-name
                     operator: NotIn
                     values: [in-cluster]
-                  - key: enable_argocd
+                  - key: enable_crossplane_kubernetes_provider
                     operator: In
                     values: ['true']
           - clusters:
@@ -30,13 +30,13 @@ spec:
                 matchLabels:
                   environment: control-plane
               values:
-                addonChartVersion: 6.5.0
+                addonChartVersion: 1.0.0
           - clusters:
               selector:
                 matchLabels:
                   environment: prod
               values:
-                addonChartVersion: 6.5.0
+                addonChartVersion: 1.0.0
   template:
     metadata:
       name: addon-{{name}}-{{values.addonChart}}
@@ -56,12 +56,23 @@ spec:
               - $values/{{metadata.annotations.addons_repo_basepath}}environments/default/addons/{{values.addonChart}}/values.yaml
               - $values/{{metadata.annotations.addons_repo_basepath}}environments/{{metadata.labels.environment}}/addons/{{values.addonChart}}/values.yaml
               - $values/{{metadata.annotations.addons_repo_basepath}}environments/clusters/{{name}}/addons/{{values.addonChart}}/values.yaml
+            values: |
+              provider:
+                package:
+                  registry: xpkg.upbound.io/crossplane-contrib/provider-kubernetes
+                  version: "v0.10.0"
+          # fileParameters:
+          #  - name:
+          #    path:
+          # parameters
+          # valuesObject
       destination:
-        namespace: '{{values.addonChartRepositoryNamespace}}'
+        namespace: '{{values.addonChartNamespace}}'
         name: '{{name}}'
       syncPolicy:
-        automated:
-          prune: false
+        retry:
+          limit: 100
+        automated: {}
         syncOptions:
           - CreateNamespace=true
           - ServerSideApply=true  # Big CRDs.
