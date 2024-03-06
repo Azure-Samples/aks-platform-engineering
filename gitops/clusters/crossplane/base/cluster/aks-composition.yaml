@@ -21,6 +21,8 @@ spec:
         toFieldPath: metadata.annotations     
   resources:
     - name: aks-cluster
+      connectionDetails:
+        - fromConnectionSecretKey: kubeconfig  
       base:
         apiVersion: containerservice.azure.upbound.io/v1beta1
         kind: KubernetesCluster
