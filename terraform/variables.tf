@@ -29,14 +29,22 @@ variable "infrastructure_provider" {
 }
 
 variable "addons" {
-  description = "Specifies the Kubernetes addons to install."
+  description = "Specifies the Kubernetes addons to install on the hub cluster."
   type        = any
   default = {
-    enable_argocd                            = true # installs argocd
-    enable_crossplane                        = true # installs crossplane core
-    enable_azure_crossplane_provider         = true # installs azure contrib provider
-    enable_azure_crossplane_upbound_provider = true # installs azure upbound provider
-    enable_crossplane_argocd_provider        = true
+    enable_argo_rollouts                   = false
+    enable_argo_events                     = false
+    enable_argo_workflows                  = false
+    enable_cluster_proportional_autoscaler = false
+    enable_gatekeeper                      = false
+    enable_gpu_operator                    = false
+    enable_ingress_nginx                   = false
+    enable_kyverno                         = false
+    enable_kube_prometheus_stack           = false
+    enable_metrics_server                  = false
+    enable_prometheus_adapter              = false
+    enable_secrets_store_csi_driver        = false
+    enable_vpa                             = false
   }
 }
 
