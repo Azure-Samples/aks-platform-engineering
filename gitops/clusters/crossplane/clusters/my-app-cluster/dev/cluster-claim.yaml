@@ -17,4 +17,3 @@ spec:
       environment: dev    
   writeConnectionSecretToRef:
     name: my-app-cluster-dev-secret
-    namespace: my-app-cluster-dev
