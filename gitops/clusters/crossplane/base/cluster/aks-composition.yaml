@@ -25,6 +25,9 @@ spec:
         apiVersion: containerservice.azure.upbound.io/v1beta1
         kind: KubernetesCluster
         spec:
+          writeConnectionSecretToRef:
+            name: example-kubeconfig
+            namespace: crossplane-system
           forProvider:
             defaultNodePool:
               - type: VirtualMachineScaleSets
@@ -32,19 +35,11 @@ spec:
                   matchControllerRef: true
             resourceGroupNameSelector:
               matchControllerRef: true
-      connectionDetails:
-        - fromConnectionSecretKey: kubeconfig              
       patches:
         - type: PatchSet
           patchSetName: location-patch
         - type: PatchSet
-          patchSetName: metadata-patch
-        - type: FromCompositeFieldPath
-          fromFieldPath: spec.writeConnectionSecretToRef.name
-          toFieldPath: spec.writeConnectionSecretToRef.name  
-        - type: FromCompositeFieldPath
-          fromFieldPath: spec.writeConnectionSecretToRef.namespace
-          toFieldPath: spec.writeConnectionSecretToRef.namespace                                  
+          patchSetName: metadata-patch                             
         - type: FromCompositeFieldPath
           fromFieldPath: metadata.annotations[crossplane.io/external-name]
           toFieldPath: metadata.annotations[crossplane.io/external-name]
