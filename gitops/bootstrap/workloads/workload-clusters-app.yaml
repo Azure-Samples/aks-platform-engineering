@@ -23,7 +23,7 @@ spec:
         path: 'gitops/clusters/{{metadata.annotations.infrastructure_provider}}'
       destination:
         name: '{{name}}'
-        namespace: workloads
+        namespace: workload
       syncPolicy:
         retry:
           limit: 10

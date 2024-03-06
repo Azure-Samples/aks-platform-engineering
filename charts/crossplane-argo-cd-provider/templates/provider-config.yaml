@@ -1,6 +1,6 @@
 {{- if and .Values.global.enabled_argocd_provider .Values.providerConfig.enabled }}
 {{- with .Values.providerConfig }}
-apiVersion: azure.upbound.io/v1beta1
+apiVersion: argocd.crossplane.io/v1alpha1
 kind: ProviderConfig
 metadata:
   name: {{ .metadata.name }}   

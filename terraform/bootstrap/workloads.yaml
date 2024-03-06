@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: ApplicationSet
 metadata:
-  name: cluster-workloads
+  name: workloads
   namespace: argocd
 spec:
   syncPolicy:
@@ -15,7 +15,7 @@ spec:
               values: [in-cluster]
   template:
     metadata:
-      name: 'cluster-workloads'
+      name: 'workload-{{metadata.labels.environment}}'
     spec:
       project: default
       source:
@@ -26,7 +26,7 @@ spec:
           recurse: true
           exclude: exclude/*
       destination:
-        namespace: 'workloads'
+        namespace: 'workload'
         name: '{{name}}'
       syncPolicy:
         automated: {}
