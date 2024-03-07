@@ -32,7 +32,11 @@ variable "addons" {
   description = "Specifies the Kubernetes addons to install on the hub cluster."
   type        = any
   default = {
-    enable_argocd                   = true # default argo install
+    enable_argocd                            = true # installs argocd
+    enable_cert_manager                      = true # installs cert manager
+    enable_crossplane                        = true # installs crossplane core
+    enable_azure_crossplane_upbound_provider = true # installs azure upbound provider
+    enable_cluster_api_operator              = true # installs azure api operator
   }
 }
 
