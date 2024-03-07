@@ -5,7 +5,9 @@ manager:
     MachinePool: true
     ClusterResourceSet: true
     ClusterTopology: true
-
+cert-manager:
+  enabled: false
+  installCRDs: false
 #configSecret:
 #  name:
 #  namespace:
