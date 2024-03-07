@@ -51,4 +51,6 @@ kubectl --kubeconfig=kubeconfig get secrets argocd-initial-admin-secret -n argoc
 kubectl get svc -n argocd argo-cd-argocd-server
 ```
 
+## Onboarding Applications 
+
 ## References
