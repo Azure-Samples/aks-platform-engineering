@@ -11,8 +11,6 @@ spec:
     tags:
       environment: dev
   virtualNetwork:
-    addressSpace:
-      - 10.0.0.0/8
     tags:
       environment: dev    
   writeConnectionSecretToRef:

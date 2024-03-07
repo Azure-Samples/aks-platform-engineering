@@ -18,7 +18,7 @@ locals {
   }
 
   oss_addons = {
-    enable_argocd                          = true  # installed by default
+    enable_argocd                          = try(var.addons.enable_argocd, false)  # installed by default
     enable_argo_rollouts                   = try(var.addons.enable_argo_rollouts, false)
     enable_argo_events                     = try(var.addons.enable_argo_events, false)
     enable_argo_workflows                  = try(var.addons.enable_argo_workflows, false)

@@ -11,10 +11,10 @@ spec:
   aks:
     defaultNodePool:
       name: system
-      vmSize: Standard_F8s_v2
+      vmSize: Standard_B2s
       enableAutoScaling: true
-      nodeCount: 3
-      minCount: 3
+      nodeCount: 1
+      minCount: 1
       maxCount: 20
       maxPods: 30
       nodeLabels:
@@ -47,10 +47,10 @@ spec:
       provisionedBy: Crossplane
   userNodePool:
     name: user
-    vmSize: Standard_F8s_v2
+    vmSize: Standard_B2s
     enableAutoScaling: true
-    nodeCount: 3
-    minCount: 3
+    nodeCount: 1
+    minCount: 1
     maxCount: 20
     maxPods: 30
     nodeLabels:
