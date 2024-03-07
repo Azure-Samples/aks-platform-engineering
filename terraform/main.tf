@@ -14,6 +14,7 @@ locals {
 
   azure_addons = {
     enable_azure_crossplane_upbound_provider = try(var.addons.enable_azure_crossplane_upbound_provider, false)
+    enable_cluster_api_operator              = try(var.addons.enable_cluster_api_operator, false)
   }
   oss_addons = {
     enable_argocd                          = try(var.addons.enable_argocd, false)
@@ -21,6 +22,7 @@ locals {
     enable_argo_events                     = try(var.addons.enable_argo_events, false)
     enable_argo_workflows                  = try(var.addons.enable_argo_workflows, false)
     enable_cluster_proportional_autoscaler = try(var.addons.enable_cluster_proportional_autoscaler, false)
+    enable_cert_manager                    = try(var.addons.enable_cert_manager, false)
     enable_gatekeeper                      = try(var.addons.enable_gatekeeper, false)
     enable_gpu_operator                    = try(var.addons.enable_gpu_operator, false)
     enable_ingress_nginx                   = try(var.addons.enable_ingress_nginx, false)

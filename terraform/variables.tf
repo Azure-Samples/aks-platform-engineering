@@ -27,8 +27,10 @@ variable "addons" {
   type        = any
   default = {
     enable_argocd                            = true # installs argocd
+    enable_cert_manager                      = true # installs cert manager
     enable_crossplane                        = true # installs crossplane core
     enable_azure_crossplane_upbound_provider = true # installs azure upbound provider
+    enable_cluster_api_operator              = true # installs azure api operator
   }
 }
 
