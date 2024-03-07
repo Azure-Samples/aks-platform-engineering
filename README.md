@@ -9,7 +9,11 @@ Run Terraform:
 cd terraform
 terraform init -upgrade
 # the gitops_addons_org needs to be in the git format to use the SSH key until the repo is private
-terraform apply -var gitops_addons_org=git@github.com:Azure-Samples
+terraform apply -var infrastructure_provider=crossplane \
+                -var gitops_addons_org=git@github.com:Azure-Samples \
+                -var gitops_workload_org=git@github.com:Azure-Samples \
+                -var service_principal_client_id=xxxxxxxx \
+                -var service_principal_client_secret=xxxxxxxxxx
 ```
 
 Get the initial admin password and the IP address of the ArgoCD web interface.

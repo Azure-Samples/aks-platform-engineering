@@ -22,8 +22,14 @@ variable "kubernetes_version" {
   default     = null
 }
 
+variable "infrastructure_provider" {
+  description = "Specific the choice of infrastructure provider. crossplane or capz"
+  type        = string
+  default     = "crossplane"
+}
+
 variable "addons" {
-  description = "Specifies the Kubernetes addons to install."
+  description = "Specifies the Kubernetes addons to install on the hub cluster."
   type        = any
   default = {
     enable_argocd                            = true # installs argocd
@@ -91,7 +97,7 @@ variable "gitops_workload_basepath" {
 variable "gitops_workload_path" {
   description = "Specifies the Git repository path for workload."
   type        = string
-  default     = "apps"
+  default     = "bootstrap/workloads"
 }
 
 variable "tags" {

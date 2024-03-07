@@ -13,11 +13,13 @@ locals {
   argocd_namespace = "argocd"
 
   azure_addons = {
-    enable_azure_crossplane_upbound_provider = try(var.addons.enable_azure_crossplane_upbound_provider, false)
+    enable_azure_crossplane_provider         = var.infrastructure_provider == "crossplane" ? true : false
+    enable_azure_crossplane_upbound_provider = var.infrastructure_provider == "crossplane" ? true : false
     enable_cluster_api_operator              = try(var.addons.enable_cluster_api_operator, false)
   }
+
   oss_addons = {
-    enable_argocd                          = try(var.addons.enable_argocd, false)
+    enable_argocd                          = try(var.addons.enable_argocd, false)  # installed by default
     enable_argo_rollouts                   = try(var.addons.enable_argo_rollouts, false)
     enable_argo_events                     = try(var.addons.enable_argo_events, false)
     enable_argo_workflows                  = try(var.addons.enable_argo_workflows, false)
@@ -32,11 +34,15 @@ locals {
     enable_prometheus_adapter              = try(var.addons.enable_prometheus_adapter, false)
     enable_secrets_store_csi_driver        = try(var.addons.enable_secrets_store_csi_driver, false)
     enable_vpa                             = try(var.addons.enable_vpa, false)
-    enable_crossplane                      = try(var.addons.enable_crossplane, false)
+    enable_crossplane                      = var.infrastructure_provider == "crossplane" ? true : false
   }
   addons = merge(local.azure_addons, local.oss_addons)
 
-  cluster_metadata = merge(local.addons_metadata, local.workloads_metadata)
+  cluster_metadata = merge(local.environment_metadata, local.addons_metadata, local.workloads_metadata)
+
+  environment_metadata = {
+    infrastructure_provider = var.infrastructure_provider
+  }
 
   addons_metadata = {
     addons_repo_url      = local.gitops_addons_url
