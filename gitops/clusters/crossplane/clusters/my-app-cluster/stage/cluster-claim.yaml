@@ -13,5 +13,7 @@ spec:
   virtualNetwork:
     tags:
       environment: stage
+  helm:
+    secretName: my-app-cluster-stage-secret       
   writeConnectionSecretToRef:
     name: my-app-cluster-stage-secret      
