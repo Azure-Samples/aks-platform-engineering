@@ -35,6 +35,8 @@ locals {
     enable_secrets_store_csi_driver        = try(var.addons.enable_secrets_store_csi_driver, false)
     enable_vpa                             = try(var.addons.enable_vpa, false)
     enable_crossplane                      = var.infrastructure_provider == "crossplane" ? true : false
+    enable_crossplane_helm_provider        = var.infrastructure_provider == "crossplane" ? true : false
+    enable_crossplane_kubernetes_provider  = var.infrastructure_provider == "crossplane" ? true : false
   }
   addons = merge(local.azure_addons, local.oss_addons)
 

@@ -288,13 +288,13 @@ spec:
           toFieldPath: metadata.name
         - type: FromCompositeFieldPath
           fromFieldPath: metadata.namespace
-          toFieldPath: metadata.name space         
+          toFieldPath: metadata.namespace         
         - type: FromCompositeFieldPath
           fromFieldPath: spec.writeConnectionSecretToRef
-          toFieldPath: spec.credentials.secretRef
+          toFieldPath: spec.credentials.secretRef.name
         - type: FromCompositeFieldPath
           fromFieldPath: metadata.namespace
-          toFieldPath: spec.credentials.namespace
+          toFieldPath: spec.credentials.secretRef.namespace
     - name: wordpress-helm-release
       base:
         apiVersion: helm.crossplane.io/v1beta1
