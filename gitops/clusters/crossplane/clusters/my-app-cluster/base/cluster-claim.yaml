@@ -11,7 +11,7 @@ spec:
   aks:
     defaultNodePool:
       name: system
-      vmSize: Standard_B2ms
+      vmSize: Standard_DS2_v2
       enableAutoScaling: true
       nodeCount: 1
       minCount: 1
