@@ -290,7 +290,7 @@ spec:
           fromFieldPath: metadata.namespace
           toFieldPath: metadata.namespace         
         - type: FromCompositeFieldPath
-          fromFieldPath: spec.writeConnectionSecretToRef
+          fromFieldPath: spec.helm.secretName
           toFieldPath: spec.credentials.secretRef.name
         - type: FromCompositeFieldPath
           fromFieldPath: metadata.namespace

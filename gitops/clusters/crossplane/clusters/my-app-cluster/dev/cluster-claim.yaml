@@ -12,6 +12,8 @@ spec:
       environment: dev
   virtualNetwork:
     tags:
-      environment: dev    
+      environment: dev   
+  helm:
+    secretName: my-app-cluster-dev-secret 
   writeConnectionSecretToRef:
     name: my-app-cluster-dev-secret
