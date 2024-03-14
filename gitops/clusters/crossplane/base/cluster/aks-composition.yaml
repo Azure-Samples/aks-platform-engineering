@@ -271,6 +271,34 @@ spec:
         - type: FromCompositeFieldPath
           fromFieldPath: spec.resourceGroup.tags
           toFieldPath: spec.forProvider.tags
+    - name: helm-provider-config
+      base:
+        apiVersion: helm.crossplane.io/v1beta1
+        kind: ProviderConfig
+        spec:
+          credentials:
+            source: Secret
+            secretRef:
+              name: cluster-config
+              namespace: crossplane-system
+              key: kubeconfig
+      patches:
+        - type: FromCompositeFieldPath
+          fromFieldPath: metadata.name
+          toFieldPath: metadata.name
+        - type: FromCompositeFieldPath
+          fromFieldPath: metadata.namespace
+          toFieldPath: metadata.namespace         
+        - type: FromCompositeFieldPath
+          fromFieldPath: "metadata.uid"
+          toFieldPath: spec.credentials.secretRef.name
+          transforms:
+            - type: string
+              string:
+                fmt: "%s-secret"          
+        - type: FromCompositeFieldPath
+          fromFieldPath: metadata.namespace
+          toFieldPath: spec.credentials.secretRef.namespace
   compositeTypeRef:
     apiVersion: kubernetes.example.com/v1alpha1
     kind: XAksCluster
