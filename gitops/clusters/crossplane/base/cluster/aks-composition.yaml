@@ -319,7 +319,8 @@ spec:
         - type: FromCompositeFieldPath
           fromFieldPath: metadata.name
           toFieldPath: spec.providerConfigRef.name
-    - base:
+    - name: kubernetes-provider-config
+      base:
         apiVersion: kubernetes.crossplane.io/v1beta1
         kind: ProviderConfig
         spec:
@@ -338,33 +339,7 @@ spec:
             - type: string
               string:
                 fmt: "%s-secret"
-      readinessChecks:
-        - type: None
-    - base:
-        apiVersion: kubernetes.crossplane.io/v1alpha2
-        kind: Object
-        spec:
-          forProvider:
-            manifest:
-              apiVersion: argoproj.io/v1alpha1
-              kind: Application
-              metadata:
-                name: azure-vote
-                namespace: argocd
-              spec:
-                project: default
-                source:    
-                  repoURL: https://github.com/Azure-Samples/aks-store-demo.git    
-                  targetRevision: HEAD
-                  path: aks-store-quickstart.yaml                
-                syncPolicy:
-                  automated: {}
-                destination:
-                  namespace: argocd
-                  server: https://kubernetes.default.svc
-      patches:
-        - fromFieldPath: metadata.name
-          toFieldPath: spec.providerConfigRef.name                   
+               
   compositeTypeRef:
     apiVersion: kubernetes.example.com/v1alpha1
     kind: XAksCluster
