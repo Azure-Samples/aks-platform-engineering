@@ -281,7 +281,7 @@ spec:
             secretRef:
               name: cluster-config
               namespace: crossplane-system
-              key: kubeconfig
+              key: attribute.kube_admin_config_raw
       patches:
         - type: FromCompositeFieldPath
           fromFieldPath: metadata.name
@@ -299,20 +299,20 @@ spec:
         - type: FromCompositeFieldPath
           fromFieldPath: metadata.namespace
           toFieldPath: spec.credentials.secretRef.namespace
-    - name: wordpress-helm-release
+    - name: argocd-helm-release
       base:
         apiVersion: helm.crossplane.io/v1beta1
         kind: Release
         metadata:
           annotations: 
-            crossplane.io/external-name: wordpress     
+            crossplane.io/external-name: argocd     
         spec:
           forProvider:
             chart:
-              name: wordpress
-              repository: https://charts.bitnami.com/bitnami
-              version:  15.2.5
-            namespace: wordpress   
+              name: argo-cd
+              repository: https://argoproj.github.io/argo-helm
+              version:  6.7.2
+            namespace: argocd   
           providerConfigRef:
             name: helm-provider	
       patches:
