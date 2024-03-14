@@ -14,7 +14,5 @@ spec:
       environment: stage
   virtualNetwork:
     tags:
-      environment: stage
-  helm:
-    secretName: my-app-cluster-stage-secret       
+      environment: stage     
   

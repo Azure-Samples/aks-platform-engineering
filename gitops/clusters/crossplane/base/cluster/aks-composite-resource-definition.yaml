@@ -336,13 +336,7 @@ spec:
                 properties:
                   tags:
                     type: object
-                    description: specifies the tags for the virtual network
-              helm:
-                type: object
-                properties:
-                  secretName:
-                    type: string
-                    description: specifies the kubeconfig secret name for the target cluster                   
+                    description: specifies the tags for the virtual network                  
             required:
               - location
     served: true

@@ -15,5 +15,3 @@ spec:
   virtualNetwork:
     tags:
       environment: dev   
-  helm:
-    secretName: my-app-cluster-dev-secret 

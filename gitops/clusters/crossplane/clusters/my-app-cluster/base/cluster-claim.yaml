@@ -70,6 +70,4 @@ spec:
       - 10.0.0.0/8
     tags:
       environment: Test
-      provisionedBy: Crossplane
-  helm:
-    secretName: my-claim-secret       
+      provisionedBy: Crossplane   
