@@ -6,6 +6,8 @@ metadata:
   annotations:
     crossplane.io/external-name: my-app-cluster-dev  
 spec:
+  writeConnectionSecretToRef:
+    name: my-app-cluster-dev-secret
   location: "North Europe"
   aks:
     tags:
@@ -15,5 +17,3 @@ spec:
       environment: dev   
   helm:
     secretName: my-app-cluster-dev-secret 
-  writeConnectionSecretToRef:
-    name: my-app-cluster-dev-secret

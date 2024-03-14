@@ -71,3 +71,5 @@ spec:
     tags:
       environment: Test
       provisionedBy: Crossplane
+  helm:
+    secretName: my-claim-secret       
