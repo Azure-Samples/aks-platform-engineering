@@ -356,7 +356,7 @@ spec:
                 source:    
                   repoURL: https://github.com/Azure-Samples/aks-store-demo.git    
                   targetRevision: HEAD
-                  path: aks-store-quickstart.yaml                
+                  path: kustomize/overlays/dev             
                 syncPolicy:
                   automated: {}
                 destination:
