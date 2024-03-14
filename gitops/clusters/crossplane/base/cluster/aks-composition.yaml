@@ -321,7 +321,7 @@ spec:
           toFieldPath: spec.providerConfigRef.name
     - name: kubernetes-provider-config
       base:
-        apiVersion: kubernetes.crossplane.io/v1beta1
+        apiVersion: kubernetes.crossplane.io/v1alpha1
         kind: ProviderConfig
         spec:
           credentials:
