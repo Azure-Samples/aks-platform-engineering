@@ -341,7 +341,7 @@ spec:
                 fmt: "%s-secret"
     - name: deploy-app
       base:
-        apiVersion: kubernetes.crossplane.io/v1alpha2
+        apiVersion: kubernetes.crossplane.io/v1alpha1
         kind: Object
         spec:
           forProvider:
