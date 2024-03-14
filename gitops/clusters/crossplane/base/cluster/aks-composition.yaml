@@ -318,7 +318,53 @@ spec:
       patches:
         - type: FromCompositeFieldPath
           fromFieldPath: metadata.name
-          toFieldPath: spec.providerConfigRef.name            
+          toFieldPath: spec.providerConfigRef.name
+    - base:
+        apiVersion: kubernetes.crossplane.io/v1beta1
+        kind: ProviderConfig
+        spec:
+          credentials:
+            source: Secret
+            secretRef:
+              name: cluster-config
+              namespace: crossplane-system
+              key: attribute.kube_admin_config_raw
+      patches:
+        - fromFieldPath: metadata.name
+          toFieldPath: metadata.name
+        - fromFieldPath: "metadata.uid"
+          toFieldPath: spec.credentials.secretRef.name
+          transforms:
+            - type: string
+              string:
+                fmt: "%s-secret"
+      readinessChecks:
+        - type: None
+    - base:
+        apiVersion: kubernetes.crossplane.io/v1alpha2
+        kind: Object
+        spec:
+          forProvider:
+            manifest:
+              apiVersion: argoproj.io/v1alpha1
+              kind: Application
+              metadata:
+                name: azure-vote
+                namespace: argocd
+              spec:
+                project: default
+                source:    
+                  repoURL: https://github.com/Azure-Samples/aks-store-demo.git    
+                  targetRevision: HEAD
+                  path: aks-store-quickstart.yaml                
+                syncPolicy:
+                  automated: {}
+                destination:
+                  namespace: argocd
+                  server: https://kubernetes.default.svc
+      patches:
+        - fromFieldPath: metadata.name
+          toFieldPath: spec.providerConfigRef.name                   
   compositeTypeRef:
     apiVersion: kubernetes.example.com/v1alpha1
     kind: XAksCluster
