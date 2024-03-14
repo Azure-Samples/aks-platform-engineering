@@ -271,44 +271,6 @@ spec:
         - type: FromCompositeFieldPath
           fromFieldPath: spec.resourceGroup.tags
           toFieldPath: spec.forProvider.tags
-    - name: helm-provider-config
-      base:
-        apiVersion: helm.crossplane.io/v1beta1
-        kind: ProviderConfig
-        spec:
-          credentials:
-            source: Secret
-            secretRef:
-              name: cluster-config
-              namespace: crossplane-system
-              key: kubeconfig
-      patches:
-        - type: FromCompositeFieldPath
-          fromFieldPath: metadata.name
-          toFieldPath: metadata.name
-        - type: FromCompositeFieldPath
-          fromFieldPath: metadata.namespace
-          toFieldPath: metadata.namespace         
-        - type: FromCompositeFieldPath
-          fromFieldPath: spec.helm.secretName
-          toFieldPath: spec.credentials.secretRef.name
-        - type: FromCompositeFieldPath
-          fromFieldPath: metadata.namespace
-          toFieldPath: spec.credentials.secretRef.namespace
-    - name: wordpress-helm-release
-      base:
-        apiVersion: helm.crossplane.io/v1beta1
-        kind: Release
-        metadata:
-          annotations: 
-            crossplane.io/external-name: wordpress     
-        spec:
-          forProvider:
-            chart:
-              name: wordpress
-              repository: https://charts.bitnami.com/bitnami
-              version:  15.2.5
-            namespace: wordpress   
   compositeTypeRef:
     apiVersion: kubernetes.example.com/v1alpha1
     kind: XAksCluster
