@@ -1,0 +1,346 @@
+apiVersion: apiextensions.crossplane.io/v1
+kind: CompositeResourceDefinition
+metadata:
+  name: xaksclusters.kubernetes.example.com
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
+spec:
+  connectionSecretKeys:
+  - kubeconfig
+  group: kubernetes.example.com
+  names:
+    kind: XAksCluster
+    plural: xaksclusters
+  versions:
+  - name: v1alpha1
+    schema:
+      openAPIV3Schema:
+        type: object
+        properties:
+          spec:
+            type: object
+            properties:
+              location:
+                type: string
+                description: specifies the location of the Azure resources
+              aks:
+                type: object
+                properties:
+                  defaultNodePool:
+                    type: object
+                    properties:
+                      name:
+                        type: string
+                        description: specifies the name of the node pool
+                        default: default
+                      maxCount:
+                        type: integer
+                        description: specifies the maximum number of nodes in the node pool
+                        default: 20
+                      minCount:
+                        type: integer
+                        description: specifies the minimum number of nodes in the node pool
+                        default: 3
+                      nodeCount:
+                        type: integer
+                        description: specifies the number of nodes in the node pool
+                        default: 3                      
+                      vmSize:
+                        type: string
+                        description: specifies the size of the Virtual Machines making up the node pool
+                        default: Standard_F8s_v2
+                      enableAutoScaling:
+                        type: boolean
+                        description: specifies whether the node pool should automatically adjust the number of nodes
+                        default: true
+                      maxPods:
+                        type: integer
+                        description: specifies the maximum number of pods that can run on a node in the node pool
+                        default: 30
+                      nodeLabels:
+                        type: object
+                        description: specifies the labels for the nodes in the node pool
+                        additionalProperties:
+                          type: string
+                      nodeTaints:
+                        type: array
+                        description: specifies the taints for the nodes in the node pool
+                        items:
+                          type: string
+                      osDiskSizeGb:
+                        type: integer
+                        description: specifies the size of the OS Disk in GB
+                        default: 128
+                      osDiskType:
+                        type: string
+                        description: specifies the type of the OS Disk
+                        enum:
+                          - Ephemeral
+                          - Managed
+                      onlyCriticalAddonsEnabled:
+                        type: boolean
+                        description: specifies whether only critical add-ons are enabled
+                      osSku:
+                        type: string
+                        description: specifies the SKU of the OS
+                        enum:
+                         - Ubuntu
+                         - Windows2019
+                         - Windows2022
+                         - AzureLinux
+                      type:
+                        type: string
+                        description: specifies the type of the node pool
+                        default: VirtualMachineScaleSets
+                  kubernetesVersion:
+                    type: string
+                    description: specifies the version of Kubernetes
+                    default: 1.28.3
+                  dnsPrefix:
+                    type: string
+                    description: specifies the DNS prefix to use with the hosted Kubernetes API server FQDN
+                  roleBasedAccessControlEnabled:
+                    type: boolean
+                    description: specifies whether Azure Active Directory Role-Based Access Control is enabled
+                    default: true
+                  azureActiveDirectoryRoleBasedAccessControl:
+                    type: array
+                    description: specifies the Azure Active Directory Role-Based Access Control settings
+                    items:
+                      type: object
+                      properties:
+                        adminGroupObjectIds:
+                          type: array
+                          description: specifies the object IDs of the Azure Active Directory admin groups
+                          items:
+                            type: string
+                        azureRbacEnabled:
+                          type: boolean
+                          description: specifies whether Azure Active Directory Role-Based Access Control is enabled
+                        managed:
+                          type: boolean
+                          description: specifies whether the Azure Active Directory Role-Based Access Control is managed
+                  azurePolicyEnabled:
+                    type: boolean
+                  networkProfile:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        dnsServiceIp:
+                          type: string
+                          description: specifies the IP address of the Kubernetes DNS service
+                          default: 172.16.0.10
+                        serviceCidr:
+                          type: string
+                          description: specifies the IP address range for the services in the Kubernetes cluster
+                          default: 172.16.0.0/16
+                        networkMode:
+                          type: string
+                          description: specifies the network mode for the Kubernetes cluster
+                          enum:
+                            - transparent
+                            - bridge
+                        networkPlugin:
+                          type: string
+                          description: specifies the network plugin used for the Kubernetes cluster
+                          default: azure
+                          enum: 
+                            - azure
+                            - kubenet
+                            - none
+                        networkPluginMode:
+                          type: string
+                          description: specifies the network plugin mode for the Kubernetes cluster
+                        networkPolicy:
+                          type: string
+                          description: specifies the network policy for the Kubernetes cluster
+                          enum:
+                           - azure
+                           - calico
+                           - cilium
+                        outboundType:
+                          type: string
+                          description: specifies the outbound type for the Kubernetes cluster
+                          enum:
+                           - loadBalancer
+                           - managedNATGateway
+                           - userAssignedNATGateway
+                           - userDefinedRouting
+                  identity:
+                    type: array
+                    description: specifies the identity settings for the Kubernetes cluster
+                    items:
+                      type: object
+                      properties:
+                        type:
+                          type: string
+                          description: specifies the type of the identity
+                          enum:
+                            - SystemAssigned
+                            - UserAssigned
+                        identityIds:
+                          type: array
+                          description: specifies the user-assigned identities
+                          items:
+                            type: string
+                    default:
+                      - type: SystemAssigned
+                  localAccountDisabled:
+                    type: boolean
+                    description: specifies whether the local account is disabled
+                  oidcIssuerEnabled:
+                    type: boolean
+                    description: specifies whether the OpenID Connect issuer is enabled
+                  workloadIdentityEnabled:
+                    type: boolean
+                    description: specifies whether the workload identity is enabled
+                  privateClusterEnabled:
+                    type: boolean
+                    description: specifies whether the private cluster is enabled
+                  privateClusterPublicFqdnEnabled:
+                    type: boolean
+                    description: specifies whether the private cluster public FQDN is enabled
+                  workloadAutoscalerProfile:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        kedaEnabled:
+                          type: boolean
+                          description: specifies whether the Kubernetes Event-Driven Autoscaler is enabled
+                        verticalPodAutoscalerEnabled:
+                          type: boolean
+                          description: specifies whether the Vertical Pod Autoscaler is enabled
+                  tags:
+                    type: object
+                    description: specifies the tags for the Kubernetes cluster
+                    additionalProperties:
+                      type: string
+                required:
+                  - defaultNodePool
+                  - networkProfile
+              userNodePool:
+                type: object
+                properties:
+                  name:
+                    type: string
+                    description: specifies the name of the node pool
+                  mode:
+                    type: string
+                    description: specifies the mode of the node pool
+                    enum:
+                      - system
+                      - user
+                    default: user
+                  maxCount:
+                    type: integer
+                    description: specifies the maximum number of nodes in the node pool
+                    default: 20
+                  minCount:
+                    type: integer
+                    description: specifies the minimum number of nodes in the node pool
+                    default: 3
+                  nodeCount:
+                    type: integer
+                    description: specifies the number of nodes in the node pool
+                    default: 3
+                  vmSize:
+                    type: string
+                    description: specifies the size of the Virtual Machines making up the node pool
+                    default: Standard_F8s_v2
+                  enableAutoScaling:
+                    type: boolean
+                    description: specifies whether the node pool should automatically adjust the number of nodes
+                    default: true
+                  maxPods:
+                    type: integer
+                    description: specifies the maximum number of pods that can run on a node in the node pool
+                    default: 30
+                  nodeLabels:
+                    type: object
+                    description: specifies the labels for the nodes in the node pool
+                    additionalProperties:
+                      type: string
+                  nodeTaints:
+                    type: array
+                    description: specifies the taints for the nodes in the node pool
+                    items:
+                      type: string
+                  osDiskSizeGb:
+                    type: integer
+                    description: specifies the size of the OS Disk in GB
+                    default: 128
+                  osDiskType:
+                    type: string
+                    description: specifies the type of the OS Disk
+                    enum:
+                      - Ephemeral
+                      - Managed
+                  osSku:
+                    type: string
+                    description: specifies the SKU of the OS
+                    enum:
+                      - Ubuntu
+                      - Windows2019
+                      - Windows2022
+                      - AzureLinux
+                  osType:
+                    type: string
+                    description: specifies the type of the OS
+                    enum:
+                      - Linux
+                      - Windows
+                required:
+                  - name
+              subnet:
+                type: object
+                properties:
+                  name:
+                    type: string
+                    description: specifies the name of the subnet
+                  privateEndpointNetworkPoliciesEnabled:
+                    type: boolean
+                    description: specifies whether private endpoint network policies are enabled
+                  privateLinkServiceNetworkPoliciesEnabled:
+                    type: boolean
+                    description: specifies whether private link service network policies are enabled
+                  addressPrefixes:
+                    type: array
+                    description: specifies the address prefixes for the subnet
+                    items:
+                      type: string
+                      description: specifies the address prefix for the subnet
+                required:
+                  - name
+                  - addressPrefixes
+              virtualNetwork:
+                type: object
+                properties:
+                  addressSpace:
+                    type: array
+                    description: specifies the address prefixes for the virtual network
+                    items:
+                      type: string
+                      description: specifies the address prefix for the virtual network
+                  tags:
+                    type: object
+                    description: specifies the tags for the virtual network
+                    additionalProperties:
+                      type: string
+                required:
+                  - addressSpace
+              resourceGroup:
+                type: object
+                properties:
+                  tags:
+                    type: object
+                    description: specifies the tags for the virtual network
+            required:
+              - location
+    served: true
+    referenceable: true
+  claimNames:
+    kind: AksClusterClaim
+    plural: aksclusterclaims

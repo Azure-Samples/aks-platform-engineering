@@ -1,0 +1,17 @@
+
+apiVersion: kubernetes.example.com/v1alpha1
+kind: AksClusterClaim
+metadata:
+  name: my-app-cluster
+  annotations:
+    crossplane.io/external-name: my-app-cluster-stage  
+spec:
+  location: "EastUs"
+  aks:
+    tags:
+      environment: stage
+  virtualNetwork:
+    tags:
+      environment: stage
+  writeConnectionSecretToRef:
+    name: my-app-cluster-stage-secret      

@@ -22,13 +22,21 @@ variable "kubernetes_version" {
   default     = null
 }
 
+variable "infrastructure_provider" {
+  description = "Specific the choice of infrastructure provider. crossplane or capz"
+  type        = string
+  default     = "crossplane"
+}
+
 variable "addons" {
-  description = "Specifies the Kubernetes addons to install."
+  description = "Specifies the Kubernetes addons to install on the hub cluster."
   type        = any
   default = {
     enable_argocd                            = true # installs argocd
+    enable_cert_manager                      = true # installs cert manager
     enable_crossplane                        = true # installs crossplane core
     enable_azure_crossplane_upbound_provider = true # installs azure upbound provider
+    enable_cluster_api_operator              = true # installs azure api operator
   }
 }
 
@@ -89,7 +97,7 @@ variable "gitops_workload_basepath" {
 variable "gitops_workload_path" {
   description = "Specifies the Git repository path for workload."
   type        = string
-  default     = "apps"
+  default     = "bootstrap/workloads"
 }
 
 variable "tags" {

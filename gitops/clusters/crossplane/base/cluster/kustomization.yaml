@@ -1,0 +1,4 @@
+---
+resources:
+  - aks-composite-resource-definition.yaml
+  - aks-composition.yaml
