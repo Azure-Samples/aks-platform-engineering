@@ -6,12 +6,13 @@ metadata:
   annotations:
     crossplane.io/external-name: my-app-cluster-stage  
 spec:
+  writeConnectionSecretToRef:
+    name: my-app-cluster-stage-secret    
   location: "EastUs"
   aks:
     tags:
       environment: stage
   virtualNetwork:
     tags:
-      environment: stage
-  writeConnectionSecretToRef:
-    name: my-app-cluster-stage-secret      
+      environment: stage     
+  
