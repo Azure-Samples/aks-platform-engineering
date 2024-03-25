@@ -1,0 +1,9 @@
+provider:
+  enabled: true
+  metadata:
+    annotations: {}
+    labels:
+      app.kubernetes.io/managed-by: Helm
+  package:
+    registry: xpkg.upbound.io/upbound
+    version: v0.42.1
