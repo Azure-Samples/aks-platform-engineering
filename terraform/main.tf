@@ -13,12 +13,12 @@ locals {
   argocd_namespace = "argocd"
 
   azure_addons = {
-    enable_azure_crossplane_upbound_provider = var.infrastructure_provider == "crossplane" && var.addons.enable_azure_crossplane_upbound_provider ? true : false
-    enable_cluster_api_operator              = var.infrastructure_provider == "capz" && var.addons.enable_cluster_api_operator ? true : false
+    enable_azure_crossplane_upbound_provider = var.infrastructure_provider == "crossplane" && try(var.addons.enable_azure_crossplane_upbound_provider, false) ? true : false
+    enable_cluster_api_operator              = var.infrastructure_provider == "capz" && try(var.addons.enable_cluster_api_operator, false) ? true : false
   }
 
   oss_addons = {
-    enable_argocd                          = try(var.addons.enable_argocd, false)  # installed by default
+    enable_argocd                          = try(var.addons.enable_argocd, false) # installed by default
     enable_argo_rollouts                   = try(var.addons.enable_argo_rollouts, false)
     enable_argo_events                     = try(var.addons.enable_argo_events, false)
     enable_argo_workflows                  = try(var.addons.enable_argo_workflows, false)
@@ -33,9 +33,9 @@ locals {
     enable_prometheus_adapter              = try(var.addons.enable_prometheus_adapter, false)
     enable_secrets_store_csi_driver        = try(var.addons.enable_secrets_store_csi_driver, false)
     enable_vpa                             = try(var.addons.enable_vpa, false)
-    enable_crossplane                      = var.infrastructure_provider == "crossplane" && var.addons.enable_crossplane ? true : false
-    enable_crossplane_helm_provider        = var.infrastructure_provider == "crossplane" && var.addons.enable_crossplane_helm_provider ? true : false
-    enable_crossplane_kubernetes_provider  = var.infrastructure_provider == "crossplane" && var.addons.enable_crossplane_kubernetes_provider? true : false
+    enable_crossplane                      = var.infrastructure_provider == "crossplane" && try(var.addons.enable_crossplane, false) ? true : false
+    enable_crossplane_helm_provider        = var.infrastructure_provider == "crossplane" && try(var.addons.enable_crossplane_helm_provider, false) ? true : false
+    enable_crossplane_kubernetes_provider  = var.infrastructure_provider == "crossplane" && try(var.addons.enable_crossplane_kubernetes_provider, false) ? true : false
   }
   addons = merge(local.azure_addons, local.oss_addons)
 
