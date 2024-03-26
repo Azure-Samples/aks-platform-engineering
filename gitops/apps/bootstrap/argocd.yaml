@@ -4,19 +4,13 @@ kind: Application
 metadata:
   name: argocd
 spec:
-  syncPolicy:
-    preserveResourcesOnDeletion: true
-  template:
-    metadata:
-      name: argocd
-    spec:
-      project: infra
-      sources:
-        - chart: argo-cd
-          repoURL: https://argoproj.github.io/argo-helm/
-          targetRevision: 6.7.2
-          helm:
-            version: v3      
-      destination:
-        namespace: argocd
-        server: https://kubernetes.default.svc
+  project: infra
+  sources:
+    - chart: argo-cd
+      repoURL: https://argoproj.github.io/argo-helm/
+      targetRevision: 6.7.2
+      helm:
+        version: v3      
+  destination:
+    namespace: argocd
+    server: https://kubernetes.default.svc
