@@ -24,7 +24,7 @@ This sample demonstrates how to deploy an multi-cluster AKS environment that sup
 ## Solution Overview
 
 The following diagram shows the high-level architecture of the solution leveraging GitOps Bridge Pattern.  
-[architecture diagram]
+<img src="./images/Architecture Diagram.png" width=100%>
 
 ## Walkthrough
 
