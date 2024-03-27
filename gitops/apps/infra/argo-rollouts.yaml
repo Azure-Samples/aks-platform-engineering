@@ -1,0 +1,15 @@
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: argo-rollouts
+spec:
+  project: infra
+  sources:
+    - chart: argo-rollouts
+      repoURL: https://argoproj.github.io/argo-helm/
+      helm:
+        version: v3      
+  destination:
+    namespace: argocd
+    server: https://kubernetes.default.svc
