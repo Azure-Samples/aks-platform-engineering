@@ -22,3 +22,14 @@ resource "azurerm_federated_identity_credential" "capz" {
   parent_id           = azurerm_user_assigned_identity.capz[0].id
   subject             = "system:serviceaccount:azure-infrastructure-system:capz-manager"
 }
+
+resource "azurerm_federated_identity_credential" "service_operator" {
+  count               = try(var.addons.enable_cluster_api_operator, false) ? 1 : 0
+  depends_on          = [module.aks]
+  name                = "serviceoperator"
+  resource_group_name = azurerm_resource_group.this.name
+  audience            = ["api://AzureADTokenExchange"]
+  issuer              = module.aks.oidc_issuer_url
+  parent_id           = azurerm_user_assigned_identity.capz[0].id
+  subject             = "system:serviceaccount:azure-infrastructure-system:azureserviceoperator-default"
+}
