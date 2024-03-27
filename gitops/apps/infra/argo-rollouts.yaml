@@ -2,13 +2,12 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: argocd
+  name: argo-rollouts
 spec:
   project: infra
   sources:
-    - chart: argo-cd
+    - chart: argo-rollouts
       repoURL: https://argoproj.github.io/argo-helm/
-      targetRevision: 6.7.2
       helm:
         version: v3      
   destination:

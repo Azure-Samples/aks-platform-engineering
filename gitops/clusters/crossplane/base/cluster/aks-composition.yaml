@@ -339,7 +339,7 @@ spec:
             - type: string
               string:
                 fmt: "%s-secret"              
-    - name: deploy-app
+    - name: deploy-infra-apps
       base:
         apiVersion: kubernetes.crossplane.io/v1alpha1
         kind: Object
@@ -356,7 +356,7 @@ spec:
                 source:    
                   repoURL: https://github.com/seenu433/aks-platform-engineering
                   targetRevision: HEAD
-                  path: gitops/apps/bootstrap          
+                  path: gitops/apps/infra          
                 syncPolicy:
                   automated: {}
                 destination:
