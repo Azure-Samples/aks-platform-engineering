@@ -342,12 +342,12 @@ spec:
                     description: specifies the tags for the virtual network                  
             required:
               - location
-        status:
-          type: object
-          properties:
-            clusterId:
-              description: Azure resource ID of the AKS cluster
-              type: string
+            status:
+              type: object
+              properties:
+                clusterId:
+                  description: Azure resource ID of the AKS cluster
+                  type: string
     served: true
     referenceable: true
   claimNames:
