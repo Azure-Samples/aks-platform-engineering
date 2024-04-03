@@ -319,6 +319,52 @@ spec:
         - type: FromCompositeFieldPath
           fromFieldPath: metadata.name
           toFieldPath: spec.providerConfigRef.name                 
+    - name: kubernetes-provider-config
+      base:
+        apiVersion: kubernetes.crossplane.io/v1alpha1
+        kind: ProviderConfig
+        spec:
+          credentials:
+            source: Secret
+            secretRef:
+              name: cluster-config
+              namespace: crossplane-system
+              key: attribute.kube_admin_config_raw
+      patches:
+        - fromFieldPath: metadata.name
+          toFieldPath: metadata.name
+        - fromFieldPath: "metadata.uid"
+          toFieldPath: spec.credentials.secretRef.name
+          transforms:
+            - type: string
+              string:
+                fmt: "%s-secret"              
+    - name: deploy-infra-apps
+      base:
+        apiVersion: kubernetes.crossplane.io/v1alpha1
+        kind: Object
+        spec:
+          forProvider:
+            manifest:
+              apiVersion: argoproj.io/v1alpha1
+              kind: Application
+              metadata:
+                name: cluster-bootstrap
+                namespace: argocd
+              spec:
+                project: default
+                source:    
+                  repoURL: https://github.com/seenu433/aks-platform-engineering
+                  targetRevision: HEAD
+                  path: gitops/apps/infra          
+                syncPolicy:
+                  automated: {}
+                destination:
+                  namespace: argocd
+                  server: https://kubernetes.default.svc
+      patches:
+        - fromFieldPath: metadata.name
+          toFieldPath: spec.providerConfigRef.name 
   compositeTypeRef:
     apiVersion: kubernetes.example.com/v1alpha1
     kind: XAksCluster
