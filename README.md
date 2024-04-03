@@ -2,17 +2,7 @@
 
 Customers are looking to build a platform engineering environment on Azure Kubernetes Service (AKS) to enable their development teams to deploy and manage applications in a consistent and secure manner. This environment should be based on GitOps principles and include a set of best practices and tools to manage the lifecycle of the applications and the underlying infrastructure. This guide provides a reference architecture and sample to build a platform engineering environment on AKS.
 
-This sample demonstrates how to deploy an multi-cluster AKS environment that supports both platform and application development teams leveraging the GitOps Bridge Pattern.  The management cluster will be configured with addons via ArgoCD using Terraform and then bootstrapped with tools needed for Day Two operations.  Crossplane or Cluster API addons to will be configured to support deploying and managing clusters for the application teams.
-
-## What is GitOps?
-
-## GitOps Bridge Pattern
-
-## Argo CD
-
-## Cluster API
-
-## Crossplane
+This sample demonstrates how to deploy an multi-cluster AKS environment that supports both platform and application development teams leveraging the [GitOps Bridge Pattern](https://github.com/gitops-bridge-dev/gitops-bridge?tab=readme-ov-file).  The control plane cluster will be configured with addons via ArgoCD using Terraform and then bootstrapped with tools needed for Day Two operations.  Crossplane or Cluster API addons to will be configured to support deploying and managing clusters for the application teams.
 
 ## Prerequisites
 
@@ -25,8 +15,6 @@ This sample demonstrates how to deploy an multi-cluster AKS environment that sup
 
 The following diagram shows the high-level architecture of the solution leveraging GitOps Bridge Pattern.  
 <img src="./images/Architecture Diagram.png" width=100%>
-
-## Walkthrough
 
 ## Getting Started
 
@@ -53,6 +41,8 @@ Get the initial admin password and the IP address of the ArgoCD web interface.
 kubectl --kubeconfig=kubeconfig get secrets argocd-initial-admin-secret -n argocd --template="{{index .data.password | base64decode}}"
 kubectl get svc -n argocd argo-cd-argocd-server
 ```
+
+## Variables 
 
 ## Onboarding Applications Workloads
 
