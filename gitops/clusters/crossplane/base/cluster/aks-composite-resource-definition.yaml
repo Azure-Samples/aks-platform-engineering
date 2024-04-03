@@ -218,6 +218,9 @@ spec:
                     description: specifies the tags for the Kubernetes cluster
                     additionalProperties:
                       type: string
+                  adminUser:
+                    type: string
+                    description: specifies the admin user for the Kubernetes cluster                     
                 required:
                   - defaultNodePool
                   - networkProfile
@@ -339,6 +342,12 @@ spec:
                     description: specifies the tags for the virtual network                  
             required:
               - location
+        status:
+          type: object
+          properties:
+            clusterId:
+              description: Azure resource ID of the AKS cluster
+              type: string
     served: true
     referenceable: true
   claimNames:
