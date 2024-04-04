@@ -343,11 +343,18 @@ spec:
             required:
               - location
           status:
-            type: object
+            description: Property bag for resource IDs.
             properties:
-              clusterId:
-                description: Azure resource ID of the AKS cluster
-                type: string
+              atProvider:
+                description: keeps the state for the external ids
+                properties:
+                  clusterId:
+                    description: Azure resource ID of the AKS cluster
+                    type: string
+                required:
+                - clusterId
+                type: object
+            type: object
     served: true
     referenceable: true
   claimNames:

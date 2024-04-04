@@ -150,7 +150,7 @@ spec:
           toFieldPath: spec.forProvider.tags
         - type: ToCompositeFieldPath
           fromFieldPath: status.atProvider.id
-          toFieldPath: status.clusterId
+          toFieldPath: status.atProvider.clusterId
     - name: user-node-pool
       base:
         apiVersion: containerservice.azure.upbound.io/v1beta1
