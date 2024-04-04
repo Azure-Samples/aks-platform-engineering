@@ -280,20 +280,6 @@ spec:
         - type: FromCompositeFieldPath
           fromFieldPath: spec.resourceGroup.tags
           toFieldPath: spec.forProvider.tags
-    - name: aks-role-assignment
-      base:
-        apiVersion: authorization.azure.upbound.io/v1beta1
-        kind: RoleAssignment
-        spec:
-          forProvider:
-            roleDefinitionName: "Azure Kubernetes Service RBAC Admin"
-      patches:
-        - type: FromCompositeFieldPath
-          fromFieldPath: status.clusterId
-          toFieldPath: spec.forProvider.scope
-        - type: FromCompositeFieldPath
-          fromFieldPath: spec.aks.adminUser
-          toFieldPath: spec.forProvider.principalId
     - name: helm-provider-config
       base:
         apiVersion: helm.crossplane.io/v1beta1
