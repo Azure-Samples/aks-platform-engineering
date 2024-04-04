@@ -149,6 +149,12 @@ spec:
           fromFieldPath: spec.aks.tags
           toFieldPath: spec.forProvider.tags
         - type: ToCompositeFieldPath
+          fromFieldPath: status.atProvider.fqdn
+          toFieldPath: metadata.labels['cluster-fqdn']
+        - type: ToCompositeFieldPath
+          fromFieldPath: status.atProvider.id
+          toFieldPath: metadata.labels['cluster-id']          
+        - type: ToCompositeFieldPath
           fromFieldPath: status.atProvider.id
           toFieldPath: status.atProvider.clusterId
     - name: user-node-pool
