@@ -30,13 +30,13 @@ spec:
                 matchLabels:
                   environment: control-plane
               values:
-                addonChartVersion: 2.0.2
+                addonChartVersion: 1.0.0
           - clusters:
               selector:
                 matchLabels:
                   environment: prod
               values:
-                addonChartVersion: 2.0.2
+                addonChartVersion: 1.0.0
   template:
     metadata:
       name: addon-{{name}}-{{values.addonChart}}
