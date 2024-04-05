@@ -148,6 +148,9 @@ spec:
         - type: FromCompositeFieldPath
           fromFieldPath: spec.aks.tags
           toFieldPath: spec.forProvider.tags
+        - type: ToCompositeFieldPath
+          fromFieldPath: status.atProvider.id
+          toFieldPath: status.atProvider.clusterId
     - name: user-node-pool
       base:
         apiVersion: containerservice.azure.upbound.io/v1beta1
@@ -271,6 +274,21 @@ spec:
         - type: FromCompositeFieldPath
           fromFieldPath: spec.resourceGroup.tags
           toFieldPath: spec.forProvider.tags
+    - name: aks-role-assignment
+      base:
+        apiVersion: authorization.azure.upbound.io/v1beta1
+        kind: RoleAssignment
+        spec:
+          forProvider:
+            roleDefinitionName: "Azure Kubernetes Service RBAC Admin"
+            scope: "place-holder"
+      patches:
+        - type: FromCompositeFieldPath
+          fromFieldPath: status.atProvider.clusterId
+          toFieldPath: spec.forProvider.scope
+        - type: FromCompositeFieldPath
+          fromFieldPath: spec.aks.adminUser
+          toFieldPath: spec.forProvider.principalId
     - name: helm-provider-config
       base:
         apiVersion: helm.crossplane.io/v1beta1
