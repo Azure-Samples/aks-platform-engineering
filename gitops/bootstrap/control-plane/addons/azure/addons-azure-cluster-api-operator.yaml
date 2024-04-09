@@ -48,9 +48,9 @@ spec:
         - repoURL: '{{metadata.annotations.addons_repo_url}}'
           targetRevision: '{{metadata.annotations.addons_repo_revision}}'
           ref: values
-        - chart: '{{values.addonChart}}'
-          repoURL: '{{values.addonChartRepository}}'
-          targetRevision: '{{values.addonChartVersion}}'
+        - repoURL: https://github.com/kubernetes-sigs/cluster-api-operator.git
+          path: hack/charts/cluster-api-operator
+          targetRevision: main
           helm:
             releaseName: '{{values.addonChart}}'
             ignoreMissingValueFiles: true
