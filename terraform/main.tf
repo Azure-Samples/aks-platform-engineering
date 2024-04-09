@@ -199,9 +199,9 @@ module "gitops_bridge_bootstrap" {
     environment  = local.environment
     metadata = merge(local.cluster_metadata,
       {
-        kubelet_identity_client_id = var.crossplane_credentials_type == "managedIdentity" ? module.aks.kubelet_identity[0].client_id : ""
-        subscription_id            = var.crossplane_credentials_type == "managedIdentity" ? data.azurerm_subscription.current.subscription_id : ""
-        tenant_id                  = var.crossplane_credentials_type == "managedIdentity" ? data.azurerm_subscription.current.tenant_id : ""
+        kubelet_identity_client_id = var.use_managed_identity ? module.aks.kubelet_identity[0].client_id : ""
+        subscription_id            = var.use_managed_identity == "managedIdentity" ? data.azurerm_subscription.current.subscription_id : ""
+        tenant_id                  = var.use_managed_identity == "managedIdentity" ? data.azurerm_subscription.current.tenant_id : ""
     })
     addons = local.addons
   }
@@ -256,7 +256,7 @@ resource "azurerm_role_assignment" "service_principal_subscription_owner_role_as
 # Crossplane Secret is created only when using a Service Principal as Crossplane Credentials
 #############################################################################################
 resource "kubernetes_namespace" "crossplane_namespace" {
-  count      = var.crossplane_credentials_type == "servicePrincipal" ? 1 : 0
+  count      = var.use_managed_identity ? 1 : 0
   depends_on = [module.aks]
   metadata {
     name = "crossplane-system"
@@ -264,7 +264,7 @@ resource "kubernetes_namespace" "crossplane_namespace" {
 }
 
 resource "kubernetes_secret" "crossplane_secret" {
-  count = var.crossplane_credentials_type == "servicePrincipal" ? 1 : 0
+  count = var.use_managed_identity == "servicePrincipal" ? 1 : 0
   type  = "Opaque"
 
   metadata {
@@ -298,7 +298,7 @@ resource "kubernetes_secret" "crossplane_secret" {
 # Kubelet User-assigned Managed Identity Role Assignment is created only when using Kubelet User-assigned Managed Identity as Crossplane Credentials
 #####################################################################################################################################################
 resource "azurerm_role_assignment" "managed_identity_role_assignment" {
-  count                            = var.crossplane_credentials_type == "managedIdentity" ? 1 : 0
+  count                            = var.use_managed_identity ? 1 : 0
   scope                            = data.azurerm_subscription.current.id
   role_definition_name             = "Owner"
   principal_id                     = module.aks.kubelet_identity[0].object_id
