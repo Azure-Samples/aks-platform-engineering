@@ -23,7 +23,9 @@ The control plane cluster will be configured with addons via ArgoCD using Terraf
 - Terraform v1.5.2 or later.
 - kubectl version 1.18.0 or later installed. To install or upgrade, see Install kubectl.
 
-## Provisioning the Control Plane Cluster
+## Getting Started
+
+### Provisioning the Control Plane Cluster
 
 Until the repo is private you need a ssh deploy key for ArgoCD to clone this repo.
 Obtain the key from the team and place it in `terraform/private_ssh_deploy_key`
@@ -67,20 +69,20 @@ In case something goes wrong and you don't find a public IP, connect to the Argo
 kubectl port-forward svc/argo-cd-argocd-server -n argocd 8080:443
 ```
 
-Getting the credentials for the Hub Cluster
+Getting the credentials for the Control Plane Cluster
 
 ```azurecli
 az aks get-credentials -n gitops-aks -g aks-gitops
 ```
 
-Inspecting the Crossplane objects on the Hub Cluster
+## Onboarding New Application Team
 
 ```kubectl
 kubectl get AksClusterClaim -A
 kubectl get xaksclusters -A
 ```
 
-Deploying apps to the workload clusters
+### Deploying apps to the workload clusters
 
 ```azurecli
 
