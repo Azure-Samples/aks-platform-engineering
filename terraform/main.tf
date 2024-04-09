@@ -264,7 +264,7 @@ resource "kubernetes_namespace" "crossplane_namespace" {
 }
 
 resource "kubernetes_secret" "crossplane_secret" {
-  count = var.crossplane_credentials_type == "servicePrincipal" ? 1 : 0
+  count = (var.infrastructure_provider == "crossplane" && var.crossplane_credentials_type == "servicePrincipal") ? 1 : 0
   type  = "Opaque"
 
   metadata {
