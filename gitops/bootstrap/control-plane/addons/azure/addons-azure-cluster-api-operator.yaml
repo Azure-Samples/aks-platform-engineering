@@ -47,6 +47,21 @@ spec:
           path: '{{metadata.annotations.addons_repo_basepath}}hooks/sleep'
         - repoURL: '{{metadata.annotations.addons_repo_url}}'
           targetRevision: '{{metadata.annotations.addons_repo_revision}}'
+          path: '{{metadata.annotations.addons_repo_basepath}}hooks/identity'
+          kustomize:
+            patches:
+            - target:
+                kind: AzureClusterIdentity
+                name: cluster-identity
+              patch: |-
+                - op: replace
+                  path: /spec/clientID
+                  value: '{{metadata.annotations.capz_identity_id}}'
+                - op: replace
+                  path: /spec/tenantID
+                  value: '{{metadata.annotations.tenant_id}}'
+        - repoURL: '{{metadata.annotations.addons_repo_url}}'
+          targetRevision: '{{metadata.annotations.addons_repo_revision}}'
           ref: values
         - chart: '{{values.addonChart}}'
           repoURL: '{{values.addonChartRepository}}'

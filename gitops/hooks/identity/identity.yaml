@@ -1,0 +1,17 @@
+---
+apiVersion: infrastructure.cluster.x-k8s.io/v1beta1
+kind: AzureClusterIdentity
+metadata:
+  annotations:
+    argocd.argoproj.io/hook: PostSync
+  labels:
+    clusterctl.cluster.x-k8s.io/move-hierarchy: "true"
+  name: cluster-identity
+  namespace: azure-infrastructure-system
+spec:
+  allowedNamespaces: {}
+  clientID: # azurerm_user_assigned_identity.capz.client_id
+  tenantID: # azurerm_user_assigned_identity.capz.tenant_id
+  type: WorkloadIdentity
+
+

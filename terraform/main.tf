@@ -43,6 +43,7 @@ locals {
 
   environment_metadata = {
     infrastructure_provider = var.infrastructure_provider
+    capz_identity_id        = "${var.infrastructure_provider == "capz" ? azurerm_user_assigned_identity.capz[0].client_id : ""}"
   }
 
   addons_metadata = {
@@ -198,10 +199,10 @@ module "gitops_bridge_bootstrap" {
     cluster_name = module.aks.aks_name
     environment  = local.environment
     metadata = merge(local.cluster_metadata,
-      {
-        kubelet_identity_client_id = var.crossplane_credentials_type == "managedIdentity" ? module.aks.kubelet_identity[0].client_id : ""
-        subscription_id            = var.crossplane_credentials_type == "managedIdentity" ? data.azurerm_subscription.current.subscription_id : ""
-        tenant_id                  = var.crossplane_credentials_type == "managedIdentity" ? data.azurerm_subscription.current.tenant_id : ""
+    {
+        kubelet_identity_client_id = module.aks.kubelet_identity[0].client_id
+        subscription_id            = data.azurerm_subscription.current.subscription_id
+        tenant_id                  = data.azurerm_subscription.current.tenant_id
     })
     addons = local.addons
   }
