@@ -4,6 +4,7 @@ kind: AzureClusterIdentity
 metadata:
   annotations:
     argocd.argoproj.io/hook: PostSync
+    argocd.argoproj.io/sync-wave: "5"
   labels:
     clusterctl.cluster.x-k8s.io/move-hierarchy: "true"
   name: cluster-identity
