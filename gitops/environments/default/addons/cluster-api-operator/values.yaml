@@ -5,7 +5,6 @@ manager:
   featureGates:
     core:
       MachinePool: true
-      ClusterResourceSet: true
       ClusterTopology: true
     azure:
       MachinePool: true
