@@ -1,5 +1,6 @@
 addon: helm
 infrastructure: "azure:v1.13.2"
+core: "cluster-api:v1.6.2"
 manager:
   featureGates:
     core:
