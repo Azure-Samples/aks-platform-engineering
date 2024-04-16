@@ -11,9 +11,11 @@ spec:
     spec:
       containers:
       - name: sleep
-        image: busybox
+        image: dtzar/helm-kubectl
         command:
-          - "sleep"
-          - "120"
+        - /bin/bash
+        - -c
+        - |
+          /usr/local/bin/kubectl wait --timeout=150s --for=jsonpath='{.status.availableReplicas}'=1 -n cert-manager deployment cert-manager
       restartPolicy: Never
   backoffLimit: 2
