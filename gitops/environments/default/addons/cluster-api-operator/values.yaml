@@ -5,6 +5,7 @@ manager:
   featureGates:
     core:
       MachinePool: true
+    addon:
       helm: true
     azure:
       MachinePool: true
