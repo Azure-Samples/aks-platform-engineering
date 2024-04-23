@@ -1,18 +1,16 @@
 addon: helm
-infrastructure: "azure:v1.13.2"
-core: "cluster-api:v1.6.2"
+infrastructure: "azure:v1.14.2"
+core: "cluster-api:v1.7.1"
 manager:
   featureGates:
     core:
       MachinePool: true
-      ClusterTopology: true
+      helm: true
     azure:
       MachinePool: true
-      ClusterResourceSet: true
-      ClusterTopology: true
 cert-manager:
-  enabled: false
-  installCRDs: false
+  enabled: true
+  installCRDs: true
 #configSecret:
 #  name:
 #  namespace:

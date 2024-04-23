@@ -14,7 +14,7 @@ spec:
               values:
                 addonChart: cluster-api-operator
                 addonChartNamespace: capi-operator-system
-                addonChartVersion: 0.9.3
+                addonChartVersion: 0.9.2
                 addonChartRepository: https://kubernetes-sigs.github.io/cluster-api-operator
               selector:
                 matchExpressions:
@@ -29,22 +29,19 @@ spec:
                 matchLabels:
                   environment: staging
               values:
-                addonChartVersion: 0.9.3
+                addonChartVersion: 0.9.2
           - clusters:
               selector:
                 matchLabels:
                   environment: prod
               values:
-                addonChartVersion: 0.9.3
+                addonChartVersion: 0.9.2
   template:
     metadata:
       name: addon-{{name}}-{{values.addonChart}}
     spec:
       project: default
       sources:
-        - repoURL: '{{metadata.annotations.addons_repo_url}}'
-          targetRevision: '{{metadata.annotations.addons_repo_revision}}'
-          path: '{{metadata.annotations.addons_repo_basepath}}hooks/sleep'
         - repoURL: '{{metadata.annotations.addons_repo_url}}'
           targetRevision: '{{metadata.annotations.addons_repo_revision}}'
           path: '{{metadata.annotations.addons_repo_basepath}}hooks/identity'

@@ -23,7 +23,7 @@ locals {
     enable_argo_events                     = try(var.addons.enable_argo_events, false)
     enable_argo_workflows                  = try(var.addons.enable_argo_workflows, false)
     enable_cluster_proportional_autoscaler = try(var.addons.enable_cluster_proportional_autoscaler, false)
-    enable_cert_manager                    = var.infrastructure_provider == "capz" || try(var.addons.enable_cert_manager,false) ? true : false
+    enable_cert_manager                    = var.infrastructure_provider == "cert-manager" || try(var.addons.enable_cert_manager,false) ? true : false
     enable_gatekeeper                      = try(var.addons.enable_gatekeeper, false)
     enable_gpu_operator                    = try(var.addons.enable_gpu_operator, false)
     enable_ingress_nginx                   = try(var.addons.enable_ingress_nginx, false)
@@ -209,7 +209,7 @@ module "gitops_bridge_bootstrap" {
   apps = local.argocd_apps
   argocd = {
     namespace     = local.argocd_namespace
-    chart_version = "6.5.0"
+    chart_version = "6.7.14"
   }
 }
 
