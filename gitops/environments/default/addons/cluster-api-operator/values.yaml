@@ -1,12 +1,10 @@
-addon: helm
-infrastructure: "azure:v1.14.2"
+addon: "helm:v0.2.2"
+infrastructure: "azure:v1.14.3"
 core: "cluster-api:v1.7.1"
 manager:
   featureGates:
     core:
       MachinePool: true
-    addon:
-      helm: true
     azure:
       MachinePool: true
       ClusterResourceSet: true
