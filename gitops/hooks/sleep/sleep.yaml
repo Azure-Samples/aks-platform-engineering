@@ -18,6 +18,6 @@ spec:
         - /bin/bash
         - -c
         - |
-          /usr/local/bin/kubectl wait --timeout=150s --for=jsonpath='{.status.availableReplicas}'=1 -n cert-manager deployment cert-manager
+          /usr/local/bin/kubectl wait --timeout=300s --for=jsonpath='{.status.availableReplicas}'=1 -n cert-manager deployment cert-manager
       restartPolicy: Never
   backoffLimit: 2
