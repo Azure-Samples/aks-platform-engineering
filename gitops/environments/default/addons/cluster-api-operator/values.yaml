@@ -1,5 +1,5 @@
 addon: "helm:v0.2.2"
-infrastructure: "azure:v1.14.3"
+infrastructure: "azure:v1.15.0"
 core: "cluster-api:v1.7.1"
 manager:
   featureGates:
@@ -7,6 +7,7 @@ manager:
       MachinePool: true
     azure:
       MachinePool: true
+      ASOAPI: true
       ClusterResourceSet: true
       ClusterTopology: true
 cert-manager:
