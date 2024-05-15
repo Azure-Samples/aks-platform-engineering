@@ -7,12 +7,12 @@ variable "resource_group_name" {
 variable "location" {
   description = "Specifies the the location for the Azure resources."
   type        = string
-  default     = "eastus"
+  default     = "westus3"
 }
 
 variable "agents_size" {
   description = "Specifies the default virtual machine size for the Kubernetes agents"
-  default     = "Standard_DS3_v2"
+  default     = "Standard_DS2_v2"
   type        = string
 }
 
