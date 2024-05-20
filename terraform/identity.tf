@@ -7,8 +7,8 @@ resource "azurerm_user_assigned_identity" "capz" {
 
 resource "azurerm_role_assignment" "capz_role_assignment" {
   count                = var.infrastructure_provider == "capz" ? 1 : 0
-  scope                = azurerm_resource_group.this.id
-  role_definition_name = "Owner"
+  scope                = data.azurerm_subscription.current.id
+  role_definition_name = "Contributor"
   principal_id         = azurerm_user_assigned_identity.capz[0].principal_id
 }
 
