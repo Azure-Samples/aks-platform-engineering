@@ -1,0 +1,60 @@
+apiVersion: addons.cluster.x-k8s.io/v1alpha1
+kind: HelmChartProxy
+metadata:
+  name: argocd
+spec:
+  clusterSelector:
+    matchLabels: {}
+  repoURL: https://argoproj.github.io/argo-helm
+  chartName: argo-cd
+  options:
+    waitForJobs: true
+    wait: true
+    timeout: 5m
+    install:
+      createNamespace: true
+---
+apiVersion: addons.cluster.x-k8s.io/v1alpha1
+kind: HelmChartProxy
+metadata:
+  name: argocd-app
+spec:
+  clusterSelector:
+    matchLabels: {}
+  repoURL: https://argoproj.github.io/argo-helm
+  chartName: argocd-apps
+  options:
+    waitForJobs: true
+    wait: true
+    timeout: 5m
+    install:
+      createNamespace: true
+  valuesTemplate: |
+    applications:
+      - name: guestbook
+        namespace: argocd
+        finalizers:
+        - resources-finalizer.argocd.argoproj.io
+        project: default
+        sources:
+          - repoURL: https://github.com/argoproj/argocd-example-apps.git
+            path: guestbook
+            targetRevision: HEAD
+        destination:
+          server: https://kubernetes.default.svc
+          namespace: guestbook
+        syncPolicy:
+          automated:
+            prune: false
+            selfHeal: false
+          syncOptions:
+          - CreateNamespace=true
+        revisionHistoryLimit: null
+    ignoreDifferences:
+      - group: apps
+        kind: Deployment
+        jsonPointers:
+        - /spec/replicas
+    info:
+    - name: url
+      value: https://argoproj.github.io/
