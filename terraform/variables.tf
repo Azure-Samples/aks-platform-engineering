@@ -37,9 +37,15 @@ variable "addons" {
 }
 
 variable "git_private_ssh_key" {
-  description = "SSH key path for git access"
+  description = "Filepath to the private SSH key for git access"
   type        = string
   default     = "./private_ssh_deploy_key"
+}
+
+variable "git_public_ssh_key" {
+  description = "A custom ssh key to control access to the AKS workload cluster(s). This should a string containing the key and not a filepath to the key."
+  type        = string
+  default     = ""
 }
 
 # Addons Git
