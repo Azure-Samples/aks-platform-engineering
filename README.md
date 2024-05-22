@@ -41,6 +41,11 @@ az ad sp create-for-rbac --name "<service-principal-name>" --role Contributor --
 
 - Fork the repo
 - Update the files cluster-claim.yaml in [dev](./gitops/clusters/crossplane/clusters/my-app-cluster/dev/cluster-claim.yaml) and [stage](./gitops/clusters/crossplane/clusters/my-app-cluster/stage/cluster-claim.yaml) folders for adminUser value as the objectId of the user/group to be designated as the admin for the cluster.
+- In order to access the workload cluster with a personal SSH key when using the CAPZ control plane option, create an SSH key with the following command. For more information on creating and using SSH keys, follow [this link](https://learn.microsoft.com/en-us/azure/virtual-machines/linux/create-ssh-keys-detailed).
+
+```bash
+ssh-keygen -m PEM -t rsa -b 4096
+```
 
 Run Terraform:
 
@@ -52,8 +57,11 @@ terraform apply -var infrastructure_provider=crossplane \
                 -var gitops_addons_org=git@github.com:Azure-Samples \
                 -var gitops_workload_org=git@github.com:Azure-Samples \
                 -var service_principal_client_id=xxxxxxxx \
-                -var service_principal_client_secret=xxxxxxxxxx
+                -var service_principal_client_secret=xxxxxxxxxx \
+                -var git_public_ssh_key="$(cat ~/.ssh/id_rsa.pub)"
 ```
+
+**Note:** Omit the `git_public_ssh_key` variable if SSH key access is not required.
 
 Get the initial admin password and the IP address of the ArgoCD web interface.
 (Wait a few minutes for the LoadBalancer to be created after the Terraform apply)

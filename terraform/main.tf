@@ -44,6 +44,7 @@ locals {
   environment_metadata = {
     infrastructure_provider = var.infrastructure_provider
     capz_identity_id        = "${var.infrastructure_provider == "capz" ? azurerm_user_assigned_identity.capz[0].client_id : ""}"
+    git_public_ssh_key      = var.git_public_ssh_key
   }
 
   addons_metadata = {
