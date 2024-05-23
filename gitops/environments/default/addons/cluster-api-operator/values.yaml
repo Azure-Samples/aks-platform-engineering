@@ -12,6 +12,9 @@ manager:
 cert-manager:
   enabled: false
   installCRDs: false
+image:
+  manager:
+    tag: v0.10.1
 #configSecret:
 #  name:
 #  namespace:

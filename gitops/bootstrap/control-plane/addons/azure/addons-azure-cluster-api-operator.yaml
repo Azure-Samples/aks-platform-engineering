@@ -14,8 +14,8 @@ spec:
               values:
                 addonChart: cluster-api-operator
                 addonChartNamespace: capi-operator-system
-                addonChartVersion: 0.10.0
-                addonChartRepository: https://kubernetes-sigs.github.io/cluster-api-operator
+                addonChartVersion: 0.10.3
+                addonChartRepository: https://willie-yao.github.io/cluster-api-operator
               selector:
                 matchExpressions:
                   - key: akuity.io/argo-cd-cluster-name
@@ -29,13 +29,13 @@ spec:
                 matchLabels:
                   environment: staging
               values:
-                addonChartVersion: 0.10.0
+                addonChartVersion: 0.10.3
           - clusters:
               selector:
                 matchLabels:
                   environment: prod
               values:
-                addonChartVersion: 0.10.0
+                addonChartVersion: 0.10.3
   template:
     metadata:
       name: addon-{{name}}-{{values.addonChart}}
