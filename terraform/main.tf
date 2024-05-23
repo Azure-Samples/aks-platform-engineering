@@ -19,15 +19,15 @@ locals {
 
   oss_addons = {
     enable_argocd                          = try(var.addons.enable_argocd, true) # installed by default
-    enable_argo_rollouts                   = try(var.addons.enable_argo_rollouts, false)
-    enable_argo_events                     = try(var.addons.enable_argo_events, false)
-    enable_argo_workflows                  = try(var.addons.enable_argo_workflows, false)
+    enable_argo_rollouts                   = try(var.addons.enable_argo_rollouts, true)
+    enable_argo_events                     = try(var.addons.enable_argo_events, true)
+    enable_argo_workflows                  = try(var.addons.enable_argo_workflows, true)
     enable_cluster_proportional_autoscaler = try(var.addons.enable_cluster_proportional_autoscaler, false)
     enable_cert_manager                    = var.infrastructure_provider == "capz" || try(var.addons.enable_cert_manager,false) ? true : false
     enable_gatekeeper                      = try(var.addons.enable_gatekeeper, false)
     enable_gpu_operator                    = try(var.addons.enable_gpu_operator, false)
     enable_ingress_nginx                   = try(var.addons.enable_ingress_nginx, false)
-    enable_kyverno                         = try(var.addons.enable_kyverno, false)
+    enable_kyverno                         = try(var.addons.enable_kyverno, true)
     enable_kube_prometheus_stack           = try(var.addons.enable_kube_prometheus_stack, false)
     enable_metrics_server                  = try(var.addons.enable_metrics_server, false)
     enable_prometheus_adapter              = try(var.addons.enable_prometheus_adapter, false)
