@@ -31,18 +31,18 @@ spec:
       createNamespace: true
   valuesTemplate: |
     applications:
-      - name: guestbook
+      - name: apps-infra
         namespace: argocd
         finalizers:
         - resources-finalizer.argocd.argoproj.io
         project: default
         sources:
-          - repoURL: https://github.com/argoproj/argocd-example-apps.git
-            path: guestbook
+          - repoURL: https://github.com/Azure-Samples/aks-platform-engineering.git
+            path: aks-platform-engineering/tree/main/gitops/apps/infra
             targetRevision: HEAD
         destination:
           server: https://kubernetes.default.svc
-          namespace: guestbook
+          namespace: default
         syncPolicy:
           automated:
             prune: false
