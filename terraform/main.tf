@@ -27,7 +27,7 @@ locals {
     enable_gatekeeper                      = try(var.addons.enable_gatekeeper, false)
     enable_gpu_operator                    = try(var.addons.enable_gpu_operator, false)
     enable_ingress_nginx                   = try(var.addons.enable_ingress_nginx, false)
-    enable_kyverno                         = try(var.addons.enable_kyverno, true)
+    enable_kyverno                         = try(var.addons.enable_kyverno, false)
     enable_kube_prometheus_stack           = try(var.addons.enable_kube_prometheus_stack, false)
     enable_metrics_server                  = try(var.addons.enable_metrics_server, false)
     enable_prometheus_adapter              = try(var.addons.enable_prometheus_adapter, false)
