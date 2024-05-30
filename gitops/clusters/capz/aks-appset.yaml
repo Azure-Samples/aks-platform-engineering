@@ -34,6 +34,9 @@ spec:
             controlplane:
               ## SSH public key (must be valid)
               sshPublicKey: '{{metadata.annotations.git_public_ssh_key}}'
+            defaults:
+              agentPool:
+                sku: Standard_DS2_v2
       syncPolicy:
         automated:
           prune: true

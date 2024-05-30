@@ -1,6 +1,6 @@
 addon: "helm:v0.2.2"
-infrastructure: "azure:v1.14.3"
-core: "cluster-api:v1.7.1"
+infrastructure: "azure:v1.15.1"
+core: "cluster-api:v1.7.2"
 manager:
   featureGates:
     core:
@@ -9,12 +9,13 @@ manager:
       MachinePool: true
       ClusterResourceSet: true
       ClusterTopology: true
+  crdPattern: "documentdb.azure.com/*;managedidentity.azure.com/*;containerservice.azure.com/*;keyvault.azure.com/*"
 cert-manager:
   enabled: false
   installCRDs: false
 image:
   manager:
-    tag: v0.10.1
+    repository: "quillie/cluster-api-operator-amd64"
 #configSecret:
 #  name:
 #  namespace:

@@ -14,7 +14,7 @@ spec:
               values:
                 addonChart: cluster-api-operator
                 addonChartNamespace: capi-operator-system
-                addonChartVersion: 0.10.4
+                addonChartVersion: 0.10.5
                 addonChartRepository: https://willie-yao.github.io/cluster-api-operator
               selector:
                 matchExpressions:
@@ -29,13 +29,13 @@ spec:
                 matchLabels:
                   environment: staging
               values:
-                addonChartVersion: 0.10.4
+                addonChartVersion: 0.10.5
           - clusters:
               selector:
                 matchLabels:
                   environment: prod
               values:
-                addonChartVersion: 0.10.4
+                addonChartVersion: 0.10.5
   template:
     metadata:
       name: addon-{{name}}-{{values.addonChart}}
