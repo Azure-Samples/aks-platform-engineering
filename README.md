@@ -22,51 +22,65 @@ Choose Crossplane **or** Cluster API provider for Azure (CAPZ) to support deploy
 
 - An active Azure subscription. If you don't have one, create a free Azure account before you begin.
 - Azure CLI version 2.60.0 or later installed. To install or upgrade, see Install Azure CLI.
-- Terraform v1.8.3 or later [configured for authentication](https://learn.microsoft.com/azure/developer/terraform/authenticate-to-azure?tabs=bash).
+- Terraform v1.8.3 or later [configured for authentication](https://learn.microsoft.com/azure/developer/terraform/authenticate-to-azure?tabs=bash) where the user account has permissions to create resource groups and user managed identities on the subscription to setup workload identity for the AKS cluster (capz option).
 - kubectl version 1.28.9 or later installed. To install or upgrade, see Install kubectl.
 
-For choosing the Crossplane option - additional Pre-requisites:
+If choosing the Crossplane option - additional Pre-requisites:
 
 - Create a service principal with the following permissions:
-  - Contributor on the subscription
+    Contributor on the subscription
 
-```azurecli
-az ad sp create-for-rbac --name "<service-principal-name>" --role Contributor --scopes /subscriptions/<subscription-id>
-```
+    ```azurecli
+    az ad sp create-for-rbac --name "<service-principal-name>" --role Contributor --scopes /subscriptions/<subscription-id>
+    ```
 
 ## Getting Started
 
 ### Provisioning the Control Plane Cluster
 
-Until the repo is public you need a ssh deploy key for ArgoCD to clone this repo.
-Obtain the key from the team and place it in `terraform/private_ssh_deploy_key`
-
 - Fork the repo
-- Update the files cluster-claim.yaml in [dev](./gitops/clusters/crossplane/clusters/my-app-cluster/dev/cluster-claim.yaml) and [stage](./gitops/clusters/crossplane/clusters/my-app-cluster/stage/cluster-claim.yaml) folders for adminUser value as the objectId of the user/group to be designated as the admin for the cluster.
-- In order to access the workload cluster with a personal SSH key when using the CAPZ control plane option, create an SSH key with the following command. For more information on creating and using SSH keys, follow [this link](https://learn.microsoft.com/en-us/azure/virtual-machines/linux/create-ssh-keys-detailed).
+- If the repo is or desired to be private, ArgoCD will need a ssh deploy key to access this repo. Create a [read-only deploy ssh key](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/managing-deploy-keys#deploy-keys) on the fork and place the corresponding private key named `private_ssh_deploy_key` in the `terraform` directory.
 
-```bash
-ssh-keygen -m PEM -t rsa -b 4096
-```
+For crossplane only:
+- Update the files cluster-claim.yaml in [dev](./gitops/clusters/crossplane/clusters/my-app-cluster/dev/cluster-claim.yaml) and [stage](./gitops/clusters/crossplane/clusters/my-app-cluster/stage/cluster-claim.yaml) folders for adminUser value as the objectId of the user/group to be designated as the admin for the cluster.
+
+Optionally for capz only:
+- In order to access the workload cluster with a personal SSH key when using the CAPZ control plane option, create an SSH key with the following command. 
+
+    ```bash
+    ssh-keygen -m PEM -t rsa -b 4096
+    ```
+
+    For more information on creating and using SSH keys, follow [this link](https://learn.microsoft.com/en-us/azure/virtual-machines/linux/create-ssh-keys-detailed).
 
 Run Terraform:
 
 ```bash
 cd terraform
 terraform init -upgrade
-# the gitops_addons_org needs to be in the git format to use the SSH key until the repo is private
+```
+
+Choose to apply capz or crossplane.  Change `Azure-Samples` to your fork organization.
+
+```bash
+# The gitops_addons_org needs to be in the git format to use the SSH key unless the repo is public
+
+# For capz control plane
+terraform apply -var gitops_addons_org=git@github.com:Azure-Samples \
+                -var gitops_workload_org=git@github.com:Azure-Samples \
+                -var git_public_ssh_key="$(cat ~/.ssh/id_rsa.pub)" # optional - only use if you want SSH key passed into workload cluster
+
+# For crossplane control plane
 terraform apply -var infrastructure_provider=crossplane \
                 -var gitops_addons_org=git@github.com:Azure-Samples \
                 -var gitops_workload_org=git@github.com:Azure-Samples \
                 -var service_principal_client_id=xxxxxxxx \
                 -var service_principal_client_secret=xxxxxxxxxx \
-                -var git_public_ssh_key="$(cat ~/.ssh/id_rsa.pub)"
 ```
 
-**Note:** Omit the `git_public_ssh_key` variable if SSH key access is not required.
+Terraform completed installing the AKS cluster, installing ArgoCD, and configuring ArgoCD to install applications under the <> directory from the git repo.
 
-Get the initial admin password and the IP address of the ArgoCD web interface.
-(Wait a few minutes for the LoadBalancer to be created after the Terraform apply)
+### Accessing the Control Plane Cluster and ArgoCD UI
 
 Getting the credentials for the Control Plane Cluster
 
@@ -74,15 +88,29 @@ Getting the credentials for the Control Plane Cluster
 export KUBECONFIG=<your_path_to_this_repo>/aks-platform-engineering/terraform/kubeconfig
 ```
 
-```kubectl
+```shell
+# Get the initial admin password and the IP address of the ArgoCD web interface.
 kubectl get secrets argocd-initial-admin-secret -n argocd --template="{{index .data.password | base64decode}}"
 kubectl get svc -n argocd argo-cd-argocd-server
 ```
 
-The username for ArgoCD is `admin`.
-
-In case something goes wrong and you don't find a public IP, connect to the ArgoCD server doing a port forward with kubectl
+It may take a few minutes for the LoadBalancer to create a public IP for the ArgoCD UI after the Terraform apply. In case something goes wrong and you don't find a public IP, connect to the ArgoCD server doing a port forward with kubectl and access the UI on https://localhost:8080.
 
 ```kubectl
 kubectl port-forward svc/argo-cd-argocd-server -n argocd 8080:443
 ```
+
+The username for the ArgoCD UI login is `admin`.
+
+### Summary
+
+1. Terraform created an AKS control plane / mangement cluster and downloaded the kubeconfig file in the `terraform` directory.
+1. Terraform installed ArgoCD via the Terraform Kubernetes provider to that cluster
+1. Terraform `kubectl apply` the bootstrap [gitops/controplane/addons](https://github.com/Azure-Samples/aks-platform-engineering/tree/main/gitops/bootstrap/control-plane/addons) and [gitops/workloads](https://github.com/Azure-Samples/aks-platform-engineering/tree/main/gitops/bootstrap/workloads) ArgoCD ApplicationSets to the cluster. 
+1.  Those two ApplicationSets utilize the [ArgoCD App of Apps pattern](https://argo-cd.readthedocs.io/en/stable/operator-manual/cluster-bootstrapping/#app-of-apps-pattern) and ArgoCD applies all of the applications under that folder in git which match the [labels specified in Terraform](https://github.com/Azure-Samples/aks-platform-engineering/blob/main/terraform/main.tf#L20-L38).
+
+    Since there are clusters definied in the workloads folder, CAPZ or Crossplane will also create AKS cluster(s) via the Application definition in ArgoCD.  Clusters were created automatically to show the power of ArgoCD and corresponding CAPZ or Crossplane code, but in a production system a PR would initiate the creation of an environment for a development team.
+
+## Next Steps
+
+Learn how to define your own cluster, infrastructure, and hand off to the development team the access to the AKS cluster and ArgoCD deployment UI in [this article](./docs/Application-Team.md).
