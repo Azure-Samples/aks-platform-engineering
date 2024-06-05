@@ -113,4 +113,4 @@ The username for the ArgoCD UI login is `admin`.
 
 ## Next Steps
 
-Learn how to define your own cluster, infrastructure, and hand off to the development team the access to the AKS cluster and ArgoCD deployment UI in [this article](./docs/Application-Team.md).
+Learn how to define your own cluster, infrastructure, and hand off to the development team the access to the AKS cluster and ArgoCD deployment UI in [this article](./docs/Onboard-New-Dev-Team.md).
