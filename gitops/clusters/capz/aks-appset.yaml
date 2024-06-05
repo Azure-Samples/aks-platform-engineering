@@ -23,7 +23,7 @@ spec:
       source:
         repoURL: 'https://mboersma.github.io/cluster-api-charts'
         chart: azure-managed-cluster
-        targetRevision: v0.2.2
+        targetRevision: v0.2.3
         helm:
           valuesObject:
             subscriptionID: '{{metadata.annotations.subscription_id}}'
@@ -34,6 +34,7 @@ spec:
             controlplane:
               ## SSH public key (must be valid)
               sshPublicKey: '{{metadata.annotations.git_public_ssh_key}}'
+              enablePreviewFeatures: true
             defaults:
               agentPool:
                 sku: Standard_DS2_v2
