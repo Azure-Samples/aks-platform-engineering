@@ -14,13 +14,10 @@ spec:
               values:
                 addonChart: cluster-api-operator
                 addonChartNamespace: capi-operator-system
-                addonChartVersion: 0.10.5
-                addonChartRepository: https://willie-yao.github.io/cluster-api-operator
+                addonChartVersion: 0.11.0
+                addonChartRepository: https://kubernetes-sigs.github.io/cluster-api-operator
               selector:
                 matchExpressions:
-                  - key: akuity.io/argo-cd-cluster-name
-                    operator: NotIn
-                    values: [in-cluster]
                   - key: enable_cluster_api_operator
                     operator: In
                     values: ['true']
@@ -29,13 +26,13 @@ spec:
                 matchLabels:
                   environment: staging
               values:
-                addonChartVersion: 0.10.5
+                addonChartVersion: 0.11.0
           - clusters:
               selector:
                 matchLabels:
                   environment: prod
               values:
-                addonChartVersion: 0.10.5
+                addonChartVersion: 0.11.0
   template:
     metadata:
       name: addon-{{name}}-{{values.addonChart}}
