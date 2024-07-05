@@ -21,10 +21,10 @@ spec:
                   - key: enable_cluster_api_operator
                     operator: In
                     values: ['true']
-          # - clusters:
-          #     selector:
-          #       matchLabels:
-          #         environment: staging
+          - clusters:
+              selector:
+                matchLabels:
+                  environment: staging
           #     values:
           #       addonChartVersion: 0.11.0
           # - clusters:
