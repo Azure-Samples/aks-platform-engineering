@@ -14,14 +14,11 @@ spec:
               values:
                 addonChart: argo-cd
                 # anything not staging or prod use this version
-                addonChartVersion: 6.11.1
+                addonChartVersion: 7.3.4
                 addonChartRepositoryNamespace: argocd
                 addonChartRepository: https://argoproj.github.io/argo-helm
               selector:
                 matchExpressions:
-                  - key: akuity.io/argo-cd-cluster-name
-                    operator: NotIn
-                    values: [in-cluster]
                   - key: enable_argocd
                     operator: In
                     values: ['true']
@@ -30,13 +27,13 @@ spec:
                 matchLabels:
                   environment: control-plane
               values:
-                addonChartVersion: 6.11.1
+                addonChartVersion: 7.3.4
           - clusters:
               selector:
                 matchLabels:
                   environment: prod
               values:
-                addonChartVersion: 6.11.1
+                addonChartVersion: 7.3.4
   template:
     metadata:
       name: addon-{{name}}-{{values.addonChart}}
