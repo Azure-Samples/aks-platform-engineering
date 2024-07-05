@@ -59,7 +59,7 @@ spec:
                   value: '{{metadata.annotations.tenant_id}}'
         - repoURL: '{{metadata.annotations.addons_repo_url}}' # Install CAPI-Operator via raw YAML manifest
           targetRevision: '{{metadata.annotations.addons_repo_revision}}'
-          path: '{{metadata.annotations.addons_repo_basepath}}bootstrap/control-plane/addons/temp'
+          path: '{{metadata.annotations.addons_repo_basepath}}bootstrap/control-plane/temp'
         # - chart: '{{values.addonChart}}'
         #   repoURL: '{{values.addonChartRepository}}'
         #   targetRevision: '{{values.addonChartVersion}}'
