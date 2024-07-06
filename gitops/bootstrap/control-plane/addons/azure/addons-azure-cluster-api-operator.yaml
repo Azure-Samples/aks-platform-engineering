@@ -35,7 +35,7 @@ spec:
           #       addonChartVersion: 0.11.0
   template:
     metadata:
-      name: addon-{{name}}-{{values.addonChart}}
+      name: addon-{{name}}-capi-operator
     spec:
       project: default
       sources:
