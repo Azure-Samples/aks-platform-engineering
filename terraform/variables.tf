@@ -12,7 +12,7 @@ variable "location" {
 
 variable "agents_size" {
   description = "Specifies the default virtual machine size for the Kubernetes agents"
-  default     = "Standard_DS2_v2"
+  default     = "Standard_D2s_v3"
   type        = string
 }
 
@@ -25,7 +25,7 @@ variable "kubernetes_version" {
 variable "infrastructure_provider" {
   description = "Specific the choice of infrastructure provider. crossplane or capz"
   type        = string
-  default     = "crossplane"
+  default     = "capz"
 }
 
 variable "addons" {
@@ -167,7 +167,7 @@ variable "enable_host_encryption" {
 variable "log_analytics_workspace_enabled" {
   description = "Specifies whether Log Analytics is enabled"
   type        = bool
-  default     = true
+  default     = false
 }
 
 variable "agents_min_count" {
@@ -191,7 +191,7 @@ variable "agents_max_pods" {
 variable "azure_policy_enabled" {
   description = "Should the Azure Policy Add-On be enabled? For more details please visit Understand Azure Policy for Azure Kubernetes Service"
   type        = bool
-  default     = true
+  default     = false
 }
 
 variable "network_policy" {
@@ -203,7 +203,7 @@ variable "network_policy" {
 variable "microsoft_defender_enabled" {
   description = "Should Microsoft Defender for Containers be enabled? For more details please visit Microsoft Defender for Containers"
   type        = bool
-  default     = true
+  default     = false
 }
 
 variable "net_profile_dns_service_ip" {
