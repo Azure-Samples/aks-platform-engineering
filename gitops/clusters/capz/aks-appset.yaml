@@ -35,6 +35,7 @@ spec:
               ## SSH public key (must be valid)
               sshPublicKey: '{{metadata.annotations.git_public_ssh_key}}'
               enablePreviewFeatures: true
+            networkPluginMode: 'Overlay'
             defaults:
               agentPool:
                 sku: Standard_DS2_v2
