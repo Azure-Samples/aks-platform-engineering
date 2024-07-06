@@ -71,7 +71,7 @@ spec:
         #       - $values/{{metadata.annotations.addons_repo_basepath}}environments/{{metadata.labels.environment}}/addons/{{values.addonChart}}/values.yaml
         #       - $values/{{metadata.annotations.addons_repo_basepath}}environments/clusters/{{name}}/addons/{{values.addonChart}}/values.yaml
       destination:
-        namespace: '{{values.addonChartNamespace}}'
+        namespace: 'capi-operator-system'
         name: '{{name}}'
       syncPolicy:
         retry:
