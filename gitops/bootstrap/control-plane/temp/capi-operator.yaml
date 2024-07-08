@@ -15,6 +15,7 @@ metadata:
   annotations:
     cert-manager.io/inject-ca-from: 'capi-operator-system/capi-operator-serving-cert'
     controller-gen.kubebuilder.io/version: v0.14.0
+    argocd.argoproj.io/sync-wave: "0"
     argocd.argoproj.io/sync-options: Prune=false
     helm.sh/resource-policy: keep
   labels:
@@ -1635,6 +1636,7 @@ metadata:
     cert-manager.io/inject-ca-from: 'capi-operator-system/capi-operator-serving-cert'
     controller-gen.kubebuilder.io/version: v0.14.0
     helm.sh/resource-policy: keep
+    argocd.argoproj.io/sync-wave: "0"
     argocd.argoproj.io/sync-options: Prune=false
   labels:
     clusterctl.cluster.x-k8s.io/core: capi-operator
@@ -4839,6 +4841,7 @@ metadata:
     cert-manager.io/inject-ca-from: 'capi-operator-system/capi-operator-serving-cert'
     controller-gen.kubebuilder.io/version: v0.14.0
     helm.sh/resource-policy: keep
+    argocd.argoproj.io/sync-wave: "0"
     argocd.argoproj.io/sync-options: Prune=false
   labels:
     clusterctl.cluster.x-k8s.io/core: capi-operator
@@ -8046,6 +8049,7 @@ metadata:
     cert-manager.io/inject-ca-from: 'capi-operator-system/capi-operator-serving-cert'
     controller-gen.kubebuilder.io/version: v0.14.0
     helm.sh/resource-policy: keep
+    argocd.argoproj.io/sync-wave: "0"
     argocd.argoproj.io/sync-options: Prune=false
   labels:
     clusterctl.cluster.x-k8s.io/core: capi-operator
@@ -11250,6 +11254,7 @@ metadata:
     cert-manager.io/inject-ca-from: 'capi-operator-system/capi-operator-serving-cert'
     controller-gen.kubebuilder.io/version: v0.14.0
     helm.sh/resource-policy: keep
+    argocd.argoproj.io/sync-wave: "0"
     argocd.argoproj.io/sync-options: Prune=false
   labels:
     clusterctl.cluster.x-k8s.io/core: capi-operator
@@ -14457,6 +14462,7 @@ metadata:
     cert-manager.io/inject-ca-from: 'capi-operator-system/capi-operator-serving-cert'
     controller-gen.kubebuilder.io/version: v0.14.0
     helm.sh/resource-policy: keep
+    argocd.argoproj.io/sync-wave: "0"
     argocd.argoproj.io/sync-options: Prune=false
   labels:
     clusterctl.cluster.x-k8s.io/core: capi-operator
@@ -16076,6 +16082,7 @@ metadata:
     cert-manager.io/inject-ca-from: 'capi-operator-system/capi-operator-serving-cert'
     controller-gen.kubebuilder.io/version: v0.14.0
     helm.sh/resource-policy: keep
+    argocd.argoproj.io/sync-wave: "0"
     argocd.argoproj.io/sync-options: Prune=false
   labels:
     clusterctl.cluster.x-k8s.io/core: capi-operator
@@ -17946,6 +17953,7 @@ kind: MutatingWebhookConfiguration
 metadata:
   annotations:
     cert-manager.io/inject-ca-from: 'capi-operator-system/capi-operator-serving-cert'
+    argocd.argoproj.io/sync-wave: "0"
   labels:
     clusterctl.cluster.x-k8s.io/core: capi-operator
   name: capi-operator-mutating-webhook-configuration
@@ -18111,6 +18119,7 @@ kind: ValidatingWebhookConfiguration
 metadata:
   annotations:
     cert-manager.io/inject-ca-from: 'capi-operator-system/capi-operator-serving-cert'
+    argocd.argoproj.io/sync-wave: "0"
   labels:
     clusterctl.cluster.x-k8s.io/core: capi-operator
   name: capi-operator-validating-webhook-configuration
