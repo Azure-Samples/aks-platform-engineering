@@ -18288,6 +18288,7 @@ metadata:
   annotations:
     "helm.sh/hook": "post-install"
     "helm.sh/hook-weight": "1"
+    argocd.argoproj.io/sync-wave: "1"
     argocd.argoproj.io/sync-options: Prune=false
   name: capi-system
 ---
