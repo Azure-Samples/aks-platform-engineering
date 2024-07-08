@@ -18395,7 +18395,6 @@ spec:
   version: v1.15.2
   manager:
     featureGates:
-      ASOAPI: true
       ClusterResourceSet: true
       ClusterTopology: true
       MachinePool: true
