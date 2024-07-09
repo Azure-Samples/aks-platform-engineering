@@ -80,6 +80,11 @@ spec:
         syncOptions:
           - CreateNamespace=true
           - ServerSideApply=true
+        terminate:
+          duration: 1m
+          resources:
+            - kind: Job
+              timeout: 1m # timeout for the resource
       ignoreDifferences:
       - group: apiextensions.k8s.io
         kind: CustomResourceDefinition
