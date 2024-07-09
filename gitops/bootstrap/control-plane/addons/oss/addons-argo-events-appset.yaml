@@ -14,13 +14,10 @@ spec:
               values:
                 addonChart: argo-events
                 # anything not staging or prod use this version
-                addonChartVersion: 2.4.4
+                addonChartVersion: 2.4.7
                 addonChartRepository: https://argoproj.github.io/argo-helm
               selector:
                 matchExpressions:
-                  - key: akuity.io/argo-cd-cluster-name
-                    operator: NotIn
-                    values: [in-cluster]
                   - key: enable_argo_events
                     operator: In
                     values: ['true']
@@ -29,13 +26,13 @@ spec:
                 matchLabels:
                   environment: staging
               values:
-                addonChartVersion: 2.4.4
+                addonChartVersion: 2.4.7
           - clusters:
               selector:
                 matchLabels:
                   environment: prod
               values:
-                addonChartVersion: 2.4.4
+                addonChartVersion: 2.4.7
   template:
     metadata:
       name: addon-{{name}}-{{values.addonChart}}

@@ -329,7 +329,7 @@ spec:
             chart:
               name: argo-cd
               repository: https://argoproj.github.io/argo-helm
-              version:  6.7.2
+              version:  7.3.4
             namespace: argocd   
           providerConfigRef:
             name: helm-provider	
