@@ -75,11 +75,16 @@ spec:
         name: '{{name}}'
       syncPolicy:
         retry:
-          limit: 5
+          limit: 5 # number of failed sync attempt retries; unlimited number of attempts if less than 0
+          backoff:
+            duration: 5s # the amount to back off. Default unit is seconds, but could also be a duration (e.g. "2m", "1h")
+            factor: 2 # a factor to multiply the base duration after each failed retry
+            maxDuration: 3m # the maximum amount of time allowed for the backoff
         automated: {}
         syncOptions:
           - CreateNamespace=true
           - ServerSideApply=true
+        preserveResourcesOnDeletion: true #https://argo-cd.readthedocs.io/en/stable/operator-manual/applicationset/Controlling-Resource-Modification/#prevent-an-applications-child-resources-from-being-deleted-when-the-parent-application-is-deleted
         terminate:
           duration: 1m
           resources:
