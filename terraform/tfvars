@@ -1,23 +1,23 @@
-# Sample tfvars
+# Sample tfvars - rename to terraform.tfvars to use
 
 # Azure region
-region = "centralus"
+location = "westus3"
 
 # Kubernetes version
 kubernetes_version = null # Defaults to latest
 
 # GitOps Addons configuration
-gitops_addons_org      = "example-org"
-gitops_addons_repo     = "example-addons-repo"
-gitops_addons_basepath = "addons"
-gitops_addons_path     = "path/to/addons"
+gitops_addons_org      = "git@github.com:myGitHubUserName"
+gitops_addons_repo     = "aks-platform-engineering"
+gitops_addons_basepath = "gitops/"
+gitops_addons_path     = "bootstrap/control-plane/addons"
 gitops_addons_revision = "main"
 
 # Workload configuration
-gitops_workload_org      = "example-org"
-gitops_workload_repo     = "example-workload-repo"
-gitops_workload_basepath = "workloads"
-gitops_workload_path     = "path/to/workloads"
+gitops_workload_org      = "git@github.com:myGitHubUserName"
+gitops_workload_repo     = "aks-platform-engineering"
+gitops_workload_basepath = "gitops/"
+gitops_workload_path     = "bootstrap/workloads"
 gitops_workload_revision = "main"
 
 # Agents size
@@ -25,21 +25,8 @@ agents_size = "Standard_D2s_v3"
 
 # Addons configuration
 addons = {
-  enable_argocd                          = true
-  enable_argo_rollouts                   = true
-  enable_argo_events                     = true
-  enable_argo_workflows                  = true
-}
-
-# Network configuration
-network = {
-  address_prefixes  = ["10.52.0.0/16"]
-  service_endpoints = ["Microsoft.Storage"]
+  enable_kyverno                         = false
 }
 
 # Resource group name
 resource_group_name = "aks-gitops"
-
-# Virtual network configuration
-virtual_network_address_space = ["10.52.0.0/16"]
-virtual_network_name          = "vnet1"
