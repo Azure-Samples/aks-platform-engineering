@@ -25,7 +25,7 @@ variable "kubernetes_version" {
 variable "infrastructure_provider" {
   description = "Specific the choice of infrastructure provider. crossplane or capz"
   type        = string
-  default     = "capz"
+  default     = "crossplane"
 }
 
 variable "addons" {
