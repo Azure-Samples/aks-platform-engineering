@@ -96,7 +96,7 @@ spec:
                   kubernetesVersion:
                     type: string
                     description: specifies the version of Kubernetes
-                    default: 1.28.3
+                    default: 
                   dnsPrefix:
                     type: string
                     description: specifies the DNS prefix to use with the hosted Kubernetes API server FQDN

@@ -15,7 +15,7 @@ spec:
                 addonChart: crossplane
                 addonChartNamespace: crossplane-system
                 # anything not staging or prod use this version
-                addonChartVersion: 1.14.5
+                addonChartVersion: 1.16.0
                 addonChartRepository: https://charts.crossplane.io/stable
               selector:
                 matchExpressions:
@@ -30,13 +30,13 @@ spec:
                 matchLabels:
                   environment: control-plane
               values:
-                addonChartVersion: 1.14.5
+                addonChartVersion: 1.16.0
           - clusters:
               selector:
                 matchLabels:
                   environment: prod
               values:
-                addonChartVersion: 1.14.5
+                addonChartVersion: 1.16.0
   template:
     metadata:
       name: addon-{{name}}-{{values.addonChart}}

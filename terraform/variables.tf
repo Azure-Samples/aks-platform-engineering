@@ -241,14 +241,3 @@ variable "service_principal_client_secret" {
   type        = string
   default     = null
 }
-
-variable "crossplane_credentials_type" {
-  description = "Specifies whether to use a new service principal or kubelet user-assigned managed identity as Crossplane credentials."
-  default     = "servicePrincipal"
-  type        = string
-
-  validation {
-    condition     = contains(["servicePrincipal", "managedIdentity"], var.crossplane_credentials_type)
-    error_message = "The value of the crossplane_credentials_type parameter is invalid. It must be either servicePrincipal or managedIdentity."
-  }
-}
