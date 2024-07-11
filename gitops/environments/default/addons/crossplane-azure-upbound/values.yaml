@@ -4,6 +4,31 @@ provider:
     annotations: {}
     labels:
       app.kubernetes.io/managed-by: Helm
+      azure.workload.identity/use: "true"
   package:
     registry: xpkg.upbound.io/upbound
-    version: v0.42.1
+    version: v1.4.0
+
+deploymentRuntimeConfig:
+  enabled: true
+  metadata:
+    name: "upbound-azure-runtime-config"
+    role_arn: ""
+    annotations: {}
+    labels:
+      app.kubernetes.io/managed-by: Helm
+  spec:
+    deploymentTemplate:
+      spec:
+        selector: {}
+        template:
+          metadata:
+            annotations: {}
+            labels: 
+              azure.workload.identity/use: true
+    serviceAccountTemplate:
+      metadata:
+        annotations: {}
+        labels:
+            azure.workload.identity/use: true
+        name: azure-provider

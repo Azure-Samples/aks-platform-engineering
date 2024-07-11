@@ -49,12 +49,21 @@ spec:
         - chart: '{{values.addonChart}}'
           repoURL: '{{values.addonChartRepository}}'
           targetRevision: '{{values.addonChartVersion}}'
+          kustomize:
+            patches:
+            - target:
+                kind: ProviderConfig
+                name: default
+              patch: |-
+                - op: replace
+                  path: /spec/credentials/source
+                  value: 'OIDCTokenFile'
           helm:
             releaseName: '{{values.addonChart}}'
             ignoreMissingValueFiles: true
             parameters:
             - name: "providerConfig.spec.clientID"
-              value: '{{metadata.annotations.kubelet_identity_client_id}}'
+              value: '{{metadata.annotations.capz_identity_id}}'
             - name: "providerConfig.spec.subscriptionID"
               value: '{{metadata.annotations.subscription_id}}'
             - name: "providerConfig.spec.tenantID"

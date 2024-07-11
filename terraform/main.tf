@@ -43,7 +43,7 @@ locals {
 
   environment_metadata = {
     infrastructure_provider = var.infrastructure_provider
-    capz_identity_id        = "${var.infrastructure_provider == "capz" ? azurerm_user_assigned_identity.capz[0].client_id : ""}"
+    capz_identity_id        = azurerm_user_assigned_identity.capz[0].client_id
     git_public_ssh_key      = var.git_public_ssh_key
   }
 
@@ -212,97 +212,4 @@ module "gitops_bridge_bootstrap" {
     namespace     = local.argocd_namespace
     chart_version = "7.3.4"
   }
-}
-
-################################################################################
-# Service Principal: Creation
-################################################################################
-data "azuread_client_config" "current" {}
-data "azurerm_subscription" "current" {}
-
-resource "azuread_application" "registered_application" {
-  count        = var.create_service_principal ? 1 : 0
-  display_name = var.registered_application_name
-  owners       = [data.azuread_client_config.current.object_id]
-}
-
-resource "azuread_service_principal" "service_principal" {
-  count                        = var.create_service_principal ? 1 : 0
-  client_id                    = azuread_application.registered_application[0].client_id
-  app_role_assignment_required = true
-  owners                       = [data.azuread_client_config.current.object_id]
-}
-
-resource "time_rotating" "service_principal_credentials_time_rotating" {
-  count          = var.create_service_principal ? 1 : 0
-  rotation_years = 2
-}
-
-resource "azuread_service_principal_password" "service_principal_password" {
-  count                = var.create_service_principal ? 1 : 0
-  service_principal_id = azuread_service_principal.service_principal[0].object_id
-  rotate_when_changed = {
-    rotation = time_rotating.service_principal_credentials_time_rotating[0].id
-  }
-}
-
-resource "azurerm_role_assignment" "service_principal_subscription_owner_role_assignment" {
-  count                            = var.create_service_principal ? 1 : 0
-  scope                            = data.azurerm_subscription.current.id
-  role_definition_name             = "Owner"
-  principal_id                     = azuread_service_principal.service_principal[0].object_id
-  skip_service_principal_aad_check = true
-}
-
-#############################################################################################
-# Crossplane Secret is created only when using a Service Principal as Crossplane Credentials
-#############################################################################################
-resource "kubernetes_namespace" "crossplane_namespace" {
-  count      = var.crossplane_credentials_type == "servicePrincipal" ? 1 : 0
-  depends_on = [module.aks]
-  metadata {
-    name = "crossplane-system"
-  }
-}
-
-resource "kubernetes_secret" "crossplane_secret" {
-  count = (var.infrastructure_provider == "crossplane" && var.crossplane_credentials_type == "servicePrincipal") ? 1 : 0
-  type  = "Opaque"
-
-  metadata {
-    name      = "azure-secret"
-    namespace = kubernetes_namespace.crossplane_namespace[0].metadata[0].name
-  }
-
-  data = {
-    creds = jsonencode({
-      "clientId"                       = "${var.create_service_principal ? azuread_service_principal.service_principal[0].client_id : var.service_principal_client_id}"
-      "clientSecret"                   = "${var.create_service_principal ? azuread_service_principal_password.service_principal_password[0].value : var.service_principal_client_secret}"
-      "subscriptionId"                 = "${data.azurerm_subscription.current.subscription_id}"
-      "tenantId"                       = "${data.azurerm_subscription.current.tenant_id}"
-      "activeDirectoryEndpointUrl"     = "https://login.microsoftonline.com"
-      "resourceManagerEndpointUrl"     = "https://management.azure.com/"
-      "activeDirectoryGraphResourceId" = "https://graph.windows.net/"
-      "sqlManagementEndpointUrl"       = "https://management.core.windows.net:8443/"
-      "galleryEndpointUrl"             = "https://gallery.azure.com/"
-      "managementEndpointUrl"          = "https://management.core.windows.net/"
-    })
-  }
-
-  timeouts {
-    create = "60m"
-  }
-
-  depends_on = [kubernetes_namespace.crossplane_namespace]
-}
-
-#####################################################################################################################################################
-# Kubelet User-assigned Managed Identity Role Assignment is created only when using Kubelet User-assigned Managed Identity as Crossplane Credentials
-#####################################################################################################################################################
-resource "azurerm_role_assignment" "managed_identity_role_assignment" {
-  count                            = var.crossplane_credentials_type == "managedIdentity" ? 1 : 0
-  scope                            = data.azurerm_subscription.current.id
-  role_definition_name             = "Owner"
-  principal_id                     = module.aks.kubelet_identity[0].object_id
-  skip_service_principal_aad_check = true
 }
