@@ -6,4 +6,4 @@ provider:
       app.kubernetes.io/managed-by: Helm
   package:
     registry: xpkg.upbound.io/upbound
-    version: v0.42.1
+    version: v1.4.0
