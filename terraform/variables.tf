@@ -244,7 +244,7 @@ variable "service_principal_client_secret" {
 
 variable "crossplane_credentials_type" {
   description = "Specifies whether to use a new service principal or kubelet user-assigned managed identity as Crossplane credentials."
-  default     = "servicePrincipal"
+  default     = "managedIdentity"
   type        = string
 
   validation {
