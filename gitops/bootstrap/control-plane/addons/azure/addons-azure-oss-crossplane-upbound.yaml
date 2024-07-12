@@ -17,7 +17,7 @@ spec:
                 # anything not staging or prod use this version
                 addonChartVersion: 1.0.0
                 #addonChartRepository: https://gitops-bridge-dev.github.io/gitops-bridge-helm-charts
-                addonChartRepository: https://github.com/seenu433/gitops-bridge-helm-charts
+                addonChartRepository: https://seenu433.github.io/gitops-bridge-helm-charts/gitops-bridge-helm-charts
               selector:
                 matchExpressions:
                   - key: akuity.io/argo-cd-cluster-name
@@ -53,7 +53,6 @@ spec:
           helm:
             releaseName: '{{values.addonChart}}'
             ignoreMissingValueFiles: true
-
             parameters:
             - name: "providerConfig.spec.credentials.source"
               value: 'OIDCTokenFile'            
