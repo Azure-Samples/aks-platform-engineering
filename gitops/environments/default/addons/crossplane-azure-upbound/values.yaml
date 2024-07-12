@@ -22,15 +22,6 @@ deploymentRuntimeConfig:
       metadata:
         labels:
           azure.workload.identity/use: "true"
-      spec:
-        replicas: 1
-        template:
-          securityContext:
-            fsGroup: 2000
-          containers:
-          - name: package-runtime
-            args:
-            - --debug
     serviceAccountTemplate:
       metadata: 
         labels:
