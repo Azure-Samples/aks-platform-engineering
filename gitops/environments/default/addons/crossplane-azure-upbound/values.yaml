@@ -31,7 +31,7 @@ deploymentRuntimeConfig:
           - name: package-runtime
             args:
             - --debug
-      serviceAccountTemplate:
-        metadata: 
-          labels:
-              azure.workload.identity/use: "true"         
+    serviceAccountTemplate:
+      metadata: 
+        labels:
+            azure.workload.identity/use: "true"         
