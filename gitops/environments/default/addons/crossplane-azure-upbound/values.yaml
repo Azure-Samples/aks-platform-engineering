@@ -8,3 +8,30 @@ provider:
   package:
     registry: xpkg.upbound.io/upbound
     version: v1.4.0
+
+deploymentRuntimeConfig:
+  enabled: true
+  metadata:
+    name: "default"
+    role_arn: ""
+    annotations: {}
+    labels:
+      app.kubernetes.io/managed-by: Helm
+  spec:
+    deploymentTemplate:
+      metadata:
+        labels:
+          azure.workload.identity/use: "true"
+      spec:
+        replicas: 1
+        template:
+          securityContext:
+            fsGroup: 2000
+          containers:
+          - name: package-runtime
+            args:
+            - --debug
+      serviceAccountTemplate:
+        metadata: 
+          labels:
+              azure.workload.identity/use: "true"         
