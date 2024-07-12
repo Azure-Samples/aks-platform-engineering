@@ -54,13 +54,13 @@ spec:
             releaseName: '{{values.addonChart}}'
             ignoreMissingValueFiles: true
             parameters:
-            - name: "providerConfig.spec.credentials.source"
+            - name: "providerConfig.spec.source"
               value: 'OIDCTokenFile'            
-            - name: "providerConfig.spec.credentials.clientID"
+            - name: "providerConfig.spec.clientID"
               value: '{{metadata.annotations.capz_identity_id}}'
-            - name: "providerConfig.spec.credentials.subscriptionID"
+            - name: "providerConfig.spec.subscriptionID"
               value: '{{metadata.annotations.subscription_id}}'
-            - name: "providerConfig.spec.credentials.tenantID"
+            - name: "providerConfig.spec.tenantID"
               value: '{{metadata.annotations.tenant_id}}'
             valueFiles:
               - $values/{{metadata.annotations.addons_repo_basepath}}environments/default/addons/{{values.addonChart}}/values.yaml
