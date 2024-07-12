@@ -16,7 +16,8 @@ spec:
                 addonChartNamespace: crossplane-system
                 # anything not staging or prod use this version
                 addonChartVersion: 1.0.0
-                addonChartRepository: https://gitops-bridge-dev.github.io/gitops-bridge-helm-charts
+                #addonChartRepository: https://gitops-bridge-dev.github.io/gitops-bridge-helm-charts
+                addonChartRepository: https://github.com/seenu433/gitops-bridge-helm-charts
               selector:
                 matchExpressions:
                   - key: akuity.io/argo-cd-cluster-name
@@ -49,24 +50,18 @@ spec:
         - chart: '{{values.addonChart}}'
           repoURL: '{{values.addonChartRepository}}'
           targetRevision: '{{values.addonChartVersion}}'
-          kustomize:
-            patches:
-            - target:
-                kind: ProviderConfig
-                name: default
-              patch: |-
-                - op: replace
-                  path: /spec/credentials/source
-                  value: 'OIDCTokenFile'
           helm:
             releaseName: '{{values.addonChart}}'
             ignoreMissingValueFiles: true
+
             parameters:
-            - name: "providerConfig.spec.clientID"
+            - name: "providerConfig.spec.credentials.source"
+              value: 'OIDCTokenFile'            
+            - name: "providerConfig.spec.credentials.clientID"
               value: '{{metadata.annotations.capz_identity_id}}'
-            - name: "providerConfig.spec.subscriptionID"
+            - name: "providerConfig.spec.credentials.subscriptionID"
               value: '{{metadata.annotations.subscription_id}}'
-            - name: "providerConfig.spec.tenantID"
+            - name: "providerConfig.spec.credentials.tenantID"
               value: '{{metadata.annotations.tenant_id}}'
             valueFiles:
               - $values/{{metadata.annotations.addons_repo_basepath}}environments/default/addons/{{values.addonChart}}/values.yaml

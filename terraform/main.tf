@@ -43,7 +43,7 @@ locals {
 
   environment_metadata = {
     infrastructure_provider = var.infrastructure_provider
-    capz_identity_id        = azurerm_user_assigned_identity.capz[0].client_id
+    capz_identity_id        = azurerm_user_assigned_identity.capz.client_id
     git_public_ssh_key      = var.git_public_ssh_key
   }
 
@@ -71,6 +71,8 @@ locals {
     GithubRepo = "github.com/gitops-bridge-dev/gitops-bridge"
   }
 }
+
+data "azurerm_subscription" "current" {}
 
 ################################################################################
 # Resource Group: Resource

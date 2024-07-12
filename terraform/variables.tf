@@ -7,7 +7,7 @@ variable "resource_group_name" {
 variable "location" {
   description = "Specifies the the location for the Azure resources."
   type        = string
-  default     = "westus3"
+  default     = "eastus2"
 }
 
 variable "agents_size" {
@@ -218,26 +218,3 @@ variable "net_profile_service_cidr" {
   type        = string
 }
 
-variable "registered_application_name" {
-  description = "Specifies the name of the Microsoft Entra ID registered application."
-  default     = "crossplane"
-  type        = string
-}
-
-variable "create_service_principal" {
-  description = "Specifies whether to use a new service principal or not."
-  default     = false
-  type        = bool
-}
-
-variable "service_principal_client_id" {
-  description = "Specifies the client id of an existing service principal with the Owner role on the subscription."
-  type        = string
-  default     = null
-}
-
-variable "service_principal_client_secret" {
-  description = "Specifies the client secret of an existing service principal with the Owner role on the subscription."
-  type        = string
-  default     = null
-}
