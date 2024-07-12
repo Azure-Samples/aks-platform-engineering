@@ -25,10 +25,10 @@ deploymentRuntimeConfig:
           metadata:
             annotations: {}
             labels: 
-              azure.workload.identity/use: true
+              azure.workload.identity/use: "true"
     serviceAccountTemplate:
       metadata:
         annotations: {}
         labels:
-            azure.workload.identity/use: true
+            azure.workload.identity/use: "true"
         name: azure-provider
