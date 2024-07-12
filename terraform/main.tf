@@ -39,7 +39,7 @@ locals {
   }
   addons = merge(local.azure_addons, local.oss_addons)
 
-  cluster_metadata = merge(local.environment_metadata, local.addons_metadata, local.workloads_metadata)
+  cluster_metadata = merge(local.environment_metadata, local.addons_metadata)
 
   environment_metadata = {
     infrastructure_provider = var.infrastructure_provider
@@ -54,16 +54,8 @@ locals {
     addons_repo_revision = local.gitops_addons_revision
   }
 
-  workloads_metadata = {
-    workload_repo_url      = "${var.gitops_workload_org}/${var.gitops_workload_repo}"
-    workload_repo_basepath = var.gitops_workload_basepath
-    workload_repo_path     = var.gitops_workload_path
-    workload_repo_revision = var.gitops_workload_revision
-  }
-
   argocd_apps = {
     addons    = file("${path.module}/bootstrap/addons.yaml")
-    workloads = file("${path.module}/bootstrap/workloads.yaml")
   }
 
   tags = {
@@ -173,11 +165,6 @@ resource "kubernetes_secret" "git_secrets" {
     git-addons = {
       type          = "git"
       url           = var.gitops_addons_org
-      sshPrivateKey = file(pathexpand(var.git_private_ssh_key))
-    }
-    git-workloads = {
-      type          = "git"
-      url           = var.gitops_workload_org
       sshPrivateKey = file(pathexpand(var.git_private_ssh_key))
     }
   }

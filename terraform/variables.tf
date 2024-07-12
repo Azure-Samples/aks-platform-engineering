@@ -74,34 +74,6 @@ variable "gitops_addons_path" {
   type        = string
   default     = "bootstrap/control-plane/addons"
 }
-
-# Workloads Git
-variable "gitops_workload_org" {
-  description = "Git repository org/user contains for workload."
-  type        = string
-  default     = "https://github.com/azure-samples"
-}
-variable "gitops_workload_repo" {
-  description = "Specifies the Git repository contains for workload."
-  type        = string
-  default     = "aks-platform-engineering"
-}
-variable "gitops_workload_revision" {
-  description = "Specifies the Git repository revision/branch/ref for workload."
-  type        = string
-  default     = "main"
-}
-variable "gitops_workload_basepath" {
-  description = "Specifies the Git repository base path for workload."
-  type        = string
-  default     = "gitops/"
-}
-variable "gitops_workload_path" {
-  description = "Specifies the Git repository path for workload."
-  type        = string
-  default     = "bootstrap/workloads"
-}
-
 variable "tags" {
   description = "Specifies tags for all the resources."
   default = {
