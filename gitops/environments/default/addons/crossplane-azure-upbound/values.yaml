@@ -35,7 +35,6 @@ deploymentRuntimeConfig:
               fsGroup: 2000              
     serviceAccountTemplate:
       metadata:
-        annotations: {}
         labels:
           azure.workload.identity/use: "true"
         name: azure-provider
