@@ -10,19 +10,4 @@ provider:
     version: v1.4.0
 
 deploymentRuntimeConfig:
-  enabled: true
-  metadata:
-    name: "default"
-    role_arn: ""
-    annotations: {}
-    labels:
-      app.kubernetes.io/managed-by: Helm
-  spec:
-    deploymentTemplate:
-      metadata:
-        labels:
-          azure.workload.identity/use: "true"
-    serviceAccountTemplate:
-      metadata: 
-        labels:
-            azure.workload.identity/use: "true"         
+  enabled: true        
