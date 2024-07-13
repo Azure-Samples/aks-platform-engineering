@@ -317,6 +317,8 @@ spec:
         - type: FromCompositeFieldPath
           fromFieldPath: metadata.namespace
           toFieldPath: spec.credentials.secretRef.namespace
+      readinessChecks:
+        - type: None
     - name: argocd-helm-release
       base:
         apiVersion: helm.crossplane.io/v1beta1
@@ -356,7 +358,9 @@ spec:
           transforms:
             - type: string
               string:
-                fmt: "%s-secret"              
+                fmt: "%s-secret" 
+      readinessChecks:
+        - type: None                             
     - name: deploy-infra-apps
       base:
         apiVersion: kubernetes.crossplane.io/v1alpha1
