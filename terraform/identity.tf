@@ -6,7 +6,7 @@ resource "azurerm_user_assigned_identity" "capz" {
 
 resource "azurerm_role_assignment" "capz_role_assignment" {
   scope                = data.azurerm_subscription.current.id
-  role_definition_name = "Contributor"
+  role_definition_name = "Owner"
   principal_id         = azurerm_user_assigned_identity.capz.principal_id
 }
 
