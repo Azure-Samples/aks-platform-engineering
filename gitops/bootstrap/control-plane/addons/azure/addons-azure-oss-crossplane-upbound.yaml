@@ -57,7 +57,7 @@ spec:
             - name: "providerConfig.spec.source"
               value: 'OIDCTokenFile'            
             - name: "providerConfig.spec.clientID"
-              value: '{{metadata.annotations.capz_identity_id}}'
+              value: '{{metadata.annotations.akspe_identity_id}}'
             - name: "providerConfig.spec.subscriptionID"
               value: '{{metadata.annotations.subscription_id}}'
             - name: "providerConfig.spec.tenantID"

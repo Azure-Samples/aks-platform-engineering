@@ -43,7 +43,7 @@ locals {
 
   environment_metadata = {
     infrastructure_provider = var.infrastructure_provider
-    capz_identity_id        = azurerm_user_assigned_identity.capz.client_id
+    akspe_identity_id        = azurerm_user_assigned_identity.akspe.client_id
     git_public_ssh_key      = var.git_public_ssh_key
   }
 
