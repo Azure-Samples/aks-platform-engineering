@@ -10,4 +10,4 @@ provider:
     version: v1.4.0
 
 deploymentRuntimeConfig:
-  enabled: true        
+  enabled: true
