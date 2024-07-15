@@ -4,6 +4,10 @@ provider:
     annotations: {}
     labels:
       app.kubernetes.io/managed-by: Helm
+      azure.workload.identity/use: "true"
   package:
     registry: xpkg.upbound.io/upbound
     version: v1.4.0
+
+deploymentRuntimeConfig:
+  enabled: true
