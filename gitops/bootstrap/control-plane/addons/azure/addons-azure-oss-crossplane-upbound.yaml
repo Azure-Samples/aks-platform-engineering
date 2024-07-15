@@ -15,8 +15,9 @@ spec:
                 addonChart: crossplane-azure-upbound
                 addonChartNamespace: crossplane-system
                 # anything not staging or prod use this version
-                addonChartVersion: 1.1.0
-                addonChartRepository: https://gitops-bridge-dev.github.io/gitops-bridge-helm-charts
+                addonChartVersion: 1.0.4
+                #addonChartRepository: https://gitops-bridge-dev.github.io/gitops-bridge-helm-charts
+                addonChartRepository: https://seenu433.github.io/gitops-bridge-helm-charts
               selector:
                 matchExpressions:
                   - key: akuity.io/argo-cd-cluster-name
@@ -30,13 +31,13 @@ spec:
                 matchLabels:
                   environment: control-plane
               values:
-                addonChartVersion: 1.1.0
+                addonChartVersion: 1.0.4
           - clusters:
               selector:
                 matchLabels:
                   environment: prod
               values:
-                addonChartVersion: 1.1.0
+                addonChartVersion: 1.0.4
   template:
     metadata:
       name: addon-{{name}}-{{values.addonChart}}
