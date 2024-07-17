@@ -376,7 +376,7 @@ spec:
               spec:
                 project: default
                 source:    
-                  repoURL: https://github.com/seenu433/aks-platform-engineering
+                  repoURL: https://github.com/Azure-Samples/aks-platform-engineering
                   targetRevision: HEAD
                   path: gitops/apps/infra          
                 syncPolicy:
