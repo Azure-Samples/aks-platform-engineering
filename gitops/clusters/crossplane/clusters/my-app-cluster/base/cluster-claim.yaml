@@ -11,7 +11,7 @@ spec:
   aks:
     defaultNodePool:
       name: system
-      vmSize: Standard_DS3_v2
+      vmSize: Standard_D2s_v3
       enableAutoScaling: true
       nodeCount: 1
       minCount: 1
@@ -22,7 +22,6 @@ spec:
       onlyCriticalAddonsEnabled: false
       osDiskSizeGb: 128
       osDiskType: Managed
-    kubernetesVersion: "1.28.3"
     roleBasedAccessControlEnabled: true
     oidcIssuerEnabled: true
     workloadIdentityEnabled: true

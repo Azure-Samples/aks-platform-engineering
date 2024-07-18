@@ -28,7 +28,7 @@ spec:
           valuesObject:
             subscriptionID: '{{metadata.annotations.subscription_id}}'
             identity:
-              clientID: '{{metadata.annotations.capz_identity_id}}'
+              clientID: '{{metadata.annotations.akspe_identity_id}}'
               tenantID: '{{metadata.annotations.tenant_id}}'
               type: WorkloadIdentity
             controlplane:

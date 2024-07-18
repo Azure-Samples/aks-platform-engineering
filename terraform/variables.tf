@@ -7,7 +7,7 @@ variable "resource_group_name" {
 variable "location" {
   description = "Specifies the the location for the Azure resources."
   type        = string
-  default     = "westus3"
+  default     = "eastus2"
 }
 
 variable "agents_size" {
@@ -74,34 +74,6 @@ variable "gitops_addons_path" {
   type        = string
   default     = "bootstrap/control-plane/addons"
 }
-
-# Workloads Git
-variable "gitops_workload_org" {
-  description = "Git repository org/user contains for workload."
-  type        = string
-  default     = "https://github.com/azure-samples"
-}
-variable "gitops_workload_repo" {
-  description = "Specifies the Git repository contains for workload."
-  type        = string
-  default     = "aks-platform-engineering"
-}
-variable "gitops_workload_revision" {
-  description = "Specifies the Git repository revision/branch/ref for workload."
-  type        = string
-  default     = "main"
-}
-variable "gitops_workload_basepath" {
-  description = "Specifies the Git repository base path for workload."
-  type        = string
-  default     = "gitops/"
-}
-variable "gitops_workload_path" {
-  description = "Specifies the Git repository path for workload."
-  type        = string
-  default     = "bootstrap/workloads"
-}
-
 variable "tags" {
   description = "Specifies tags for all the resources."
   default = {
@@ -216,39 +188,4 @@ variable "net_profile_service_cidr" {
   description = "Specifies the service CIDR"
   default     = "10.0.0.0/16"
   type        = string
-}
-
-variable "registered_application_name" {
-  description = "Specifies the name of the Microsoft Entra ID registered application."
-  default     = "crossplane"
-  type        = string
-}
-
-variable "create_service_principal" {
-  description = "Specifies whether to use a new service principal or not."
-  default     = false
-  type        = bool
-}
-
-variable "service_principal_client_id" {
-  description = "Specifies the client id of an existing service principal with the Owner role on the subscription."
-  type        = string
-  default     = null
-}
-
-variable "service_principal_client_secret" {
-  description = "Specifies the client secret of an existing service principal with the Owner role on the subscription."
-  type        = string
-  default     = null
-}
-
-variable "crossplane_credentials_type" {
-  description = "Specifies whether to use a new service principal or kubelet user-assigned managed identity as Crossplane credentials."
-  default     = "servicePrincipal"
-  type        = string
-
-  validation {
-    condition     = contains(["servicePrincipal", "managedIdentity"], var.crossplane_credentials_type)
-    error_message = "The value of the crossplane_credentials_type parameter is invalid. It must be either servicePrincipal or managedIdentity."
-  }
 }
