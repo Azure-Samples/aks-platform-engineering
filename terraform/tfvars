@@ -13,13 +13,6 @@ gitops_addons_basepath = "gitops/"
 gitops_addons_path     = "bootstrap/control-plane/addons"
 gitops_addons_revision = "main"
 
-# Workload configuration
-gitops_workload_org      = "git@github.com:myGitHubUserName"
-gitops_workload_repo     = "aks-platform-engineering"
-gitops_workload_basepath = "gitops/"
-gitops_workload_path     = "bootstrap/workloads"
-gitops_workload_revision = "main"
-
 # Agents size
 agents_size = "Standard_D2s_v3"
 

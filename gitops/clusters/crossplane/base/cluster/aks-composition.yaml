@@ -378,7 +378,7 @@ spec:
                 source:    
                   repoURL: https://github.com/Azure-Samples/aks-platform-engineering
                   targetRevision: HEAD
-                  path: gitops/apps/infra          
+                  path: gitops/bootstrap/workloads
                 syncPolicy:
                   automated: {}
                 destination:
