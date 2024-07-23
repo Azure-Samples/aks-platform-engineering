@@ -36,7 +36,7 @@ spec:
               sshPublicKey: '{{metadata.annotations.git_public_ssh_key}}'
             defaults:
               agentPool:
-                sku: Standard_DS2_v2
+                sku: Standard_D2s_v3
       syncPolicy:
         automated:
           prune: true
