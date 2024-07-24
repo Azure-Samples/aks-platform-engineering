@@ -107,3 +107,11 @@ EOF
 ```
 
 The AKS store demo application was installed into the `pets` namespace and webpage can be [visited by following instructions here](https://learn.microsoft.com/en-us/azure/aks/learn/quick-kubernetes-deploy-cli#test-the-application). Be sure to visit the IP address using `http` and not `https`.
+
+The development team can also view the status of the applications in the ArgoCD console installed on the team cluster.
+
+```shell
+# Get the initial admin password and the IP address of the ArgoCD web interface.
+kubectl get secrets argocd-initial-admin-secret -n argocd --template="{{index .data.password | base64decode}}"
+kubectl get svc -n argocd argo-cd-argocd-server
+```
