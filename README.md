@@ -12,7 +12,7 @@ This sample will illustrate an end-to-end workflow that Platform Engineering and
 ## Architecture
 
 This sample leverages the [GitOps Bridge Pattern](https://github.com/gitops-bridge-dev/gitops-bridge?tab=readme-ov-file).  The following diagram shows the high-level architecture of the solution:  
-![Platform Engineering on AKS Architecture Diagram](./images/Architecture%20Diagram.png)
+![Platform Engineering on AKS Architecture Diagram](./images/AKS-platform-engineering-architecture.png)
 
 The control plane cluster will be configured with addons via ArgoCD using Terraform and then bootstrapped with tools needed for Day Two operations.  
 
