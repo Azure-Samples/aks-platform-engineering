@@ -45,12 +45,10 @@ Choose to apply capz or crossplane.  Change `Azure-Samples` to your fork organiz
 # The gitops_addons_org needs to be in the git format to use the SSH key unless the repo is public
 
 # For capz control plane
-terraform apply -var gitops_addons_org=git@github.com:Azure-Samples \
-                -var gitops_workload_org=git@github.com:Azure-Samples \
+terraform apply -var gitops_addons_org=git@github.com:Azure-Samples
 
 # For crossplane control plane
-terraform apply -var gitops_addons_org=git@github.com:Azure-Samples \
-                -var gitops_workload_org=git@github.com:Azure-Samples
+terraform apply -var gitops_addons_org=git@github.com:Azure-Samples
                 -var infrastructure_provider=crossplane
 ```
 
