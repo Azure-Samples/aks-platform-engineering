@@ -45,14 +45,16 @@ Choose to apply capz or crossplane.  Change `Azure-Samples` to your fork organiz
 # The gitops_addons_org needs to be in the git format to use the SSH key unless the repo is public
 
 # For capz control plane
-terraform apply -var gitops_addons_org=git@github.com:Azure-Samples
+terraform apply -var gitops_addons_org=git@github.com:Azure-Samples --auto-approve
 
 # For crossplane control plane
-terraform apply -var gitops_addons_org=git@github.com:Azure-Samples
-                -var infrastructure_provider=crossplane
+terraform apply -var gitops_addons_org=git@github.com:Azure-Samples \
+                -var infrastructure_provider=crossplane --auto-approve
 ```
 
-Terraform completed installing the AKS cluster, installing ArgoCD, and configuring ArgoCD to install applications under the <> directory from the git repo.
+>Note: You can ignore the warnings related to deprecated attributes and invalid kubeconfig path.
+
+Terraform completed installing the AKS cluster, installing ArgoCD, and configuring ArgoCD to install applications under the `gitops\bootstrap\control-plane\addons` directory from the git repo.
 
 ### Accessing the Control Plane Cluster and ArgoCD UI
 
@@ -60,6 +62,7 @@ Getting the credentials for the Control Plane Cluster
 
 ```shell
 export KUBECONFIG=<your_path_to_this_repo>/aks-platform-engineering/terraform/kubeconfig
+echo $KUBECONFIG
 ```
 
 ```shell
@@ -83,6 +86,8 @@ The crossplane option will automatically install via ArgoCD when using the `var 
 The following steps will install CAPZ via the Cluster-API operator which also includes Azure Service Operator (ASO) to the management cluster.
 
 ```shell
+helm repo add capi-operator https://kubernetes-sigs.github.io/cluster-api-operator
+helm repo update
 helm install capi-operator capi-operator/cluster-api-operator --create-namespace -n capi-operator-system \
 --set infrastructure="azure:v1.16.0" \
 --set addon="helm:v0.2.4" \
