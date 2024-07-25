@@ -32,8 +32,8 @@ spec:
               tenantID: '{{metadata.annotations.tenant_id}}'
               type: WorkloadIdentity
             controlplane:
-              ## SSH public key (must be valid)
-              sshPublicKey: '{{metadata.annotations.git_public_ssh_key}}'
+              ## Optional SSH public key data (must be valid)
+              sshPublicKey: ''
             defaults:
               agentPool:
                 sku: Standard_D2s_v3
