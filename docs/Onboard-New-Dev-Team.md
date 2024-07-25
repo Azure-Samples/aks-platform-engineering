@@ -24,43 +24,13 @@ Update the  `sshPublicKey` value in the `gitops/clusters/capz/aks-appset.yaml` f
 
 After these changes commit the changes to the git repo on your fork.
 
-Next, create an ArgoCD application to sync the new team clusters by doing a `kubectl apply -f`` with the following code to the management cluster:
+Next, create an ArgoCD application to sync the new team clusters by running this command against the management cluster:
 
 ```
-apiVersion: argoproj.io/v1alpha1
-kind: ApplicationSet
-metadata:
-  name: clusters
-  namespace: argocd
-spec:
-  syncPolicy:
-    preserveResourcesOnDeletion: true
-  generators:
-  - clusters:
-      selector:
-        matchLabels:
-          environment: control-plane
-  template:
-    metadata:
-      name: clusters
-    spec:
-      project: default
-      source:
-        repoURL: '{{metadata.annotations.addons_repo_url}}'
-        targetRevision: '{{metadata.annotations.addons_repo_revision}}'
-        path: 'gitops/clusters/{{metadata.annotations.infrastructure_provider}}'
-      destination:
-        name: '{{name}}'
-        namespace: workload
-      syncPolicy:
-        retry:
-          limit: 10
-        automated: {}
-        syncOptions:
-          - CreateNamespace=true
+kubectl apply -f ../gitops/clusters/clusters-argo-applicationset.yaml
 ```
 
-The application will show up in the ArgoCD console and start provisioning the infrastructure in the `gitops/clusters/` folder.  This will take a few minutes.
+The application will show up in the ArgoCD console and start provisioning the infrastructure in the `gitops/clusters/<capz/crossplane>` folder.  The metadata in that file is already present on the ArgoCD cluster from the initial `terraform apply` and can be seen in the management ArgoCD UI - under `Settings - Clusters - gitops-aks` cluster.  The team cluster creation will take a few minutes.
 
 ## Connect to existing deployed workload cluster
 
