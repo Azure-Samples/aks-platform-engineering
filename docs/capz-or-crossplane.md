@@ -14,7 +14,7 @@ One other unique advantage of the CAPZ and ASO stack is there is an option to [i
 
 Crossplane is a CNCF project that provides a Kubernetes control plane to manage infrastructure resources across multiple cloud providers in a consistent way using Kubernetes Custom Resource Definitions (CRDs).  The [Crossplane project](https://github.com/crossplane/crossplane) and [Azure provider for Crossplane](https://github.com/crossplane-contrib/provider-upjet-azure) is open source, but supported primarily by the startup [Upbound](https://www.upbound.io/) which has paid offering based on top of Crossplane and the general community.  The Azure provider for Crossplane is written on top of the [Terraform go SDK for Azure](https://github.com/crossplane-contrib/provider-upjet-azure/blob/35c73f51f9b32091717de22c79a7928c2802f3c6/go.mod#L18), so there is a layer of abstraction between the Azure API and the CRDs.
 
-The advantage of Crossplane is it is cloud agnostic and can manage many resources across multiple cloud providers with a single relatively consistent infrastructure as code YAML structure. There are also additional benefits if deciding to use the paid offering from Upbound.
+The advantage of Crossplane is that it is cloud agnostic and can manage many resources across multiple cloud providers with a single, relatively consistent infrastructure as code YAML structure. There are also additional benefits from using the paid offering from Upbound.
 
 ## Comparison Summary
 
