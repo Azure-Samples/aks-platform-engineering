@@ -12,11 +12,11 @@ This sample will illustrate an end-to-end workflow that Platform Engineering and
 ## Architecture
 
 This sample leverages the [GitOps Bridge Pattern](https://github.com/gitops-bridge-dev/gitops-bridge?tab=readme-ov-file).  The following diagram shows the high-level architecture of the solution:  
-![Platform Engineering on AKS Architecture Diagram](./images/Architecture%20Diagram.png)
+![Platform Engineering on AKS Architecture Diagram](./images/AKS-platform-engineering-architecture.png)
 
 The control plane cluster will be configured with addons via ArgoCD using Terraform and then bootstrapped with tools needed for Day Two operations.  
 
-Choose Crossplane **or** Cluster API provider for Azure (CAPZ) to support deploying and managing clusters and Azure infrastructure for the application teams by changing the Terraform `infrastructure_provider` variable to either `crossplane` or `capz`.  The default is `capz` if no value is specified.
+Choose Crossplane **or** Cluster API provider for Azure (CAPZ) to support deploying and managing clusters and Azure infrastructure for the application teams by changing the Terraform `infrastructure_provider` variable to either `crossplane` or `capz`.  [See this document](./docs/capz-or-crossplane.md) for further information on the comparison.  The default is `capz` if no value is specified.
 
 ## Prerequisites
 
