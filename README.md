@@ -54,7 +54,7 @@ terraform apply -var gitops_addons_org=git@github.com:Azure-Samples \
 
 >Note: You can ignore the warnings related to deprecated attributes and invalid kubeconfig path.
 
-Terraform completed installing the AKS cluster, installing ArgoCD, and configuring ArgoCD to install applications under the `gitops\bootstrap\control-plane\addons` directory from the git repo.
+Terraform completed installing the AKS cluster, installing ArgoCD, and configuring ArgoCD to install applications under the `gitops/bootstrap/control-plane/addons` directory from the git repo.
 
 ### Accessing the Control Plane Cluster and ArgoCD UI
 
@@ -83,6 +83,19 @@ The username for the ArgoCD UI login is `admin`.
 
 The crossplane option will automatically install via ArgoCD when using the `var infrastructure_provider=crossplane`, but the CAPZ option will need to be installed manually.  Cert-manager was automatically installed via ArgoCD which is an install pre-requisite. Workload identity was also created and attached to the AKS management cluster.
 
+First verify that certificate manager is installed and pods are ready in the `cert-manager` namespace.
+
+```shell
+kubectl get pods -n cert-manager
+```
+
+```shell
+NAME                                       READY   STATUS    RESTARTS   AGE
+cert-manager-cainjector-57fd464d97-l89hs   1/1     Running   0          84s
+cert-manager-d548d744-ghmf9                1/1     Running   0          84s
+cert-manager-webhook-8656b957f-4rhr6       1/1     Running   0          84s
+```
+
 The following steps will install CAPZ via the Cluster-API operator which also includes Azure Service Operator (ASO) to the management cluster.
 
 ```shell
@@ -100,6 +113,9 @@ This will take some time to install and can be verified it is complete by seeing
 
 ```shell
 kubectl get pods -n azure-infrastructure-system
+```
+
+```shell
 NAME                                                      READY   STATUS    RESTARTS       AGE
 azureserviceoperator-controller-manager-d9d69f497-h5cdm   1/1     Running   1 (115s ago)   2m24s
 capz-controller-manager-ff97799dd-8l5n2                   1/1     Running   0              2m23s

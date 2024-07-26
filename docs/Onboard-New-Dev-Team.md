@@ -22,7 +22,7 @@ ssh-keygen -m PEM -t rsa -b 4096
 
 Update the  `sshPublicKey` value in the `gitops/clusters/capz/aks-appset.yaml` file.
 
-After these changes commit the changes to the git repo on your fork.
+After these changes, commit the changes to the git repo on your fork.
 
 Next, create an ArgoCD application to sync the new team clusters by running this command against the management cluster:
 
