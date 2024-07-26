@@ -16,7 +16,7 @@ This sample leverages the [GitOps Bridge Pattern](https://github.com/gitops-brid
 
 The control plane cluster will be configured with addons via ArgoCD using Terraform and then bootstrapped with tools needed for Day Two operations.  
 
-Choose Crossplane **or** Cluster API provider for Azure (CAPZ) to support deploying and managing clusters and Azure infrastructure for the application teams by changing the Terraform `infrastructure_provider` variable to either `crossplane` or `capz`.  [See this document](./docs/capz-or-crossplane.md) for further information on the comparison.  The default is `crossplane` if no value is specified.  The CAPZ option also automatically installs Azure Service Operator (ASO) so any Azure resource can be provisioned as long as the [CRD pattern](https://azure.github.io/azure-service-operator/guide/crd-management/#automatic-crd-installation-recommended) is specified for desired resources [in the helm values file which installs CAPZ](https://github.com/Azure-Samples/aks-platform-engineering/blob/main/gitops/environments/default/addons/cluster-api-operator/values.yaml#L12).
+Choose Crossplane **or** Cluster API provider for Azure (CAPZ) to support deploying and managing clusters and Azure infrastructure for the application teams by changing the Terraform `infrastructure_provider` variable to either `crossplane` or `capz`.  [See this document](./docs/capz-or-crossplane.md) for further information on the comparison.  The default is `capz` if no value is specified.
 
 ## Prerequisites
 
@@ -45,16 +45,16 @@ Choose to apply capz or crossplane.  Change `Azure-Samples` to your fork organiz
 # The gitops_addons_org needs to be in the git format to use the SSH key unless the repo is public
 
 # For capz control plane
-terraform apply -var gitops_addons_org=git@github.com:Azure-Samples \
-                -var gitops_workload_org=git@github.com:Azure-Samples \
-                -var infrastructure_provider=capz
+terraform apply -var gitops_addons_org=git@github.com:Azure-Samples --auto-approve
 
 # For crossplane control plane
 terraform apply -var gitops_addons_org=git@github.com:Azure-Samples \
-                -var gitops_workload_org=git@github.com:Azure-Samples
+                -var infrastructure_provider=crossplane --auto-approve
 ```
 
-Terraform completed installing the AKS cluster, installing ArgoCD, and configuring ArgoCD to install applications under the <> directory from the git repo.
+>Note: You can ignore the warnings related to deprecated attributes and invalid kubeconfig path.
+
+Terraform completed installing the AKS cluster, installing ArgoCD, and configuring ArgoCD to install applications under the `gitops/bootstrap/control-plane/addons` directory from the git repo.
 
 ### Accessing the Control Plane Cluster and ArgoCD UI
 
@@ -62,6 +62,7 @@ Getting the credentials for the Control Plane Cluster
 
 ```shell
 export KUBECONFIG=<your_path_to_this_repo>/aks-platform-engineering/terraform/kubeconfig
+echo $KUBECONFIG
 ```
 
 ```shell
@@ -77,6 +78,55 @@ kubectl port-forward svc/argo-cd-argocd-server -n argocd 8080:443
 ```
 
 The username for the ArgoCD UI login is `admin`.
+
+### Install and configure CAPZ using Cluster-API operator
+
+The crossplane option will automatically install via ArgoCD when using the `var infrastructure_provider=crossplane`, but the CAPZ option will need to be installed manually.  Cert-manager was automatically installed via ArgoCD which is an install pre-requisite. Workload identity was also created and attached to the AKS management cluster.
+
+First verify that certificate manager is installed and pods are ready in the `cert-manager` namespace.
+
+```shell
+kubectl get pods -n cert-manager
+```
+
+```shell
+NAME                                       READY   STATUS    RESTARTS   AGE
+cert-manager-cainjector-57fd464d97-l89hs   1/1     Running   0          84s
+cert-manager-d548d744-ghmf9                1/1     Running   0          84s
+cert-manager-webhook-8656b957f-4rhr6       1/1     Running   0          84s
+```
+
+The following steps will install CAPZ via the Cluster-API operator which also includes Azure Service Operator (ASO) to the management cluster.
+
+```shell
+helm repo add capi-operator https://kubernetes-sigs.github.io/cluster-api-operator
+helm repo update
+helm install capi-operator capi-operator/cluster-api-operator --create-namespace -n capi-operator-system \
+--set infrastructure="azure:v1.16.0" \
+--set addon="helm:v0.2.4" \
+--set core="cluster-api:v1.7.4" \
+--set manager.featureGates.core.MachinePool="true" \
+--set manager.featureGates.azure.MachinePool="true" \
+--wait --timeout 90s
+```
+This will take some time to install and can be verified it is complete by seeing two ready pods in the `azure-infrastructure-system` namespace. 
+
+```shell
+kubectl get pods -n azure-infrastructure-system
+```
+
+```shell
+NAME                                                      READY   STATUS    RESTARTS       AGE
+azureserviceoperator-controller-manager-d9d69f497-h5cdm   1/1     Running   1 (115s ago)   2m24s
+capz-controller-manager-ff97799dd-8l5n2                   1/1     Running   0              2m23s
+```
+Now apply the credentials for CAPZ to be able to create resources using the Workload Identity created by Terraform.
+
+Add in the `clientID:` and `tenantID:` values from the `terraform apply` matching output values to the `gitops/hooks/identity/identity.yaml` file. Feel free to run `terraform apply` again if needed to get these output values.  Then apply the identity to the cluster.
+
+```shell
+kubectl apply -f ../gitops/hooks/identity/identity.yaml
+```
 
 ### Summary
 

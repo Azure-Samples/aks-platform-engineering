@@ -23,7 +23,7 @@ spec:
       source:
         repoURL: 'https://mboersma.github.io/cluster-api-charts'
         chart: azure-managed-cluster
-        targetRevision: v0.2.2
+        targetRevision: v0.2.4
         helm:
           valuesObject:
             subscriptionID: '{{metadata.annotations.subscription_id}}'
@@ -32,11 +32,11 @@ spec:
               tenantID: '{{metadata.annotations.tenant_id}}'
               type: WorkloadIdentity
             controlplane:
-              ## SSH public key (must be valid)
-              sshPublicKey: '{{metadata.annotations.git_public_ssh_key}}'
+              ## Optional SSH public key data (must be valid)
+              sshPublicKey: ''
             defaults:
               agentPool:
-                sku: Standard_DS2_v2
+                sku: Standard_D2s_v3
       syncPolicy:
         automated:
           prune: true

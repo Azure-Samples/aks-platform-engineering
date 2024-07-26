@@ -13,52 +13,24 @@ For crossplane only - update these files:
   - cluster-claim.yaml in [dev](./gitops/clusters/crossplane/clusters/my-app-cluster/dev/cluster-claim.yaml) - change line 13 adminUser value as the objectId of the user to be designated as the admin user for the cluster.
   - cluster-claim.yaml in [stage](./gitops/clusters/crossplane/clusters/my-app-cluster/stage/cluster-claim.yaml) - change line 13 adminUser value as the objectId of the user to be designated as the admin user for the cluster.
 
-Optional for capz only:
+Optional for CAPZ only:
 - In order to access the workload cluster with a personal SSH key when using the CAPZ control plane option, create an SSH key with the following command. For more information on creating and using SSH keys, follow [this link](https://learn.microsoft.com/en-us/azure/virtual-machines/linux/create-ssh-keys-detailed).
 
 ```bash
 ssh-keygen -m PEM -t rsa -b 4096
 ```
 
+Update the  `sshPublicKey` value in the `gitops/clusters/capz/aks-appset.yaml` file.
+
 After these changes, commit the changes to the git repo on your fork.
 
-Next, create an ArgoCD application to sync the new team clusters by doing a `kubectl apply -f`` with the following code to the management cluster:
+Next, create an ArgoCD application to sync the new team clusters by running this command against the management cluster:
 
 ```
-apiVersion: argoproj.io/v1alpha1
-kind: ApplicationSet
-metadata:
-  name: clusters
-  namespace: argocd
-spec:
-  syncPolicy:
-    preserveResourcesOnDeletion: true
-  generators:
-  - clusters:
-      selector:
-        matchLabels:
-          environment: control-plane
-  template:
-    metadata:
-      name: clusters
-    spec:
-      project: default
-      source:
-        repoURL: '{{metadata.annotations.addons_repo_url}}'
-        targetRevision: '{{metadata.annotations.addons_repo_revision}}'
-        path: 'gitops/clusters/{{metadata.annotations.infrastructure_provider}}'
-      destination:
-        name: '{{name}}'
-        namespace: workload
-      syncPolicy:
-        retry:
-          limit: 10
-        automated: {}
-        syncOptions:
-          - CreateNamespace=true
+kubectl apply -f ../gitops/clusters/clusters-argo-applicationset.yaml
 ```
 
-The application will show up in the ArgoCD console and start provisioning the infrastructure in the `gitops/clusters/` folder.  This will take a few minutes.
+The application will show up in the ArgoCD console and start provisioning the infrastructure in the `gitops/clusters/<capz/crossplane>` folder.  The metadata in that file is already present on the ArgoCD cluster from the initial `terraform apply` and can be seen in the management ArgoCD UI - under `Settings - Clusters - gitops-aks` cluster.  The team cluster creation will take a few minutes.
 
 ## Connect to existing deployed workload cluster
 
@@ -81,40 +53,35 @@ az aks get-credentials -n aks0 -g aks0
 
 The existing clusters already installed ArgoCD and the required platform engineering requirements from the ArgoCD application which again utilized the app of apps pattern to install everything in the `gitops/apps/infra` folder.
 
-The new dev team would like to install their application so they will create a new ArgoCD application which synchronizes to the folder in their own repository which contains the Kubernetes deployment manifests. The repoURL could be any git repository, but assume this public sample app repository is the developer team's repo to make things easier for demo purposes. Execute a `kubectl apply -f`` with the following code while connected to the team cluster:
+The new dev team would like to install their application so they will create a new ArgoCD application which synchronizes to the folder in their own repository which contains the Kubernetes deployment manifests. The repoURL could be any git repository, but assume this public sample app repository is the developer team's repo to make things easier for demo purposes. Execute a `kubectl apply -f` with the following code while connected to the team cluster:
 
-```
+```kubectl
+kubectl apply -f - <<EOF
 apiVersion: argoproj.io/v1alpha1
-kind: ApplicationSet
+kind: Application
 metadata:
   name: aks-store-demo
-  namespace: aks-store-demo
+  namespace: argocd
 spec:
-  generators:
-  - clusters:
-      selector:
-        matchLabels:
-          environment: dev
-  - clusters:
-      selector:
-        matchLabels:
-          environment: staging
-  template:
-    metadata:
-      name: clusters
-    spec:
-      project: default
-      source:
-        repoURL: 'https://github.com/Azure-Samples/aks-store-demo.git '
-        targetRevision: HEAD
-        path: 'kustomize/overlays/dev'
-      destination:
-        name: aks-store-demo
-        namespace: aks-store-demo
-      syncPolicy:
-        retry:
-          limit: 10
-        automated: {}
-        syncOptions:
-          - CreateNamespace=true
+  project: default
+  source:    
+      repoURL: https://github.com/Azure-Samples/aks-store-demo.git    
+      targetRevision: HEAD
+      path: kustomize/overlays/dev             
+  syncPolicy:
+      automated: {}
+  destination:
+      namespace: argocd
+      server: https://kubernetes.default.svc
+EOF
+```
+
+The AKS store demo application was installed into the `pets` namespace and webpage can be [visited by following instructions here](https://learn.microsoft.com/en-us/azure/aks/learn/quick-kubernetes-deploy-cli#test-the-application). Be sure to visit the IP address using `http` and not `https`.
+
+The development team can also view the status of the applications in the ArgoCD console installed on the team cluster.
+
+```shell
+# Get the initial admin password and the IP address of the ArgoCD web interface.
+kubectl get secrets argocd-initial-admin-secret -n argocd --template="{{index .data.password | base64decode}}"
+kubectl get svc -n argocd argo-cd-argocd-server
 ```

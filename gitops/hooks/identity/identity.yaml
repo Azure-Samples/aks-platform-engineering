@@ -12,8 +12,8 @@ metadata:
   namespace: azure-infrastructure-system
 spec:
   allowedNamespaces: {}
-  clientID: # azurerm_user_assigned_identity.capz.client_id
-  tenantID: # azurerm_user_assigned_identity.capz.tenant_id
+  clientID: # terraform output akspe_client_id
+  tenantID: # # terraform output tenant
   type: WorkloadIdentity
 
 
