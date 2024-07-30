@@ -39,7 +39,7 @@ cd terraform
 terraform init -upgrade
 ```
 
-Choose to apply capz or crossplane.
+Choose the `infrastructure_provider` variable to be `capz` (default) or `crossplane`.
 
 > [!Important] 
 > Change `azure-samples` to your fork organization or GitHub user name in the commands below.
