@@ -1,6 +1,6 @@
 global:
   image:
-    tag: v2.12.0-rc3
+    tag: v2.12.0-rc4
 
 controller:
   replicas: 1 # Additional replicas will cause sharding of managed clusters across number of replicas.
