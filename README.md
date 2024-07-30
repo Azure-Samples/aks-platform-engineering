@@ -52,7 +52,7 @@ terraform apply -var gitops_addons_org=git@github.com:Azure-Samples \
                 -var infrastructure_provider=crossplane --auto-approve
 ```
 
->Note: You can ignore the warnings related to deprecated attributes and invalid kubeconfig path.
+> Note: You can ignore the warnings related to deprecated attributes and invalid kubeconfig path.
 
 Terraform completed installing the AKS cluster, installing ArgoCD, and configuring ArgoCD to install applications under the `gitops/bootstrap/control-plane/addons` directory from the git repo.
 
@@ -137,3 +137,7 @@ kubectl apply -f ../gitops/hooks/identity/identity.yaml
 ## Next Steps
 
 Learn how to define your own cluster, infrastructure, and hand off to the development team the access to the AKS cluster and ArgoCD deployment UI in [this article](./docs/Onboard-New-Dev-Team.md).
+
+## Trademarks
+
+Trademarks This project may contain trademarks or logos for projects, products, or services. Authorized use of Microsoft trademarks or logos is subject to and must follow Microsoft’s Trademark & Brand Guidelines. Use of Microsoft trademarks or logos in modified versions of this project must not cause confusion or imply Microsoft sponsorship. Any use of third-party trademarks or logos are subject to those third-party’s policies.
