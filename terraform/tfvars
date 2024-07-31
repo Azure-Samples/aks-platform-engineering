@@ -7,7 +7,7 @@ location = "westus3"
 kubernetes_version = null # Defaults to latest
 
 # GitOps Addons configuration
-gitops_addons_org      = "git@github.com:myGitHubUserName"
+gitops_addons_org      = "https://github.com/myGitHubUserName"
 gitops_addons_repo     = "aks-platform-engineering"
 gitops_addons_basepath = "gitops/"
 gitops_addons_path     = "bootstrap/control-plane/addons"
