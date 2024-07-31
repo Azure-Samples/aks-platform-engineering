@@ -30,7 +30,11 @@ Choose Crossplane **or** Cluster API provider for Azure (CAPZ) to support deploy
 ### Provisioning the Control Plane Cluster
 
 - Fork the repo
-- If the repo is or desired to be private, ArgoCD will need a ssh deploy key to access this repo. Create a [read-only deploy ssh key](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/managing-deploy-keys#deploy-keys) on the fork and place the corresponding private key named `private_ssh_deploy_key` in the `terraform` directory.  Additionally, change the `gitops_addons_org` variable to use the `git@github.com:Azure-Samples` format versus `https://`.
+- Only if the repo is desired to be private, ArgoCD will need a ssh deploy key to access this repo. Follow these steps to enable: 
+    - Create a [read-only deploy ssh key](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/managing-deploy-keys#deploy-keys) on the fork
+    - Place the corresponding private key named `private_ssh_deploy_key` in the `terraform` directory
+    - Change the `gitops_addons_org` variable to `git@github.com:Azure-Samples` replacing Azure-Samples with your fork org/username versus the existing `https://` format
+    - Uncomment line 218 of the `main.tf` file: `# sshPrivateKey = file(pathexpand(var.git_private_ssh_key))`
 
 Run Terraform:
 
