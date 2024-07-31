@@ -30,7 +30,11 @@ Choose Crossplane **or** Cluster API provider for Azure (CAPZ) to support deploy
 ### Provisioning the Control Plane Cluster
 
 - Fork the repo
-- If the repo is or desired to be private, ArgoCD will need a ssh deploy key to access this repo. Create a [read-only deploy ssh key](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/managing-deploy-keys#deploy-keys) on the fork and place the corresponding private key named `private_ssh_deploy_key` in the `terraform` directory.
+- Only if the repo is desired to be private, ArgoCD will need a ssh deploy key to access this repo. Follow these steps to enable: 
+    - Create a [read-only deploy ssh key](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/managing-deploy-keys#deploy-keys) on the fork
+    - Place the corresponding private key named `private_ssh_deploy_key` in the `terraform` directory
+    - Change the `gitops_addons_org` variable to `git@github.com:Azure-Samples` replacing Azure-Samples with your fork org/username versus the existing `https://` format
+    - Uncomment line 218 of the `main.tf` file: `# sshPrivateKey = file(pathexpand(var.git_private_ssh_key))`
 
 Run Terraform:
 
@@ -39,16 +43,19 @@ cd terraform
 terraform init -upgrade
 ```
 
-Choose to apply capz or crossplane.  Change `Azure-Samples` to your fork organization.  Alternatively, consider changing the example `tvars` file to match your desired configuration versus using the `-var` switches below.
+Choose the `infrastructure_provider` variable to be `capz` (default) or `crossplane`.
+
+> [!Important] 
+> Change `azure-samples` to your fork organization or GitHub user name in the commands below.
+
+Alternatively, consider changing the example `tvars` file to match your desired configuration versus using the `-var` switches below.
 
 ```bash
-# The gitops_addons_org needs to be in the git format to use the SSH key unless the repo is public
-
 # For capz control plane
-terraform apply -var gitops_addons_org=git@github.com:Azure-Samples --auto-approve
+terraform apply -var gitops_addons_org=https://github.com/azure-samples --auto-approve
 
 # For crossplane control plane
-terraform apply -var gitops_addons_org=git@github.com:Azure-Samples \
+terraform apply -var gitops_addons_org=https://github.com/azure-samples \
                 -var infrastructure_provider=crossplane --auto-approve
 ```
 

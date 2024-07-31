@@ -215,7 +215,7 @@ resource "kubernetes_secret" "git_secrets" {
     git-addons = {
       type          = "git"
       url           = var.gitops_addons_org
-      sshPrivateKey = file(pathexpand(var.git_private_ssh_key))
+      # sshPrivateKey = file(pathexpand(var.git_private_ssh_key))
     }
   }
   metadata {
