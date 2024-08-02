@@ -1,0 +1,8 @@
+api:
+  adminAccount:
+    passwordHash: '$2a$10$2PqnGA40RswbHnvw5TKV2OhxtCIVaygvSHX7TUv8ADBF3bGD2vhN2'
+    tokenTTL: "24h"
+    tokenSigningKey: "iwishtowashmyirishwristwatch"
+
+controller:
+  logLevel: "DEBUG"
