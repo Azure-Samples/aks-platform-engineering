@@ -14,7 +14,7 @@ spec:
               values:
                 addonChart: argo-rollouts
                 # anything not staging or prod use this version
-                addonChartVersion: 2.37.2
+                addonChartVersion: 2.37.3
                 addonChartRepository: https://argoproj.github.io/argo-helm
               selector:
                 matchExpressions:
@@ -26,13 +26,13 @@ spec:
                 matchLabels:
                   environment: staging
               values:
-                addonChartVersion: 2.37.2
+                addonChartVersion: 2.37.3
           - clusters:
               selector:
                 matchLabels:
                   environment: prod
               values:
-                addonChartVersion: 2.37.2
+                addonChartVersion: 2.37.3
   template:
     metadata:
       name: addon-{{name}}-{{values.addonChart}}
