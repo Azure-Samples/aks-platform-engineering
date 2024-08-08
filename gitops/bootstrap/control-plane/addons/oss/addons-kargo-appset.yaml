@@ -2,7 +2,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: ApplicationSet
 metadata:
-  name: addons-argo-rollouts
+  name: addons-kargo
 spec:
   syncPolicy:
     preserveResourcesOnDeletion: true
@@ -12,27 +12,28 @@ spec:
         generators:
           - clusters:
               values:
-                addonChart: argo-rollouts
+                addonChart: kargo
                 # anything not staging or prod use this version
-                addonChartVersion: 2.37.3
-                addonChartRepository: https://argoproj.github.io/argo-helm
+                addonChartVersion: 0.8.1
+                addonChartRepositoryNamespace: kargo
+                addonChartRepository: ghcr.io/akuity/kargo-charts
               selector:
                 matchExpressions:
-                  - key: enable_argo_rollouts
+                  - key: enable_kargo
                     operator: In
                     values: ['true']
           - clusters:
               selector:
                 matchLabels:
-                  environment: staging
+                  environment: control-plane
               values:
-                addonChartVersion: 2.37.3
+                addonChartVersion: 0.8.1
           - clusters:
               selector:
                 matchLabels:
                   environment: prod
               values:
-                addonChartVersion: 2.37.3
+                addonChartVersion: 0.8.1
   template:
     metadata:
       name: addon-{{name}}-{{values.addonChart}}
@@ -51,12 +52,14 @@ spec:
             valueFiles:
               - $values/{{metadata.annotations.addons_repo_basepath}}environments/default/addons/{{values.addonChart}}/values.yaml
               - $values/{{metadata.annotations.addons_repo_basepath}}environments/{{metadata.labels.environment}}/addons/{{values.addonChart}}/values.yaml
-              - $values/{{metadata.annotations.addons_repo_basepath}}clusters/{{name}}/addons/{{values.addonChart}}/values.yaml
+              - $values/{{metadata.annotations.addons_repo_basepath}}environments/clusters/{{name}}/addons/{{values.addonChart}}/values.yaml
       destination:
-        namespace: '{{values.addonChart}}'
+        namespace: '{{values.addonChartRepositoryNamespace}}'
         name: '{{name}}'
       syncPolicy:
-        automated: {}
+        automated:
+          prune: false
         syncOptions:
           - CreateNamespace=true
           - ServerSideApply=true  # Big CRDs.
+          - SkipDryRunOnMissingResource=true
