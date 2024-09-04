@@ -8,7 +8,7 @@ CAPZ is the Azure provider for Cluster API which has more than [30 different pro
 
 Both CAPZ and ASO are officially staffed and supported open source projects by Microsoft which have regular releases, community calls, and Kubernetes slack channel support.  ASO has an [automation process which generates Kubernetes CRDs directly from the Azure APIs](https://azure.github.io/azure-service-operator/contributing/generator-overview/).  This is advantageous because it allows 100% API coverage directly from the source of truth.
 
-One other unique advantage of the CAPZ and ASO stack is there is an option to [import existing production AKS clusters](https://capz.sigs.k8s.io/topics/managedcluster.html?highlight=import#adopting-existing-aks-clusters) into the control plane.  This is useful for organizations that have existing AKS clusters and want to start managing them in a GitOps platform engineering centric way like this repository demonstrates.
+One other unique advantage of the CAPZ and ASO stack is there is an option to [import existing production AKS clusters](https://capz.sigs.k8s.io/managed/adopting-clusters) into the control plane.  This is useful for organizations that have existing AKS clusters and want to start managing them in a GitOps platform engineering centric way like this repository demonstrates.
 
 ## Crossplane
 
