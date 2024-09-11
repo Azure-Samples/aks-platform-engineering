@@ -14,7 +14,7 @@ spec:
               values:
                 addonChart: cert-manager
                 # anything not staging or prod use this version
-                addonChartVersion: v1.15.1
+                addonChartVersion: v1.15.3
                 addonChartRepository: https://charts.jetstack.io
               selector:
                 matchExpressions:
@@ -26,13 +26,13 @@ spec:
                 matchLabels:
                   environment: staging
               values:
-                addonChartVersion: v1.15.1
+                addonChartVersion: v1.15.3
           - clusters:
               selector:
                 matchLabels:
                   environment: prod
               values:
-                addonChartVersion: v1.15.1
+                addonChartVersion: v1.15.3
   template:
     metadata:
       name: addon-{{name}}-{{values.addonChart}}

@@ -108,15 +108,12 @@ The following steps will install CAPZ via the Cluster-API operator which also in
 ```shell
 helm repo add capi-operator https://kubernetes-sigs.github.io/cluster-api-operator
 helm repo update
-helm install capi-operator capi-operator/cluster-api-operator --create-namespace -n capi-operator-system \
---set infrastructure="azure:v1.16.0" \
---set addon="helm:v0.2.4" \
---set core="cluster-api:v1.7.4" \
---set manager.featureGates.core.MachinePool="true" \
---set manager.featureGates.azure.MachinePool="true" \
---wait --timeout 90s
-```
-This will take some time to install and can be verified it is complete by seeing two ready pods in the `azure-infrastructure-system` namespace. 
+helm install capi-operator capi-operator/cluster-api-operator --create-namespace -n capi-operator-system --wait --timeout 90s -f gitops/environments/default/addons/cluster-api-provider-azure/values.yaml
+``` 
+
+In order to install CAPI Operator with additional CRDs, `helm install` must use a `values.yaml` file since the commands cannot be passed on the command line.  documentdb and managedidentity CRDS are added by default in the provided [values.yaml file](./gitops/environments/default/addons/cluster-api-provider-azure/values.yaml) and can be optionally customized if desired.  For more information read the first section of [CAPZ versus Crossplane](./docs/capz-or-crossplane.md#cluster-api-provider-for-azure-capz-and-azure-service-operator-aso).
+
+This will take some time to install and can be verified it is complete by seeing two ready pods in the `azure-infrastructure-system` namespace.
 
 ```shell
 kubectl get pods -n azure-infrastructure-system

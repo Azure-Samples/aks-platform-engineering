@@ -15,7 +15,7 @@ spec:
               values:
                 addonChart: argo-workflows
                 # anything not staging or prod use this version
-                addonChartVersion: 0.41.14
+                addonChartVersion: 0.42.1
                 addonChartRepository: https://argoproj.github.io/argo-helm
               selector:
                 matchExpressions:
@@ -27,13 +27,13 @@ spec:
                 matchLabels:
                   environment: staging
               values:
-                addonChartVersion: 0.41.14
+                addonChartVersion: 0.42.1
           - clusters:
               selector:
                 matchLabels:
                   environment: prod
               values:
-                addonChartVersion: 0.41.14
+                addonChartVersion: 0.42.1
   template:
     metadata:
       name: addon-{{.name}}-{{.values.addonChart}}
