@@ -7,7 +7,6 @@ manager:
       MachinePool: true
     azure:
       MachinePool: true
----
 additionalDeployments:
   azureserviceoperator-controller-manager:
     deployment:
