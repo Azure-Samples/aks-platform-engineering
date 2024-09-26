@@ -112,6 +112,12 @@ variable "os_disk_size_gb" {
   default     = 50
 }
 
+variable "os_sku" {
+  type        = string
+  default     = "AzureLinux"
+  description = "(Optional) Specifies the OS SKU used by the agent pool. Possible values are AzureLinux, Ubuntu, Windows2019 and Windows2022. If not specified, the default is Ubuntu if OSType=Linux or Windows2019 if OSType=Windows. And the default Windows OSSKU will be changed to Windows2022 after Windows2019 is deprecated. Changing this from AzureLinux or Ubuntu to AzureLinux or Ubuntu will not replace the resource, otherwise temporary_name_for_rotation must be specified when attempting a change."
+}
+
 variable "sku_tier" {
   description = "Specifies the SKU Tier that should be used for this AKS Cluster."
   type        = string

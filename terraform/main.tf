@@ -113,6 +113,7 @@ module "aks" {
   network_plugin                    = var.network_plugin
   vnet_subnet_id                    = lookup(module.network.vnet_subnets_name_id, "aks")
   os_disk_size_gb                   = var.os_disk_size_gb
+  os_sku                            = var.os_sku
   sku_tier                          = var.sku_tier
   private_cluster_enabled           = var.private_cluster_enabled
   enable_auto_scaling               = var.enable_auto_scaling
