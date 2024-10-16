@@ -14,7 +14,7 @@ spec:
               values:
                 addonChart: kargo
                 # anything not staging or prod use this version
-                addonChartVersion: '{{metadata.annotations.kargo_chart_version}}'
+                addonChartVersion: '{{metadata.labels.kargo_chart_version}}'
                 addonChartRepositoryNamespace: kargo
                 addonChartRepository: ghcr.io/akuity/kargo-charts
               selector:
