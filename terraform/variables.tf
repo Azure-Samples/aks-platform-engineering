@@ -36,6 +36,20 @@ variable "addons" {
   }
 }
 
+variable "addons_versions" {
+  description = "Specifies the Kubernetes addons to install on the hub cluster."
+  type        = list (object({
+    argocd_chart_version = string
+    argo_rollouts_chart_version = string
+    kargo_chart_version = string
+  }))
+  default = [{
+    argocd_chart_version                     = "7.6.10" # https://github.com/argoproj/argo-helm/blob/main/charts/argo-cd/Chart.yaml
+    argo_rollouts_chart_version              = "2.37.7" # https://github.com/argoproj/argo-helm/blob/main/charts/argo-rollouts/Chart.yaml
+    kargo_chart_version                      = "0.9.1" # https://github.com/akuity/kargo/releases
+  }]
+}
+
 variable "git_private_ssh_key" {
   description = "Filepath to the private SSH key for git access"
   type        = string

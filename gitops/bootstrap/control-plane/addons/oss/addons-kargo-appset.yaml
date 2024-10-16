@@ -14,7 +14,7 @@ spec:
               values:
                 addonChart: kargo
                 # anything not staging or prod use this version
-                addonChartVersion: 0.8.7
+                addonChartVersion: '{{metadata.annotations.kargo_chart_version}}'
                 addonChartRepositoryNamespace: kargo
                 addonChartRepository: ghcr.io/akuity/kargo-charts
               selector:
@@ -27,13 +27,13 @@ spec:
                 matchLabels:
                   environment: control-plane
               values:
-                addonChartVersion: 0.8.7
+                addonChartVersion: '{{metadata.annotations.addons_repo_url}}'
           - clusters:
               selector:
                 matchLabels:
                   environment: prod
               values:
-                addonChartVersion: 0.8.7
+                addonChartVersion: '{{metadata.annotations.addons_repo_url}}'
   template:
     metadata:
       name: addon-{{name}}-{{values.addonChart}}
