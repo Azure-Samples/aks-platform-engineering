@@ -12,8 +12,8 @@ metadata:
   namespace: azure-infrastructure-system
 spec:
   allowedNamespaces: {}
-  clientID: "33163005-1bcb-43e4-a4f2-7ca86e4a6158"
-  tenantID: "b4b34f80-345f-445e-90b7-31ac0c5cf7ef"
+  clientID: "change to akspe_client_id value from terraform output"
+  tenantID: "change to tenant value from terraform output"
   type: WorkloadIdentity
 
 
