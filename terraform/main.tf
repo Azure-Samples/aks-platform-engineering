@@ -97,6 +97,37 @@ module "network" {
 }
 
 ################################################################################
+# Postgres: Module
+################################################################################
+resource "azurerm_postgresql_flexible_server" "backstagedbserver" {
+  name                = "backstage-postgresql-server"
+  location            = var.location
+  public_network_access_enabled = true
+  administrator_password = "secretPassword123!"
+  resource_group_name = azurerm_resource_group.this.name
+  administrator_login = "psqladminun"
+  sku_name = "GP_Standard_D4s_v3"
+  version = "12"
+  zone = 1
+}
+
+# Define the PostgreSQL database
+resource "azurerm_postgresql_flexible_server_database" "backstage_plugin_catalog" {
+  name                = "backstage_plugin_catalog"
+  server_id         = azurerm_postgresql_flexible_server.backstagedbserver.id
+  charset             = "UTF8"
+  collation = "en_US.utf8"
+}
+
+resource "azurerm_postgresql_flexible_server_firewall_rule" "allow_all" {
+  name                = "AllowAll_2024-10-16_11-52-53"
+  server_id = azurerm_postgresql_flexible_server.backstagedbserver.id
+  start_ip_address    = "0.0.0.0"
+  end_ip_address      = "255.255.255.255"
+}
+
+
+################################################################################
 # AKS: Module
 ################################################################################
 
@@ -201,6 +232,82 @@ resource "azurerm_federated_identity_credential" "service_operator" {
   subject             = "system:serviceaccount:azure-infrastructure-system:azureserviceoperator-default"
 }
 
+
+
+
+resource "azuread_application" "backstage-app" {
+  display_name = "Backstage"
+
+  app_role {
+    id              = uuid() # Generate a unique ID for the role
+    allowed_member_types = ["User"]
+    description          = "Allows the app to read the profile of signed-in users."
+    display_name         = "User.Read"
+    value                = "User.Read"
+  }
+
+  app_role {
+    id              = uuid() # Generate a unique ID for the role
+    allowed_member_types = ["User"]
+    description          = "Allows the app to read all users' full profiles."
+    display_name         = "User.Read.All"
+    value                = "User.Read.All"
+  }
+
+  app_role {
+    id              = uuid() # Generate a unique ID for the role
+    allowed_member_types = ["User"]
+    description          = "Allows the app to read the memberships of all groups."
+    display_name         = "GroupMember.Read.All"
+    value                = "GroupMember.Read.All"
+  }
+}
+
+# Define the OAuth2 permissions (redirect URIs)
+resource "azuread_application_redirect_uris" "backstage_redirect_uri" {
+  application_id = "/applications/${azuread_application.backstage-app.object_id}"
+  type                  = "Web"
+  redirect_uris         = ["https://${azurerm_public_ip.backstage_public_ip.ip_address}/api/auth/microsoft/handler/frame"]
+}
+# Define the service principal
+resource "azuread_service_principal" "backstage-app-sp" {
+  client_id = azuread_application.backstage-app.application_id
+}
+
+# Define the service principal password
+resource "azuread_service_principal_password" "backstage-sp-password" {
+  service_principal_id = azuread_service_principal.backstage-app-sp.id
+  end_date             = "2099-01-01T00:00:00Z"
+}
+
+
+# Output the necessary variables
+output "azure_client_id" {
+  value = azuread_application.backstage-app.application_id
+}
+
+output "azure_client_secret" {
+  value = azuread_service_principal_password.backstage-sp-password.value
+  sensitive = true
+}
+
+output "azure_tenant_id" {
+  value = data.azurerm_client_config.current.tenant_id
+}
+
+################################################################################
+# AKS: Public IP for predictable backstage service & redirect URI
+################################################################################
+
+resource "azurerm_public_ip" "backstage_public_ip" {
+  name                = "backstage-public-ip"
+  location            = azurerm_resource_group.this.location
+  resource_group_name = module.aks.node_resource_group
+  allocation_method   = "Static"
+  sku                 = "Standard"
+}
+
+
 ################################################################################
 # GitOps Bridge: Private ssh keys for git
 ################################################################################
@@ -230,6 +337,7 @@ resource "kubernetes_secret" "git_secrets" {
   data = each.value
 }
 
+
 ################################################################################
 # GitOps Bridge: Bootstrap
 ################################################################################
@@ -252,5 +360,856 @@ module "gitops_bridge_bootstrap" {
   argocd = {
     namespace     = local.argocd_namespace
     chart_version = "7.5.2"
+  }
+}
+
+################################################################################
+# Ingress Controller - NGINX: Bootstrap
+################################################################################
+
+resource "helm_release" "nginx" {
+  depends_on = [module.aks]
+  name       = "nginx"
+  repository = "https://helm-charts.wikimedia.org/stable/"
+  chart      = "raw"
+  version    = "0.3.0"
+  for_each = { for manifest in provider::kubernetes::manifest_decode_multi(file("${path.module}/nginx.yaml"))  : "${lower(manifest.kind)}-${manifest.metadata.name}" => manifest }
+  values = [
+      <<-EOF
+      resources:
+     - apiVersion: v1
+kind: Namespace
+metadata:
+  labels:
+    app.kubernetes.io/instance: ingress-nginx
+    app.kubernetes.io/name: ingress-nginx
+  name: ingress-nginx
+---
+- apiVersion: v1
+automountServiceAccountToken: true
+kind: ServiceAccount
+metadata:
+  labels:
+    app.kubernetes.io/component: controller
+    app.kubernetes.io/instance: ingress-nginx
+    app.kubernetes.io/name: ingress-nginx
+    app.kubernetes.io/part-of: ingress-nginx
+    app.kubernetes.io/version: 1.12.0-beta.0
+  name: ingress-nginx
+  namespace: ingress-nginx
+---
+- apiVersion: v1
+automountServiceAccountToken: true
+kind: ServiceAccount
+metadata:
+  labels:
+    app.kubernetes.io/component: admission-webhook
+    app.kubernetes.io/instance: ingress-nginx
+    app.kubernetes.io/name: ingress-nginx
+    app.kubernetes.io/part-of: ingress-nginx
+    app.kubernetes.io/version: 1.12.0-beta.0
+  name: ingress-nginx-admission
+  namespace: ingress-nginx
+---
+- apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  labels:
+    app.kubernetes.io/component: controller
+    app.kubernetes.io/instance: ingress-nginx
+    app.kubernetes.io/name: ingress-nginx
+    app.kubernetes.io/part-of: ingress-nginx
+    app.kubernetes.io/version: 1.12.0-beta.0
+  name: ingress-nginx
+  namespace: ingress-nginx
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - namespaces
+  verbs:
+  - get
+- apiGroups:
+  - ""
+  resources:
+  - configmaps
+  - pods
+  - secrets
+  - endpoints
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - ""
+  resources:
+  - services
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - networking.k8s.io
+  resources:
+  - ingresses
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - networking.k8s.io
+  resources:
+  - ingresses/status
+  verbs:
+  - update
+- apiGroups:
+  - networking.k8s.io
+  resources:
+  - ingressclasses
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - coordination.k8s.io
+  resourceNames:
+  - ingress-nginx-leader
+  resources:
+  - leases
+  verbs:
+  - get
+  - update
+- apiGroups:
+  - coordination.k8s.io
+  resources:
+  - leases
+  verbs:
+  - create
+- apiGroups:
+  - ""
+  resources:
+  - events
+  verbs:
+  - create
+  - patch
+- apiGroups:
+  - discovery.k8s.io
+  resources:
+  - endpointslices
+  verbs:
+  - list
+  - watch
+  - get
+---
+- apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  labels:
+    app.kubernetes.io/component: admission-webhook
+    app.kubernetes.io/instance: ingress-nginx
+    app.kubernetes.io/name: ingress-nginx
+    app.kubernetes.io/part-of: ingress-nginx
+    app.kubernetes.io/version: 1.12.0-beta.0
+  name: ingress-nginx-admission
+  namespace: ingress-nginx
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - secrets
+  verbs:
+  - get
+  - create
+---
+- apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  labels:
+    app.kubernetes.io/instance: ingress-nginx
+    app.kubernetes.io/name: ingress-nginx
+    app.kubernetes.io/part-of: ingress-nginx
+    app.kubernetes.io/version: 1.12.0-beta.0
+  name: ingress-nginx
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - configmaps
+  - endpoints
+  - nodes
+  - pods
+  - secrets
+  - namespaces
+  verbs:
+  - list
+  - watch
+- apiGroups:
+  - coordination.k8s.io
+  resources:
+  - leases
+  verbs:
+  - list
+  - watch
+- apiGroups:
+  - ""
+  resources:
+  - nodes
+  verbs:
+  - get
+- apiGroups:
+  - ""
+  resources:
+  - services
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - networking.k8s.io
+  resources:
+  - ingresses
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - ""
+  resources:
+  - events
+  verbs:
+  - create
+  - patch
+- apiGroups:
+  - networking.k8s.io
+  resources:
+  - ingresses/status
+  verbs:
+  - update
+- apiGroups:
+  - networking.k8s.io
+  resources:
+  - ingressclasses
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - discovery.k8s.io
+  resources:
+  - endpointslices
+  verbs:
+  - list
+  - watch
+  - get
+---
+- apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  labels:
+    app.kubernetes.io/component: admission-webhook
+    app.kubernetes.io/instance: ingress-nginx
+    app.kubernetes.io/name: ingress-nginx
+    app.kubernetes.io/part-of: ingress-nginx
+    app.kubernetes.io/version: 1.12.0-beta.0
+  name: ingress-nginx-admission
+rules:
+- apiGroups:
+  - admissionregistration.k8s.io
+  resources:
+  - validatingwebhookconfigurations
+  verbs:
+  - get
+  - update
+---
+- apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  labels:
+    app.kubernetes.io/component: controller
+    app.kubernetes.io/instance: ingress-nginx
+    app.kubernetes.io/name: ingress-nginx
+    app.kubernetes.io/part-of: ingress-nginx
+    app.kubernetes.io/version: 1.12.0-beta.0
+  name: ingress-nginx
+  namespace: ingress-nginx
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: ingress-nginx
+subjects:
+- kind: ServiceAccount
+  name: ingress-nginx
+  namespace: ingress-nginx
+---
+- apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  labels:
+    app.kubernetes.io/component: admission-webhook
+    app.kubernetes.io/instance: ingress-nginx
+    app.kubernetes.io/name: ingress-nginx
+    app.kubernetes.io/part-of: ingress-nginx
+    app.kubernetes.io/version: 1.12.0-beta.0
+  name: ingress-nginx-admission
+  namespace: ingress-nginx
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: ingress-nginx-admission
+subjects:
+- kind: ServiceAccount
+  name: ingress-nginx-admission
+  namespace: ingress-nginx
+---
+- apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  labels:
+    app.kubernetes.io/instance: ingress-nginx
+    app.kubernetes.io/name: ingress-nginx
+    app.kubernetes.io/part-of: ingress-nginx
+    app.kubernetes.io/version: 1.12.0-beta.0
+  name: ingress-nginx
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: ingress-nginx
+subjects:
+- kind: ServiceAccount
+  name: ingress-nginx
+  namespace: ingress-nginx
+---
+- apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  labels:
+    app.kubernetes.io/component: admission-webhook
+    app.kubernetes.io/instance: ingress-nginx
+    app.kubernetes.io/name: ingress-nginx
+    app.kubernetes.io/part-of: ingress-nginx
+    app.kubernetes.io/version: 1.12.0-beta.0
+  name: ingress-nginx-admission
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: ingress-nginx-admission
+subjects:
+- kind: ServiceAccount
+  name: ingress-nginx-admission
+  namespace: ingress-nginx
+---
+- apiVersion: v1
+data: null
+kind: ConfigMap
+metadata:
+  labels:
+    app.kubernetes.io/component: controller
+    app.kubernetes.io/instance: ingress-nginx
+    app.kubernetes.io/name: ingress-nginx
+    app.kubernetes.io/part-of: ingress-nginx
+    app.kubernetes.io/version: 1.12.0-beta.0
+  name: ingress-nginx-controller
+  namespace: ingress-nginx
+---
+- apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app.kubernetes.io/component: controller
+    app.kubernetes.io/instance: ingress-nginx
+    app.kubernetes.io/name: ingress-nginx
+    app.kubernetes.io/part-of: ingress-nginx
+    app.kubernetes.io/version: 1.12.0-beta.0
+  name: ingress-nginx-controller
+  namespace: ingress-nginx
+spec:
+  externalTrafficPolicy: Local
+  ipFamilies:
+  - IPv4
+  ipFamilyPolicy: SingleStack
+  ports:
+  - appProtocol: http
+    name: http
+    port: 80
+    protocol: TCP
+    targetPort: http
+  - appProtocol: https
+    name: https
+    port: 443
+    protocol: TCP
+    targetPort: https
+  selector:
+    app.kubernetes.io/component: controller
+    app.kubernetes.io/instance: ingress-nginx
+    app.kubernetes.io/name: ingress-nginx
+  type: LoadBalancer
+---
+- apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app.kubernetes.io/component: controller
+    app.kubernetes.io/instance: ingress-nginx
+    app.kubernetes.io/name: ingress-nginx
+    app.kubernetes.io/part-of: ingress-nginx
+    app.kubernetes.io/version: 1.12.0-beta.0
+  name: ingress-nginx-controller-admission
+  namespace: ingress-nginx
+spec:
+  ports:
+  - appProtocol: https
+    name: https-webhook
+    port: 443
+    targetPort: webhook
+  selector:
+    app.kubernetes.io/component: controller
+    app.kubernetes.io/instance: ingress-nginx
+    app.kubernetes.io/name: ingress-nginx
+  type: ClusterIP
+---
+- apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/component: controller
+    app.kubernetes.io/instance: ingress-nginx
+    app.kubernetes.io/name: ingress-nginx
+    app.kubernetes.io/part-of: ingress-nginx
+    app.kubernetes.io/version: 1.12.0-beta.0
+  name: ingress-nginx-controller
+  namespace: ingress-nginx
+spec:
+  minReadySeconds: 0
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: controller
+      app.kubernetes.io/instance: ingress-nginx
+      app.kubernetes.io/name: ingress-nginx
+  strategy:
+    rollingUpdate:
+      maxUnavailable: 1
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/component: controller
+        app.kubernetes.io/instance: ingress-nginx
+        app.kubernetes.io/name: ingress-nginx
+        app.kubernetes.io/part-of: ingress-nginx
+        app.kubernetes.io/version: 1.12.0-beta.0
+    spec:
+      containers:
+      - args:
+        - /nginx-ingress-controller
+        - --publish-service=$(POD_NAMESPACE)/ingress-nginx-controller
+        - --election-id=ingress-nginx-leader
+        - --controller-class=k8s.io/ingress-nginx
+        - --ingress-class=nginx
+        - --configmap=$(POD_NAMESPACE)/ingress-nginx-controller
+        - --validating-webhook=:8443
+        - --validating-webhook-certificate=/usr/local/certificates/cert
+        - --validating-webhook-key=/usr/local/certificates/key
+        env:
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: POD_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        - name: LD_PRELOAD
+          value: /usr/local/lib/libmimalloc.so
+        image: registry.k8s.io/ingress-nginx/controller:v1.12.0-beta.0@sha256:9724476b928967173d501040631b23ba07f47073999e80e34b120e8db5f234d5
+        imagePullPolicy: IfNotPresent
+        lifecycle:
+          preStop:
+            exec:
+              command:
+              - /wait-shutdown
+        livenessProbe:
+          failureThreshold: 5
+          httpGet:
+            path: /healthz
+            port: 10254
+            scheme: HTTP
+          initialDelaySeconds: 10
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 1
+        name: controller
+        ports:
+        - containerPort: 80
+          name: http
+          protocol: TCP
+        - containerPort: 443
+          name: https
+          protocol: TCP
+        - containerPort: 8443
+          name: webhook
+          protocol: TCP
+        readinessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /healthz
+            port: 10254
+            scheme: HTTP
+          initialDelaySeconds: 10
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 1
+        resources:
+          requests:
+            cpu: 100m
+            memory: 90Mi
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            add:
+            - NET_BIND_SERVICE
+            drop:
+            - ALL
+          readOnlyRootFilesystem: false
+          runAsGroup: 82
+          runAsNonRoot: true
+          runAsUser: 101
+          seccompProfile:
+            type: RuntimeDefault
+        volumeMounts:
+        - mountPath: /usr/local/certificates/
+          name: webhook-cert
+          readOnly: true
+      dnsPolicy: ClusterFirst
+      nodeSelector:
+        kubernetes.io/os: linux
+      serviceAccountName: ingress-nginx
+      terminationGracePeriodSeconds: 300
+      volumes:
+      - name: webhook-cert
+        secret:
+          secretName: ingress-nginx-admission
+---
+- apiVersion: batch/v1
+kind: Job
+metadata:
+  labels:
+    app.kubernetes.io/component: admission-webhook
+    app.kubernetes.io/instance: ingress-nginx
+    app.kubernetes.io/name: ingress-nginx
+    app.kubernetes.io/part-of: ingress-nginx
+    app.kubernetes.io/version: 1.12.0-beta.0
+  name: ingress-nginx-admission-create
+  namespace: ingress-nginx
+spec:
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/component: admission-webhook
+        app.kubernetes.io/instance: ingress-nginx
+        app.kubernetes.io/name: ingress-nginx
+        app.kubernetes.io/part-of: ingress-nginx
+        app.kubernetes.io/version: 1.12.0-beta.0
+      name: ingress-nginx-admission-create
+    spec:
+      containers:
+      - args:
+        - create
+        - --host=ingress-nginx-controller-admission,ingress-nginx-controller-admission.$(POD_NAMESPACE).svc
+        - --namespace=$(POD_NAMESPACE)
+        - --secret-name=ingress-nginx-admission
+        env:
+        - name: POD_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        image: registry.k8s.io/ingress-nginx/kube-webhook-certgen:v1.4.4@sha256:a9f03b34a3cbfbb26d103a14046ab2c5130a80c3d69d526ff8063d2b37b9fd3f
+        imagePullPolicy: IfNotPresent
+        name: create
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+            - ALL
+          readOnlyRootFilesystem: true
+          runAsGroup: 65532
+          runAsNonRoot: true
+          runAsUser: 65532
+          seccompProfile:
+            type: RuntimeDefault
+      nodeSelector:
+        kubernetes.io/os: linux
+      restartPolicy: OnFailure
+      serviceAccountName: ingress-nginx-admission
+---
+- apiVersion: batch/v1
+kind: Job
+metadata:
+  labels:
+    app.kubernetes.io/component: admission-webhook
+    app.kubernetes.io/instance: ingress-nginx
+    app.kubernetes.io/name: ingress-nginx
+    app.kubernetes.io/part-of: ingress-nginx
+    app.kubernetes.io/version: 1.12.0-beta.0
+  name: ingress-nginx-admission-patch
+  namespace: ingress-nginx
+spec:
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/component: admission-webhook
+        app.kubernetes.io/instance: ingress-nginx
+        app.kubernetes.io/name: ingress-nginx
+        app.kubernetes.io/part-of: ingress-nginx
+        app.kubernetes.io/version: 1.12.0-beta.0
+      name: ingress-nginx-admission-patch
+    spec:
+      containers:
+      - args:
+        - patch
+        - --webhook-name=ingress-nginx-admission
+        - --namespace=$(POD_NAMESPACE)
+        - --patch-mutating=false
+        - --secret-name=ingress-nginx-admission
+        - --patch-failure-policy=Fail
+        env:
+        - name: POD_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        image: registry.k8s.io/ingress-nginx/kube-webhook-certgen:v1.4.4@sha256:a9f03b34a3cbfbb26d103a14046ab2c5130a80c3d69d526ff8063d2b37b9fd3f
+        imagePullPolicy: IfNotPresent
+        name: patch
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+            - ALL
+          readOnlyRootFilesystem: true
+          runAsGroup: 65532
+          runAsNonRoot: true
+          runAsUser: 65532
+          seccompProfile:
+            type: RuntimeDefault
+      nodeSelector:
+        kubernetes.io/os: linux
+      restartPolicy: OnFailure
+      serviceAccountName: ingress-nginx-admission
+---
+- apiVersion: networking.k8s.io/v1
+kind: IngressClass
+metadata:
+  labels:
+    app.kubernetes.io/component: controller
+    app.kubernetes.io/instance: ingress-nginx
+    app.kubernetes.io/name: ingress-nginx
+    app.kubernetes.io/part-of: ingress-nginx
+    app.kubernetes.io/version: 1.12.0-beta.0
+  name: nginx
+spec:
+  controller: k8s.io/ingress-nginx
+---
+- apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingWebhookConfiguration
+metadata:
+  labels:
+    app.kubernetes.io/component: admission-webhook
+    app.kubernetes.io/instance: ingress-nginx
+    app.kubernetes.io/name: ingress-nginx
+    app.kubernetes.io/part-of: ingress-nginx
+    app.kubernetes.io/version: 1.12.0-beta.0
+  name: ingress-nginx-admission
+webhooks:
+- admissionReviewVersions:
+  - v1
+  clientConfig:
+    service:
+      name: ingress-nginx-controller-admission
+      namespace: ingress-nginx
+      path: /networking/v1/ingresses
+      port: 443
+  failurePolicy: Fail
+  matchPolicy: Equivalent
+  name: validate.nginx.ingress.kubernetes.io
+  rules:
+  - apiGroups:
+    - networking.k8s.io
+    apiVersions:
+    - v1
+    operations:
+    - CREATE
+    - UPDATE
+    resources:
+    - ingresses
+  sideEffects: None
+
+      EOF
+  ]
+}
+
+################################################################################
+# TLS Cert Management - CertManager: Bootstrap
+################################################################################
+
+resource "helm_release" "cert_manager" {
+  depends_on = [module.aks]
+  name       = "cert-manager"
+  repository = "https://charts.jetstack.io"
+  chart      = "cert-manager"
+  version    = "v1.15.1"
+
+  set {
+    name  = "installCRDs"
+    value = "true"
+  }
+}
+
+################################################################################
+# Letsencryptdeployment - CertManager: Bootstrap
+################################################################################
+
+resource "helm_release" "cluster_issuer" {
+  depends_on = [helm_release.cert_manager]
+  name       = "cluster-issuer"
+  repository = "https://helm-charts.wikimedia.org/stable/"
+  chart      = "raw"
+  version    = "0.3.0"
+  values = [
+    <<-EOF
+    resources:
+    apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: letsencrypt-prod
+spec:
+  acme:
+    server: https://acme-v02.api.letsencrypt.org/directory
+    email: your-email@example.com
+    privateKeySecretRef:
+      name: letsencrypt-prod
+    solvers:
+    - http01:
+        ingress:
+          class: nginx
+    EOF
+  ]
+}
+
+################################################################################
+# Backstage: Bootstrap
+################################################################################
+resource "kubernetes_namespace" "backstage_nammespace" {
+  depends_on = [module.aks]
+  metadata {
+    name = "backstage"
+  }
+}
+
+resource "helm_release" "backstage" {
+  name       = "backstage"
+  repository = "oci://oowcontainerimages.azurecr.io/helm"
+  chart      = "backstagechart"
+  version    = "0.1.0"
+
+  set {
+    name  = "image.repository"
+    value = "oowcontainerimages.azurecr.io/backstage"
+  }
+
+  set {
+    name  = "service.type"
+    value = "LoadBalancer"
+  }
+  set {
+    name  = "service.annotations.service\\.beta\\.kubernetes\\.io/azure-load-balancer-resource-group"
+    value = module.aks.node_resource_group
+  }
+  set {
+    name  = "service.annotations.service\\.beta\\.kubernetes\\.io/azure-load-balancer-ipv4"
+    value = azurerm_public_ip.backstage_public_ip.ip_address
+  }
+  set {
+    name  = "image.tag"
+    value = "v1"
+  }
+
+  set {
+    name  = "env.BASE_URL"
+    value = "https://${azurerm_public_ip.backstage_public_ip.ip_address}"
+  }
+
+  set {
+    name  = "env.POSTGRES_HOST"
+    value = azurerm_postgresql_flexible_server.backstagedbserver.fqdn
+  }
+
+  set {
+    name  = "env.POSTGRES_PORT"
+    value = "5432"
+  }
+
+  set {
+    name  = "env.POSTGRES_USER"
+    value = azurerm_postgresql_flexible_server.backstagedbserver.administrator_login
+  }
+
+  set {
+    name  = "env.POSTGRES_PASSWORD"
+    value = azurerm_postgresql_flexible_server.backstagedbserver.administrator_password
+  }
+
+  set {
+    name  = "env.POSTGRES_DB"
+    value = azurerm_postgresql_flexible_server_database.backstage_plugin_catalog.name
+  }
+
+  set {
+    name  = "env.AZURE_CLIENT_ID"
+    value = azuread_application.backstage-app.client_id
+  }
+
+  set {
+    name  = "env.AZURE_CLIENT_SECRET"
+    value = azuread_service_principal_password.backstage-sp-password.value
+  }
+
+  set {
+    name  = "env.AZURE_TENANT_ID"
+    value = data.azurerm_client_config.current.tenant_id
+  }
+   # Add Ingress configuration for Backstage
+  set {
+    name  = "ingress.enabled"
+    value = "true"
+  }
+
+  set {
+    name  = "ingress.annotations.cert-manager\\.io/cluster-issuer"
+    value = "letsencrypt-prod"
+  }
+
+  set {
+    name  = "ingress.hosts[0].host"
+    value = azurerm_public_ip.backstage_public_ip.ip_address
+  }
+
+  set {
+    name  = "ingress.hosts[0].paths[0].path"
+    value = "/"
+  }
+
+  set {
+    name  = "ingress.hosts[0].paths[0].pathType"
+    value = "Prefix"
+  }
+
+  set {
+    name  = "ingress.tls[0].hosts[0]"
+    value =   azurerm_public_ip.backstage_public_ip.ip_address
+  }
+
+  set {
+    name  = "ingress.tls[0].secretName"
+    value = "backstage-tls"
   }
 }
