@@ -3,7 +3,8 @@ infrastructure: "azure:v1.17.0"
 addon: "helm:v0.2.5"
 manager:
   featureGates:
-    ClusterTopology: true
+    core:
+      ClusterTopology: true
 additionalDeployments:
   azureserviceoperator-controller-manager:
     deployment:
