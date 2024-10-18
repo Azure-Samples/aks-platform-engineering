@@ -22,6 +22,18 @@ variable "kubernetes_version" {
   default     = null
 }
 
+variable "green_field_application_gateway_for_ingress"{ 
+  description = "Specifies the Application Gateway for Ingress Controller"
+  type        = any
+  default     = null
+}
+
+variable "create_role_assignments_for_application_gateway" {
+  description = "Specifies whether to create role assignments for Application Gateway"
+  type        = bool
+  default     = true
+}
+
 variable "infrastructure_provider" {
   description = "Specific the choice of infrastructure provider. crossplane or capz"
   type        = string
