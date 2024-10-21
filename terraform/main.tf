@@ -12,6 +12,8 @@ locals {
 
   argocd_namespace = "argocd"
 
+  github_token = ""
+
   azure_addons = {
     enable_azure_crossplane_upbound_provider = var.infrastructure_provider == "crossplane" ? true : false
     enable_cluster_api_operator              = var.infrastructure_provider == "capz" ? true : false
@@ -185,6 +187,9 @@ module "aks" {
   depends_on = [module.network]
 }
 
+
+
+
 ################################################################################
 # Workload Identity: Module
 ################################################################################
@@ -263,7 +268,47 @@ resource "azuread_application" "backstage-app" {
     display_name         = "GroupMember.Read.All"
     value                = "GroupMember.Read.All"
   }
+
+  required_resource_access {
+    resource_app_id = "00000003-0000-0000-c000-000000000000" # Microsoft Graph API
+
+    resource_access {
+      id   = "e1fe6dd8-ba31-4d61-89e7-88639da4683d" # User.Read
+      type = "Scope"
+    }
+
+    resource_access {
+      id   = "df021288-bdef-4463-88db-98f22de89214" # User.Read.All
+      type = "Role"
+    }
+
+    resource_access {
+      id   = "98830695-27a2-44f7-8c18-0c3ebc9698f6" # GroupMember.Read.All
+      type = "Role"
+    }
+
+    resource_access {
+      id   = "64a6cdd6-aab1-4aaf-94b8-3cc8405e90d0" # email
+      type = "Scope"
+    }
+
+    resource_access {
+      id   = "7427e0e9-2fba-42fe-b0c0-848c9e6a8182" # offline_access
+      type = "Scope"
+    }
+
+    resource_access {
+      id = "e383f46e-2787-4529-855e-0e479a3ffac0" # mail.send
+      type = "Scope"
+    }
+
+    resource_access {
+      id   = "37f7f235-527c-4136-accd-4a02d197296e" # openid
+      type = "Scope"
+    }
+  }
 }
+
 
 # Define the OAuth2 permissions (redirect URIs)
 resource "azuread_application_redirect_uris" "backstage_redirect_uri" {
@@ -282,6 +327,22 @@ resource "azuread_service_principal_password" "backstage-sp-password" {
   end_date             = "2099-01-01T00:00:00Z"
 }
 
+resource "null_resource" "ascii_art" {
+  depends_on = [ azuread_service_principal_password.backstage-sp-password ]
+  provisioner "local-exec" {
+    command = <<EOT
+echo "    _      _     ______  _____   _______ "
+echo "   / \\   | |   |  ____||  __ \\|__   __|"
+echo "  / _ \\  | |   | |__   | |__) |   | |   "
+echo " / ___ \\ | |   |  __|  |  _  /    | |   "
+echo "/_/   \\_\|_|___| |____ | | \\\    | |   "
+echo "        \\_\\_____|______||_| \_\  |_|   "
+echo ""
+echo ""
+echo "Please grant admin consent on app registration now to avoid waiting for the 1 hour schedule post backstage chart deployment."
+EOT
+  }
+}
 
 # Output the necessary variables
 output "azure_client_id" {
@@ -308,6 +369,40 @@ resource "azurerm_public_ip" "backstage_public_ip" {
   allocation_method   = "Static"
   sku                 = "Standard"
 }
+
+################################################################################
+# Backstage: Service Account & Secret
+################################################################################
+resource "kubernetes_namespace" "backstage_nammespace" {
+  depends_on = [module.aks]
+  metadata {
+    name = "backstage"
+  }
+}
+resource "kubernetes_service_account" "backstage_service_account" {
+  depends_on = [ kubernetes_namespace.backstage_nammespace ]
+  metadata {
+    name      = "backstage-service-account"
+    namespace = "backstage"
+    
+  }
+  
+}
+
+resource "kubernetes_secret" "backstage_service_account_secret" {
+  depends_on = [ kubernetes_service_account.backstage_service_account ]
+  metadata {
+      annotations = {
+      "kubernetes.io/service-account.name" = kubernetes_service_account.backstage_service_account.metadata[0].name
+    }
+    name      = "backstage-service-account-secret"
+    namespace = kubernetes_service_account.backstage_service_account.metadata[0].namespace
+  }
+
+  type                           = "kubernetes.io/service-account-token"
+  wait_for_service_account_token = true
+}
+
 
 
 ################################################################################
@@ -369,25 +464,20 @@ module "gitops_bridge_bootstrap" {
 ################################################################################
 # Backstage: Bootstrap
 ################################################################################
-resource "kubernetes_namespace" "backstage_nammespace" {
-  depends_on = [module.aks]
-  metadata {
-    name = "backstage"
-  }
-}
 
 resource "kubernetes_secret" "tls_secret" {
   depends_on = [kubernetes_namespace.backstage_nammespace]
 
   metadata {
     name      = "my-tls-secret"
+    namespace = kubernetes_namespace.backstage_nammespace.metadata[0].name
   }
 
   type = "kubernetes.io/tls"
 
   data = {
-    "tls.crt" = filebase64("tls.crt")  # Adjust the path accordingly
-    "tls.key" = filebase64("tls.key")  # Adjust the path accordingly
+    "tls.crt" = file("crt.pem")  # Adjust the path accordingly
+    "tls.key" = file("key.pem")  # Adjust the path accordingly
   }
 }
 
@@ -404,6 +494,29 @@ resource "helm_release" "backstage" {
     name  = "image.repository"
     value = "oowcontainerimages.azurecr.io/backstage"
   }
+    set {
+    name  = "image.tag"
+    value = "v2"
+  }
+    set {
+    name  = "env.K8S_CLUSTER_NAME"
+    value = module.aks.aks_name
+  }
+
+      set {
+    name  = "env.K8S_CLUSTER_NAME"
+    value = module.aks.aks_name
+  }
+
+  set {
+    name  = "env.K8S_SERVICE_ACCOUNT_TOKEN"
+    value = kubernetes_secret.backstage_service_account_secret.data.token
+  }
+
+    set {
+    name  = "env.GH_TOKEN"
+    value = local.github_token
+  }
 
   set {
     name  = "service.type"
@@ -413,6 +526,7 @@ resource "helm_release" "backstage" {
     name  = "service.annotations.service\\.beta\\.kubernetes\\.io/azure-load-balancer-resource-group"
     value = module.aks.node_resource_group
   }
+
   set {
     name  = "service.annotations.service\\.beta\\.kubernetes\\.io/azure-load-balancer-ipv4"
     value = azurerm_public_ip.backstage_public_ip.ip_address
@@ -465,5 +579,14 @@ resource "helm_release" "backstage" {
   set {
     name  = "env.AZURE_TENANT_ID"
     value = data.azurerm_client_config.current.tenant_id
+  }
+    set {
+    name  = "podAnnotations.backstage\\.io/kubernetes-id"
+    value = "${module.aks.aks_name}-component"
+  }
+  
+  set {
+    name  = "labels.kubernetesId"
+    value = "${module.aks.aks_name}-component"
   }
 }
