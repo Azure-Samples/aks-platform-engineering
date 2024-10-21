@@ -10,6 +10,7 @@ locals {
   gitops_addons_path     = var.gitops_addons_path
   gitops_addons_revision = var.gitops_addons_revision
 
+
   argocd_namespace = "argocd"
 
   github_token = ""
@@ -514,8 +515,13 @@ resource "helm_release" "backstage" {
   }
 
     set {
-    name  = "env.GH_TOKEN"
+    name  = "env.GITHUB_TOKEN"
     value = local.github_token
+  }
+
+  set {
+    name = "env.GITOPS_REPO"
+    value = local.gitops_addons_url
   }
 
   set {
