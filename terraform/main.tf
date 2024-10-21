@@ -21,7 +21,9 @@ locals {
 
   oss_addons = {
     enable_argocd                          = try(var.addons.enable_argocd, true) # installed by default
+    argocd_chart_version                   = var.addons_versions[0].argocd_chart_version
     enable_argo_rollouts                   = try(var.addons.enable_argo_rollouts, true) # installed by default
+    argo_rollouts_chart_version            = var.addons_versions[0].argo_rollouts_chart_version
     enable_argo_events                     = try(var.addons.enable_argo_events, true) # installed by default
     enable_argo_workflows                  = try(var.addons.enable_argo_workflows, true) # installed by default
     enable_cluster_proportional_autoscaler = try(var.addons.enable_cluster_proportional_autoscaler, false)
@@ -29,7 +31,8 @@ locals {
     enable_gatekeeper                      = try(var.addons.enable_gatekeeper, false)
     enable_gpu_operator                    = try(var.addons.enable_gpu_operator, false)
     enable_ingress_nginx                   = try(var.addons.enable_ingress_nginx, false)
-    enable_kargo                           = try(var.addons.enable_kargo, true) # installed by default 
+    enable_kargo                           = try(var.addons.enable_kargo, true) # installed by default
+    kargo_chart_version                    = var.addons_versions[0].kargo_chart_version
     enable_kyverno                         = try(var.addons.enable_kyverno, false)
     enable_kube_prometheus_stack           = try(var.addons.enable_kube_prometheus_stack, false)
     enable_metrics_server                  = try(var.addons.enable_metrics_server, false)
@@ -456,7 +459,7 @@ module "gitops_bridge_bootstrap" {
   apps = local.argocd_apps
   argocd = {
     namespace     = local.argocd_namespace
-    chart_version = "7.5.2"
+    chart_version = var.addons_versions[0].argocd_chart_version
   }
 }
 
