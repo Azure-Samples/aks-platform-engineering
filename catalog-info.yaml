@@ -1,0 +1,8 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: "aks-store-demo"
+spec:
+  type: service
+  owner: owaino@microsoft.com
+  lifecycle: experimental
