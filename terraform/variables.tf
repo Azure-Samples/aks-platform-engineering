@@ -4,6 +4,13 @@ variable "resource_group_name" {
   type        = string
 }
 
+variable "github_token" {
+  description = "Specifies the GitHub token for the GitHub repository."
+  type        = string
+  default     = ""
+  
+}
+
 variable "location" {
   description = "Specifies the the location for the Azure resources."
   type        = string

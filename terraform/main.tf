@@ -13,7 +13,7 @@ locals {
 
   argocd_namespace = "argocd"
 
-  github_token = ""
+  github_token = var.github_token
 
   azure_addons = {
     enable_azure_crossplane_upbound_provider = var.infrastructure_provider == "crossplane" ? true : false
@@ -393,6 +393,50 @@ resource "kubernetes_service_account" "backstage_service_account" {
   
 }
 
+resource "kubernetes_role" "backstage_pod_reader" {
+  depends_on = [ kubernetes_service_account.backstage_service_account ]
+  metadata {
+    name      = "backstage-pod-reader"
+    namespace = "backstage"
+  }
+
+  rule {
+    api_groups = [""]
+    resources  = [
+      "pods",
+      "services",
+      "replicationcontrollers",
+      "persistentvolumeclaims",
+      "configmaps",
+      "secrets",
+      "events",
+      "pods/log",
+      "pods/status",
+    ]
+    verbs = ["get", "list", "watch"]
+  }
+}
+
+resource "kubernetes_role_binding" "backstage_role_binding" {
+  depends_on = [kubernetes_role.backstage_pod_reader]
+  metadata {
+    name      = "backstage-role-binding"
+    namespace = "backstage"
+  }
+
+  role_ref {
+    api_group = "rbac.authorization.k8s.io"
+    kind      = "Role"
+    name      = kubernetes_role.backstage_pod_reader.metadata[0].name
+  }
+
+  subject {
+    kind      = "ServiceAccount"
+    name      = kubernetes_service_account.backstage_service_account.metadata[0].name
+    namespace = kubernetes_service_account.backstage_service_account.metadata[0].namespace
+  }
+}
+
 resource "kubernetes_secret" "backstage_service_account_secret" {
   depends_on = [ kubernetes_service_account.backstage_service_account ]
   metadata {
@@ -405,6 +449,20 @@ resource "kubernetes_secret" "backstage_service_account_secret" {
 
   type                           = "kubernetes.io/service-account-token"
   wait_for_service_account_token = true
+}
+
+resource "null_resource" "get_cluster_info" {
+  provisioner "local-exec" {
+    command = "kubectl cluster-info | grep 'Kubernetes control plane is running at' | awk '{print $NF}' | tr -d '\n' > cluster_info.txt"
+    environment = {
+      KUBECONFIG = "${path.module}/kubeconfig"
+    }
+    interpreter = ["bash", "-c"]
+  }
+
+  triggers = {
+    always_run = "${timestamp()}"
+  }
 }
 
 
@@ -508,8 +566,8 @@ resource "helm_release" "backstage" {
   }
 
       set {
-    name  = "env.K8S_CLUSTER_NAME"
-    value = module.aks.aks_name
+    name  = "env.K8S_CLUSTER_URL"
+    value = "https://${module.aks.aks_name}"
   }
 
   set {
