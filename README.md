@@ -18,6 +18,7 @@ products:
 - azure-virtual-machines
 name:  Building a Platform Engineering Environment on Azure Kubernetes Service (AKS)
 description: This project demonstrates the process of implementing a consistent and solid platform engineering strategy on the Azure platform using Azure Kubernetes Service (AKS), ArgoCD, and Crossplane or Cluster API (CAPZ).
+urlFragment: aks-platform-engineering
 ---
 
 # Building a Platform Engineering Environment on Azure Kubernetes Service (AKS)
