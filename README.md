@@ -1,3 +1,25 @@
+---
+page_type: sample
+languages:
+- bash
+- terraform
+- yaml
+- json
+products:
+- azure
+- azure-resource-manager
+- azure-kubernetes-service
+- azure-container-registry
+- azure-storage
+- azure-blob-storage
+- azure-storage-accounts
+- azure-monitor
+- azure-log-analytics
+- azure-virtual-machines
+name:  Building a Platform Engineering Environment on Azure Kubernetes Service (AKS)
+description: This project demonstrates the process of implementing a consistent and solid platform engineering strategy on the Azure platform using Azure Kubernetes Service (AKS), ArgoCD, and Crossplane or Cluster API (CAPZ).
+---
+
 # Building a Platform Engineering Environment on Azure Kubernetes Service (AKS)
 
 At its core, platform engineering is about constructing a solid and adaptable groundwork that simplifies and accelerates the development, deployment, and operation of software applications.  The goal is to abstract the complexity inherent in managing infrastructure and operational concerns, enabling dev teams to focus on crafting code that adds direct value. This environment is based on GitOps principles and includes a set of best practices and tools to manage the lifecycle of the applications and the underlying infrastructure. Many platform teams use multiple clusters to separate concerns and provide isolation between different environments, such as development, staging, and production. This guide provides a reference architecture and sample to build a platform engineering environment on Azure Kubernetes Service (AKS).
