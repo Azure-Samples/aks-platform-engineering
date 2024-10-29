@@ -331,8 +331,8 @@ spec:
             chart:
               name: argo-cd
               repository: https://argoproj.github.io/argo-helm
-              version:  7.3.4
-            namespace: argocd   
+              version:  '{{metadata.labels.argocd_chart_version}}'
+            namespace: argocd
           providerConfigRef:
             name: helm-provider	
       patches:
@@ -378,7 +378,7 @@ spec:
                 source:    
                   repoURL: https://github.com/Azure-Samples/aks-platform-engineering
                   targetRevision: HEAD
-                  path: gitops/bootstrap/workloads
+                  path: gitops/bootstrap/workloads/infra
                 syncPolicy:
                   automated: {}
                 destination:
