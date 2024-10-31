@@ -2,6 +2,7 @@ locals {
   name        = local.environment
   environment = "control-plane"
   location    = var.location
+  
 
   #cluster_version = var.kubernetes_version
 
@@ -14,6 +15,7 @@ locals {
   argocd_namespace = "argocd"
 
   github_token = var.github_token
+  build_backstage = var.build_backstage
 
   azure_addons = {
     enable_azure_crossplane_upbound_provider = var.infrastructure_provider == "crossplane" ? true : false
@@ -106,6 +108,7 @@ module "network" {
 # Postgres: Module
 ################################################################################
 resource "azurerm_postgresql_flexible_server" "backstagedbserver" {
+  count = local.build_backstage ? 1 : 0
   name                = "backstage-postgresql-server"
   location            = var.location
   public_network_access_enabled = true
@@ -119,6 +122,7 @@ resource "azurerm_postgresql_flexible_server" "backstagedbserver" {
 
 # Define the PostgreSQL database
 resource "azurerm_postgresql_flexible_server_database" "backstage_plugin_catalog" {
+  count = local.build_backstage ? 1 : 0
   name                = "backstage_plugin_catalog"
   server_id         = azurerm_postgresql_flexible_server.backstagedbserver.id
   charset             = "UTF8"
@@ -126,6 +130,7 @@ resource "azurerm_postgresql_flexible_server_database" "backstage_plugin_catalog
 }
 
 resource "azurerm_postgresql_flexible_server_firewall_rule" "allow_all" {
+  count = local.build_backstage ? 1 : 0
   name                = "AllowAll_2024-10-16_11-52-53"
   server_id = azurerm_postgresql_flexible_server.backstagedbserver.id
   start_ip_address    = "0.0.0.0"
@@ -247,6 +252,7 @@ resource "azurerm_federated_identity_credential" "service_operator" {
 
 
 resource "azuread_application" "backstage-app" {
+  count = local.build_backstage ? 1 : 0
   display_name = "Backstage"
 
   app_role {
@@ -316,22 +322,26 @@ resource "azuread_application" "backstage-app" {
 
 # Define the OAuth2 permissions (redirect URIs)
 resource "azuread_application_redirect_uris" "backstage_redirect_uri" {
+  count = local.build_backstage ? 1 : 0
   application_id = "/applications/${azuread_application.backstage-app.object_id}"
   type                  = "Web"
   redirect_uris         = ["https://${azurerm_public_ip.backstage_public_ip.ip_address}/api/auth/microsoft/handler/frame"]
 }
 # Define the service principal
 resource "azuread_service_principal" "backstage-app-sp" {
+  count = local.build_backstage ? 1 : 0
   client_id = azuread_application.backstage-app.application_id
 }
 
 # Define the service principal password
 resource "azuread_service_principal_password" "backstage-sp-password" {
+  count = local.build_backstage ? 1 : 0
   service_principal_id = azuread_service_principal.backstage-app-sp.id
   end_date             = "2099-01-01T00:00:00Z"
 }
 
 resource "null_resource" "ascii_art" {
+  count = local.build_backstage ? 1 : 0
   depends_on = [ azuread_service_principal_password.backstage-sp-password ]
   provisioner "local-exec" {
     command = <<EOT
@@ -367,6 +377,7 @@ output "azure_tenant_id" {
 ################################################################################
 
 resource "azurerm_public_ip" "backstage_public_ip" {
+  count = local.build_backstage ? 1 : 0
   name                = "backstage-public-ip"
   location            = azurerm_resource_group.this.location
   resource_group_name = module.aks.node_resource_group
@@ -378,12 +389,14 @@ resource "azurerm_public_ip" "backstage_public_ip" {
 # Backstage: Service Account & Secret
 ################################################################################
 resource "kubernetes_namespace" "backstage_nammespace" {
+  count = local.build_backstage ? 1 : 0
   depends_on = [module.aks]
   metadata {
     name = "backstage"
   }
 }
 resource "kubernetes_service_account" "backstage_service_account" {
+  count = local.build_backstage ? 1 : 0
   depends_on = [ kubernetes_namespace.backstage_nammespace ]
   metadata {
     name      = "backstage-service-account"
@@ -394,6 +407,7 @@ resource "kubernetes_service_account" "backstage_service_account" {
 }
 
 resource "kubernetes_role" "backstage_pod_reader" {
+  count = local.build_backstage ? 1 : 0
   depends_on = [ kubernetes_service_account.backstage_service_account ]
   metadata {
     name      = "backstage-pod-reader"
@@ -418,6 +432,7 @@ resource "kubernetes_role" "backstage_pod_reader" {
 }
 
 resource "kubernetes_role_binding" "backstage_role_binding" {
+  count = local.build_backstage ? 1 : 0
   depends_on = [kubernetes_role.backstage_pod_reader]
   metadata {
     name      = "backstage-role-binding"
@@ -438,6 +453,7 @@ resource "kubernetes_role_binding" "backstage_role_binding" {
 }
 
 resource "kubernetes_secret" "backstage_service_account_secret" {
+  count = local.build_backstage ? 1 : 0
   depends_on = [ kubernetes_service_account.backstage_service_account ]
   metadata {
       annotations = {
@@ -528,6 +544,7 @@ module "gitops_bridge_bootstrap" {
 ################################################################################
 
 resource "kubernetes_secret" "tls_secret" {
+  count = local.build_backstage ? 1 : 0
   depends_on = [kubernetes_namespace.backstage_nammespace]
 
   metadata {
@@ -546,6 +563,7 @@ resource "kubernetes_secret" "tls_secret" {
 
 
 resource "helm_release" "backstage" {
+  count = local.build_backstage ? 1 : 0
   depends_on = [ kubernetes_secret.tls_secret ]
   name       = "backstage"
   repository = "oci://oowcontainerimages.azurecr.io/helm"

@@ -228,3 +228,9 @@ variable "net_profile_service_cidr" {
   default     = "10.0.0.0/16"
   type        = string
 }
+
+variable "build_backstage" {
+  description = "Flag to control whether Backstage-related components are built"
+  type        = bool
+  default     = true
+}
