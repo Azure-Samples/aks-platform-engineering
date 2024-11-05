@@ -360,11 +360,12 @@ EOT
 
 # Output the necessary variables
 output "azure_client_id" {
-  value = azuread_application.backstage-app[0].application_id
+value = length(azuread_application.backstage-app) > 0 ? azuread_application.backstage-app[0].application_id : null
 }
 
 output "azure_client_secret" {
-  value = azuread_service_principal_password.backstage-sp-password[0].value
+ 
+  value = length(azuread_service_principal_password.backstage-sp-password) > 0 ? azuread_service_principal_password.backstage-sp-password[0].value : null
   sensitive = true
 }
 
