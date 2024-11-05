@@ -1,0 +1,116 @@
+apiVersion: scaffolder.backstage.io/v1beta3
+# https://backstage.io/docs/features/software-catalog/descriptor-format#kind-template
+kind: Template
+metadata:
+  name: Deploy-Kubernetes-Service 
+  title: Deploy your Application as a Kubernetes Service
+  description: This template deploys your application as a Kubernetes service via ArgoCD.
+spec:
+  owner: owaino@microsoft.com
+  type: service
+
+  # These parameters are used to generate the input form in the frontend, and are
+  # used to gather input data for the execution of the template.
+  parameters:
+    - title: Service Deployment Infromation.
+      required:
+        - name
+      properties:
+        name:
+          title: Name
+          type: string
+          description: Unique name of the service for Backstage catalog.
+          ui:autofocus: true
+          ui:options:
+            rows: 5
+    - title: Enter your application repository details.
+      required:
+        - appRepoUrl
+      properties:
+        appRepoUrl:
+          title: Application/Service Repository Location
+          type: string
+          description: The URL of the repository containing your service/s.
+          ui:field: RepoUrlPicker
+          ui:options:
+            allowedHosts:
+              - github.com
+    - title: Enter your GitOps repository details.
+      required:
+        - argoRepoUrl
+        - commitMessage
+      properties:
+        argoRepoUrl:
+          title: GitOps Repository Location
+          type: string
+          description: The URL of your control repository for GitOps (ArgoCD).
+          ui:field: RepoUrlPicker
+          ui:options:
+            allowedHosts:
+              - github.com
+        commitMessage:
+          title: Commit Message
+          type: string
+          description: The commit message to use when pushing the ArgoCD application definition.
+          ui:emptyValue: 'Please enter a commit message...'
+          ui:options:
+            rows: 1
+
+
+
+
+  # These steps are executed in the scaffolder backend, using data that we gathered
+  # via the parameters above.
+  steps:
+    # Each step executes an action, in this case one templates files into the working directory.
+
+
+    - id: fetch-remote
+      name: Fetch Remote Repo
+      action: fetch:plain
+      input:
+        url: https://${{ (parameters.argoRepoUrl | parseRepoUrl).host  }}/${{ (parameters.argoRepoUrl | parseRepoUrl).owner  }}/${{ (parameters.argoRepoUrl | parseRepoUrl).repo  }}.git 
+        targetPath: ./my-app
+        
+    # Step 2: Copy additional content into the sourcePath
+    - id: add-content
+      name: Add content from local directory
+      action: fetch:template
+      input:
+        url: ./content   # This is the path to the local content directory
+        targetPath: ./my-app   # Destination is the fetched template directory
+        values:
+          name: ${{ parameters.name }}
+          appRepoUrl: ${{ (parameters.appRepoUrl | parseRepoUrl).host  }}/${{ (parameters.appRepoUrl | parseRepoUrl).owner  }}/${{ (parameters.appRepoUrl | parseRepoUrl).repo  }}
+
+    - id: push-to-github
+      name: Create PR to add Argo App Defintion to ARGO Repository and Catalog info.
+      action: publish:github:pull-request
+      input:
+        title: Backstage PR for service ${{ parameters.name }}
+        description: This is a push from backstage for service ${{ parameters.name }}
+        repoUrl: ${{ parameters.argoRepoUrl }}
+        commitMessage: ${{ parameters.commitMessage }}
+        sourcePath: ./my-app
+        branchName: backstage
+        update: true
+
+
+    # The final step is to register our new component in the catalog.
+    - id: register
+      name: Register
+      action: catalog:register
+      input:
+        repoContentsUrl: https://${{ (parameters.argoRepoUrl | parseRepoUrl).host  }}/${{ (parameters.argoRepoUrl | parseRepoUrl).owner  }}/${{ (parameters.argoRepoUrl | parseRepoUrl).repo  }}
+        catalogInfoPath: '/blob/backstage/catalog-info.yaml'
+        optional: true
+
+
+  # Outputs are displayed to the user after a successful execution of the template.
+  output:
+    links:
+      - title: PR URL
+        url: ${{ steps['push-to-github'].output.remoteUrl }}
+      - title: Open in catalog
+        icon: catalog
+        entityRef: ${{ steps['register'].output.entityRef }}

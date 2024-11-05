@@ -4,15 +4,22 @@ variable "resource_group_name" {
   type        = string
 }
 
+variable "github_token" {
+  description = "Specifies the GitHub token for the GitHub repository."
+  type        = string
+  default     = ""
+  
+}
+
 variable "location" {
   description = "Specifies the the location for the Azure resources."
   type        = string
-  default     = "eastus2"
+  default     = "uksouth"
 }
 
 variable "agents_size" {
   description = "Specifies the default virtual machine size for the Kubernetes agents"
-  default     = "Standard_D2s_v3"
+  default     = "Standard_D4ds_v5"
   type        = string
 }
 
@@ -20,6 +27,18 @@ variable "kubernetes_version" {
   description = "Specifies which Kubernetes release to use. The default used is the latest Kubernetes version available in the location."
   type        = string
   default     = null
+}
+
+variable "green_field_application_gateway_for_ingress"{ 
+  description = "Specifies the Application Gateway for Ingress Controller"
+  type        = any
+  default     = null
+}
+
+variable "create_role_assignments_for_application_gateway" {
+  description = "Specifies whether to create role assignments for Application Gateway"
+  type        = bool
+  default     = true
 }
 
 variable "infrastructure_provider" {
@@ -208,4 +227,10 @@ variable "net_profile_service_cidr" {
   description = "Specifies the service CIDR"
   default     = "10.0.0.0/16"
   type        = string
+}
+
+variable "build_backstage" {
+  description = "Flag to control whether Backstage-related components are built"
+  type        = bool
+  default     = true
 }
