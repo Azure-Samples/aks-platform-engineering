@@ -90,12 +90,21 @@ spec:
           adminGroupObjectId: ${{ parameters.adminGroupObjectId }}
 
     - id: rename-folder
-      name: Rename Folder
+      name: Rename Folder - Crossplane
       action: fs:rename
       input:
        files:
         - from: ./my-app/gitops/clusters/crossplane/clusters/teamcluster
           to: ./my-app/gitops/clusters/crossplane/clusters/${{ parameters.name }}-cluster
+
+
+    - id: rename-folder
+      name: Rename Folder - CAPZ
+      action: fs:rename
+      input:
+       files:
+        - from: ./my-app/gitops/clusters/capz/clusters/teamcluster
+          to: ./my-app/gitops/clusters/capz/clusters/${{ parameters.name }}-cluster
   
 
     - id: push-to-github

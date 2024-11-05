@@ -20,7 +20,9 @@ In this project, Backstage is used to provide a unified developer portal that in
 - **Automate Workflows**: Using Software Templates to standardize project creation.
 
 ## Optional - Building Backstage Image
-This repo uses a hosted backstage image with entra auth enabled, automatically onboarding users into your backstage user list. It also has an example software catalog template to demo creating the resources required for argo to create and bootstrap a cluster named by the user. If you want to test Backstage please continue to getting started. If you want to make changes to this image such as adding a different domain or new software catalogs you will need to make your changes, build your own image and change the deployment manifest to reference the image you have created. The source code for Backstage is found in the root Backstage folder. To build the image follow the steps below:
+This repo uses a hosted backstage image with entra auth enabled, automatically onboarding users into your backstage user list. It also has an example software catalog template to demo creating the resources required for argo to create and bootstrap a cluster named by the user. If you want to test Backstage please continue to getting started. 
+
+If you want to make changes to this image such as adding a different domain or new software catalogs you will need to make your changes, build your own image and change the deployment manifest to reference the image you have created. The source code for Backstage is found in the root Backstage folder. To build the image follow the steps below:
 
 1. **Fork & Clone the Repository**:
     - First, fork the repository to your own GitHub account by clicking the "Fork" button on the repository page.
