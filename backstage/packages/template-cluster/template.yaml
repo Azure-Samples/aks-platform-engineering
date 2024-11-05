@@ -88,6 +88,7 @@ spec:
           name: ${{ parameters.name }}
           adminUser: ${{ parameters.adminUser }}
           adminGroupObjectId: ${{ parameters.adminGroupObjectId }}
+          repoUrl: ${{ parameters.argoRepoUrl }}
 
     - id: rename-folder
       name: Rename Folder - Crossplane
@@ -98,13 +99,16 @@ spec:
           to: ./my-app/gitops/clusters/crossplane/clusters/${{ parameters.name }}-cluster
 
 
-    - id: rename-folder
-      name: Rename Folder - CAPZ
+    - id: rename-files
+      name: Rename Files - CAPZ
       action: fs:rename
       input:
        files:
-        - from: ./my-app/gitops/clusters/capz/clusters/teamcluster
-          to: ./my-app/gitops/clusters/capz/clusters/${{ parameters.name }}-cluster
+        - from: ./my-app/gitops/clusters/capz/teamcluster.yaml
+          to: ./my-app/gitops/clusters/capz/clusters/${{ parameters.name }}cluster.yaml
+        - from: ./my-app/gitops/clusters/capz/teamcluster-argo-helmchartproxy.yaml
+          to: ./my-app/gitops/clusters/capz/clusters/${{ parameters.name }}cluster-argo-helmchartproxy
+
   
 
     - id: push-to-github

@@ -1,0 +1,62 @@
+apiVersion: addons.cluster.x-k8s.io/v1alpha1
+kind: HelmChartProxy
+metadata:
+  name: argocd
+  namespace: default
+spec:
+  clusterSelector:
+    matchLabels: {}
+  repoURL: https://argoproj.github.io/argo-helm
+  chartName: argo-cd
+  options:
+    waitForJobs: true
+    wait: true
+    timeout: 5m
+    install:
+      createNamespace: true
+---
+apiVersion: addons.cluster.x-k8s.io/v1alpha1
+kind: HelmChartProxy
+metadata:
+  name: argocd-app
+  namespace: default
+spec:
+  clusterSelector:
+    matchLabels: {}
+  repoURL: https://argoproj.github.io/argo-helm
+  chartName: argocd-apps
+  options:
+    waitForJobs: true
+    wait: true
+    timeout: 5m
+    install:
+      createNamespace: true
+  valuesTemplate: |
+    applications:
+      - name: apps-infra
+        namespace: argocd
+        finalizers:
+        - resources-finalizer.argocd.argoproj.io
+        project: default
+        sources:
+          - repoURL: https://github.com/Azure-Samples/aks-platform-engineering.git
+            path: aks-platform-engineering/tree/main/gitops/apps/infra
+            targetRevision: HEAD
+        destination:
+          server: https://kubernetes.default.svc
+          namespace: default
+        syncPolicy:
+          automated:
+            prune: false
+            selfHeal: false
+          syncOptions:
+          - CreateNamespace=true
+        revisionHistoryLimit: null
+    ignoreDifferences:
+      - group: apps
+        kind: Deployment
+        jsonPointers:
+        - /spec/replicas
+    info:
+    - name: url
+      value: https://argoproj.github.io/

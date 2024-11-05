@@ -1,0 +1,51 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: aks-appset
+  namespace: argocd
+spec:
+  generators:
+  - clusters:
+      selector:
+        matchExpressions:
+          - key: akuity.io/argo-cd-cluster-name
+            operator: NotIn
+            values: [in-cluster]
+  template:
+    metadata:
+      name: aks0
+      namespace: argocd
+    spec:
+      destination:
+        namespace: default
+        server: https://kubernetes.default.svc
+      project: default
+      source:
+        repoURL: 'https://mboersma.github.io/cluster-api-charts'
+        chart: azure-managed-cluster
+        targetRevision: v0.2.4
+        helm:
+          valuesObject:
+            subscriptionID: '{{metadata.annotations.subscription_id}}'
+            identity:
+              clientID: '{{metadata.annotations.akspe_identity_id}}'
+              tenantID: '{{metadata.annotations.tenant_id}}'
+              type: WorkloadIdentity
+            controlplane:
+              ## Optional SSH public key data (must be valid)
+              sshPublicKey: ''
+            defaults:
+              agentPool:
+                sku: Standard_D2s_v3
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+        syncOptions:
+          - CreateNamespace=true
+        retry:
+          limit: -1 # number of failed sync attempt retries; unlimited number of attempts if less than 0
+          backoff:
+            duration: 5s # the amount to back off. Default unit is seconds, but could also be a duration (e.g. "2m", "1h")
+            factor: 2 # a factor to multiply the base duration after each failed retry
+            maxDuration: 10m # the maximum amount of time allowed for the backoff strategy
