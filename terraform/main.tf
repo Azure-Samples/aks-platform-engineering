@@ -124,15 +124,15 @@ resource "azurerm_postgresql_flexible_server" "backstagedbserver" {
 resource "azurerm_postgresql_flexible_server_database" "backstage_plugin_catalog" {
   count = local.build_backstage ? 1 : 0
   name                = "backstage_plugin_catalog"
-  server_id         = azurerm_postgresql_flexible_server.backstagedbserver.id
+  server_id         = azurerm_postgresql_flexible_server.backstagedbserver[count.index].id
   charset             = "UTF8"
   collation = "en_US.utf8"
 }
 
 resource "azurerm_postgresql_flexible_server_firewall_rule" "allow_all" {
   count = local.build_backstage ? 1 : 0
-  name                = "AllowAll_2024-10-16_11-52-53"
-  server_id = azurerm_postgresql_flexible_server.backstagedbserver.id
+  name                = "AllowAll"
+  server_id = azurerm_postgresql_flexible_server.backstagedbserver[count.index].id
   start_ip_address    = "0.0.0.0"
   end_ip_address      = "255.255.255.255"
 }
@@ -323,20 +323,20 @@ resource "azuread_application" "backstage-app" {
 # Define the OAuth2 permissions (redirect URIs)
 resource "azuread_application_redirect_uris" "backstage_redirect_uri" {
   count = local.build_backstage ? 1 : 0
-  application_id = "/applications/${azuread_application.backstage-app.object_id}"
+  application_id = "/applications/${azuread_application.backstage-app[count.index].object_id}"
   type                  = "Web"
-  redirect_uris         = ["https://${azurerm_public_ip.backstage_public_ip.ip_address}/api/auth/microsoft/handler/frame"]
+  redirect_uris         = ["https://${azurerm_public_ip.backstage_public_ip[count.index].ip_address}/api/auth/microsoft/handler/frame"]
 }
 # Define the service principal
 resource "azuread_service_principal" "backstage-app-sp" {
   count = local.build_backstage ? 1 : 0
-  client_id = azuread_application.backstage-app.application_id
+  client_id = azuread_application.backstage-app[count.index].application_id
 }
 
 # Define the service principal password
 resource "azuread_service_principal_password" "backstage-sp-password" {
   count = local.build_backstage ? 1 : 0
-  service_principal_id = azuread_service_principal.backstage-app-sp.id
+  service_principal_id = azuread_service_principal.backstage-app-sp[count.index].id
   end_date             = "2099-01-01T00:00:00Z"
 }
 
@@ -360,11 +360,11 @@ EOT
 
 # Output the necessary variables
 output "azure_client_id" {
-  value = azuread_application.backstage-app.application_id
+  value = azuread_application.backstage-app[0].application_id
 }
 
 output "azure_client_secret" {
-  value = azuread_service_principal_password.backstage-sp-password.value
+  value = azuread_service_principal_password.backstage-sp-password[0].value
   sensitive = true
 }
 
@@ -442,13 +442,13 @@ resource "kubernetes_role_binding" "backstage_role_binding" {
   role_ref {
     api_group = "rbac.authorization.k8s.io"
     kind      = "Role"
-    name      = kubernetes_role.backstage_pod_reader.metadata[0].name
+    name      = kubernetes_role.backstage_pod_reader[count.index].metadata[0].name
   }
 
   subject {
     kind      = "ServiceAccount"
-    name      = kubernetes_service_account.backstage_service_account.metadata[0].name
-    namespace = kubernetes_service_account.backstage_service_account.metadata[0].namespace
+    name      = kubernetes_service_account.backstage_service_account[count.index].metadata[0].name
+    namespace = kubernetes_service_account.backstage_service_account[count.index].metadata[0].namespace
   }
 }
 
@@ -457,10 +457,10 @@ resource "kubernetes_secret" "backstage_service_account_secret" {
   depends_on = [ kubernetes_service_account.backstage_service_account ]
   metadata {
       annotations = {
-      "kubernetes.io/service-account.name" = kubernetes_service_account.backstage_service_account.metadata[0].name
+      "kubernetes.io/service-account.name" = kubernetes_service_account.backstage_service_account[count.index].metadata[0].name
     }
     name      = "backstage-service-account-secret"
-    namespace = kubernetes_service_account.backstage_service_account.metadata[0].namespace
+    namespace = kubernetes_service_account.backstage_service_account[count.index].metadata[0].namespace
   }
 
   type                           = "kubernetes.io/service-account-token"
@@ -549,14 +549,14 @@ resource "kubernetes_secret" "tls_secret" {
 
   metadata {
     name      = "my-tls-secret"
-    namespace = kubernetes_namespace.backstage_nammespace.metadata[0].name
+    namespace = kubernetes_namespace.backstage_nammespace[count.index].metadata[0].name
   }
 
   type = "kubernetes.io/tls"
 
   data = {
-    "tls.crt" = file("crt.pem")  # Adjust the path accordingly
-    "tls.key" = file("key.pem")  # Adjust the path accordingly
+    "tls.crt" = file("tls.crt")  # Adjust the path accordingly
+    "tls.key" = file("tls.key")  # Adjust the path accordingly
   }
 }
 
@@ -590,7 +590,7 @@ resource "helm_release" "backstage" {
 
   set {
     name  = "env.K8S_SERVICE_ACCOUNT_TOKEN"
-    value = kubernetes_secret.backstage_service_account_secret.data.token
+    value = kubernetes_secret.backstage_service_account_secret[count.index].data.token
   }
 
     set {
@@ -614,7 +614,7 @@ resource "helm_release" "backstage" {
 
   set {
     name  = "service.annotations.service\\.beta\\.kubernetes\\.io/azure-load-balancer-ipv4"
-    value = azurerm_public_ip.backstage_public_ip.ip_address
+    value = azurerm_public_ip.backstage_public_ip[count.index].ip_address
   }
   set {
     name  = "image.tag"
@@ -623,12 +623,12 @@ resource "helm_release" "backstage" {
 
   set {
     name  = "env.BASE_URL"
-    value = "https://${azurerm_public_ip.backstage_public_ip.ip_address}"
+    value = "https://${azurerm_public_ip.backstage_public_ip[count.index].ip_address}"
   }
 
   set {
     name  = "env.POSTGRES_HOST"
-    value = azurerm_postgresql_flexible_server.backstagedbserver.fqdn
+    value = azurerm_postgresql_flexible_server.backstagedbserver[count.index].fqdn
   }
 
   set {
@@ -638,27 +638,27 @@ resource "helm_release" "backstage" {
 
   set {
     name  = "env.POSTGRES_USER"
-    value = azurerm_postgresql_flexible_server.backstagedbserver.administrator_login
+    value = azurerm_postgresql_flexible_server.backstagedbserver[count.index].administrator_login
   }
 
   set {
     name  = "env.POSTGRES_PASSWORD"
-    value = azurerm_postgresql_flexible_server.backstagedbserver.administrator_password
+    value = azurerm_postgresql_flexible_server.backstagedbserver[count.index].administrator_password
   }
 
   set {
     name  = "env.POSTGRES_DB"
-    value = azurerm_postgresql_flexible_server_database.backstage_plugin_catalog.name
+    value = azurerm_postgresql_flexible_server_database.backstage_plugin_catalog[count.index].name
   }
 
   set {
     name  = "env.AZURE_CLIENT_ID"
-    value = azuread_application.backstage-app.client_id
+    value = azuread_application.backstage-app[count.index].client_id
   }
 
   set {
     name  = "env.AZURE_CLIENT_SECRET"
-    value = azuread_service_principal_password.backstage-sp-password.value
+    value = azuread_service_principal_password.backstage-sp-password[count.index].value
   }
 
   set {
