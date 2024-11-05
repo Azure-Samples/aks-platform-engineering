@@ -110,7 +110,7 @@ If you want to make changes to this image such as adding a different domain or n
     To deploy Backstage, you can use the provided Terraform scripts. Navigate to the `terraform` directory and apply the configuration:
     ```sh
     cd terraform
-    terraform apply -var gitops_addons_org=https://github.com/azure-samples -var infrastructure_provider=crossplane -var build_backstage=true -var gitops_addons_org=https://github.com/<your_gh_username/org> -var github_token=<your_pat_token> --auto-approve
+    terraform apply -var infrastructure_provider=crossplane -var build_backstage=true -var gitops_addons_org=https://github.com/<your_gh_username/org> -var github_token=<your_pat_token> --auto-approve
     ```
 
     > **Note:** There is an alert generated in the terraform output that informs you to go to your newly created backstage SP and "Grant Admin" to the SP. This is because onboarding all users from your entra tenant requires admin privileges. If you don't do this prior to Backstage deploying you will have to wait for the scheduled task to run again (Once an hour) or manually populate the users in the backstage user table. 
