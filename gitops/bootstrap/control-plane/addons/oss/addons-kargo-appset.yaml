@@ -27,13 +27,13 @@ spec:
                 matchLabels:
                   environment: control-plane
               values:
-                addonChartVersion: '{{metadata.annotations.addons_repo_url}}'
+                addonChartVersion: '{{metadata.labels.kargo_chart_version}}'
           - clusters:
               selector:
                 matchLabels:
                   environment: prod
               values:
-                addonChartVersion: '{{metadata.annotations.addons_repo_url}}'
+                addonChartVersion: '{{metadata.labels.kargo_chart_version}}'
   template:
     metadata:
       name: addon-{{name}}-{{values.addonChart}}
