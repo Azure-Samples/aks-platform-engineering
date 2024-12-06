@@ -1,0 +1,145 @@
+apiVersion: scaffolder.backstage.io/v1beta3
+# https://backstage.io/docs/features/software-catalog/descriptor-format#kind-template
+kind: Template
+metadata:
+  name: Deploy-Kubernetes-Cluster
+  title: Deploy your teams new AKS Cluster
+  description: This template deploys your teams new AKS cluster.
+spec:
+  owner: owaino@microsoft.com
+  type: service
+
+  # These parameters are used to generate the input form in the frontend, and are
+  # used to gather input data for the execution of the template.
+  parameters:
+    - title: Request an AKS Cluster.
+      required:
+        - name
+        - adminUser
+        - adminGroupObjectId
+      properties:
+        name:
+          title: Cluster Name
+          type: string
+          description: Unique name of the service for your AKS Cluster
+          ui:autofocus: true
+          ui:options:
+            rows: 5
+        adminUser:
+          title: Admin User Object ID
+          type: string
+          description: The object ID from entra of your admin user.
+          ui:autofocus: true
+          ui:options:
+            rows: 5
+        adminGroupObjectId:
+          title: Admin Group Object ID
+          type: string
+          description: The admin group object ID from entra.
+          ui:autofocus: true
+          ui:options:
+            rows: 5
+    - title: Enter your GitOps repository details.
+      required:
+        - argoRepoUrl
+        - commitMessage
+      properties:
+        argoRepoUrl:
+          title: GitOps Repository Location
+          type: string
+          description: The URL of your control repository for GitOps (ArgoCD).
+          ui:field: RepoUrlPicker
+          ui:options:
+            allowedHosts:
+              - github.com
+        commitMessage:
+          title: Commit Message
+          type: string
+          description: The commit message to use when creating a new cluster.
+          ui:emptyValue: 'Please enter a commit message...'
+          ui:options:
+            rows: 1
+
+
+
+
+  # These steps are executed in the scaffolder backend, using data that we gathered
+  # via the parameters above.
+  steps:
+    # Each step executes an action, in this case one templates files into the working directory.
+
+
+    - id: fetch-remote
+      name: Fetch Remote Repo
+      action: fetch:plain
+      input:
+        url: https://${{ (parameters.argoRepoUrl | parseRepoUrl).host  }}/${{ (parameters.argoRepoUrl | parseRepoUrl).owner  }}/${{ (parameters.argoRepoUrl | parseRepoUrl).repo  }}.git 
+        targetPath: ./my-app
+
+        
+    # Step 2: Copy additional content into the sourcePath
+    - id: add-content
+      name: Add content from local directory
+      action: fetch:template
+      input:
+        url: ./content   # This is the path to the local content directory
+        targetPath: ./my-app   # Destination is the fetched template directory
+        values:
+          name: ${{ parameters.name }}
+          adminUser: ${{ parameters.adminUser }}
+          adminGroupObjectId: ${{ parameters.adminGroupObjectId }}
+          repoUrl: ${{ parameters.argoRepoUrl }}
+
+    - id: rename-folder
+      name: Rename Folder - Crossplane
+      action: fs:rename
+      input:
+       files:
+        - from: ./my-app/gitops/clusters/crossplane/clusters/teamcluster
+          to: ./my-app/gitops/clusters/crossplane/clusters/${{ parameters.name }}-cluster
+
+
+    - id: rename-files
+      name: Rename Files - CAPZ
+      action: fs:rename
+      input:
+       files:
+        - from: ./my-app/gitops/clusters/capz/teamcluster.yaml
+          to: ./my-app/gitops/clusters/capz/clusters/${{ parameters.name }}cluster.yaml
+        - from: ./my-app/gitops/clusters/capz/teamcluster-argo-helmchartproxy.yaml
+          to: ./my-app/gitops/clusters/capz/clusters/${{ parameters.name }}cluster-argo-helmchartproxy
+
+  
+
+    - id: push-to-github
+      name: Create PR to add Argo App Defintion to ARGO Repository and Catalog info.
+      action: publish:github:pull-request
+      input:
+        title: Backstage PR for service ${{ parameters.name }}
+        description: This is a push from backstage for a new cluster named ${{ parameters.name }}-cluster
+        repoUrl: ${{ parameters.argoRepoUrl }}
+        commitMessage: ${{ parameters.commitMessage }}
+        sourcePath: ./my-app
+        branchName: backstage
+        update: true
+
+
+
+    # The final step is to register our new component in the catalog.
+    - id: register
+      name: Register
+      action: catalog:register
+      input:
+        repoContentsUrl: https://${{ (parameters.argoRepoUrl | parseRepoUrl).host  }}/${{ (parameters.argoRepoUrl | parseRepoUrl).owner  }}/${{ (parameters.argoRepoUrl | parseRepoUrl).repo  }}
+        catalogInfoPath: '/blob/backstage/catalog-info.yaml'
+        optional: true
+
+
+  # Outputs are displayed to the user after a successful execution of the template.
+  output:
+    links:
+      - title: PR URL
+        url: ${{ steps['push-to-github'].output.remoteUrl }}
+      - title: Open in catalog
+        icon: catalog
+        entityRef: ${{ steps['register'].output.entityRef }}

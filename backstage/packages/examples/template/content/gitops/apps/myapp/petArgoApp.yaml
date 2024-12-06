@@ -1,0 +1,20 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: aks-store-demo
+  namespace: argocd
+spec:
+  project: default
+  source:    
+      repoURL: ${{ values.appRepoUrl }}.git
+      targetRevision: HEAD
+      path: kustomize/overlays/dev             
+  syncPolicy:
+      automated: {}
+  destination:
+      namespace: argocd
+      server: https://kubernetes.default.svc
+  template:
+    metadata:
+      annotations:
+        backstage.io/kubernetes-id: ${{ parameters.name }}
