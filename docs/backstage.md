@@ -39,7 +39,7 @@ In this project, Backstage is used to provide a unified developer portal that in
     To deploy Backstage, you can use the provided Terraform scripts. Navigate to the `terraform` directory and apply the configuration:
     ```sh
     cd terraform
-    terraform apply -var build_backstage=true -var gitops_addons_org=https://github.com/owainow -var github_token=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 --auto-approve
+    terraform apply -var build_backstage=true -var gitops_addons_org=https://github.com/owainow -var github_token=<ghp_token> --auto-approve
     ```
 
     > **Note:** GitHub PAT's can be created under your GitHub account under "Developer Settings". The required GitHub token permissions for Backstage in this case are related to the repository creation. The tempalte provided will create a new file in your forked repo. For classic GH PAT's this will be full repo access to create PR's and commit changes. For fine grained tokens this will be contents Read and Write and Pull Requests Read and Write permissions at the repository level. 
