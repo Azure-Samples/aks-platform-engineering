@@ -119,7 +119,7 @@ If you want to make changes to this image such as adding a different domain or n
     export POSTGRES_PASSWORD=your-local-postgres-password
     export POSTGRES_DB=your-local-postgres-db
 
-    yarn start
+    yarn start --config ../../app-config-local.yaml
     ```
 
 6. **Ensure Azure CLI is Installed**: Make sure you have the Azure CLI installed and logged in. If not, install it from [here](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli) and log in using:
