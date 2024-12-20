@@ -107,13 +107,12 @@ If you want to make changes to this image such as adding a different domain or n
 4. **Build the Project**: Run the build script defined in your `package.json`. Based on your previous commands, it looks like you need to build the backend:
 
     ```sh
-    yarn build:backend --config ./app-config-local.yaml
+    yarn build:backend --config ../../app-config-local.yaml
     ```
 
 5. **Optional - Run the Application Locally**: After building the project, you can run it locally. Ensure that all necessary environment variables are set:
 
     ```sh
-    export BASE_URL=https://your-local-base-url.com
     export POSTGRES_HOST=your-local-postgres-host
     export POSTGRES_PORT=your-local-postgres-port
     export POSTGRES_USER=your-local-postgres-user
