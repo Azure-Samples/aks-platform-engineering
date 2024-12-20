@@ -14,12 +14,12 @@ variable "github_token" {
 variable "location" {
   description = "Specifies the the location for the Azure resources."
   type        = string
-  default     = "uksouth"
+  default     = "eastus2"
 }
 
 variable "agents_size" {
   description = "Specifies the default virtual machine size for the Kubernetes agents"
-  default     = "Standard_D4ds_v5"
+  default     = "Standard_D2s_v3"
   type        = string
 }
 
@@ -232,5 +232,11 @@ variable "net_profile_service_cidr" {
 variable "build_backstage" {
   description = "Flag to control whether Backstage-related components are built"
   type        = bool
-  default     = true
+  default     = false
+}
+
+variable "postgres_password" {
+  description = "Password for the Backstage Postgres database"
+  type        = string
+  default     = "secretPassword123!"
 }
