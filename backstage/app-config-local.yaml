@@ -1,6 +1,6 @@
 app:
   title:  Microsoft - Platform Engineering
-  baseUrl: ${BASE_URL}:443
+  baseUrl: http://localhost:3000
 
 
 organization:
@@ -13,7 +13,7 @@ backend:
   # auth:
   #   keys:
   #     - secret: ${BACKEND_SECRET}
-  baseUrl: ${BASE_URL}:443
+  baseUrl: http://localhost:7007
   listen:
     host: 0.0.0.0
     port: 7007
@@ -25,7 +25,7 @@ backend:
     # Content-Security-Policy directives follow the Helmet format: https://helmetjs.github.io/#reference
     # Default Helmet Content-Security-Policy values can be removed by setting the key to false
   cors:
-    origin: ${BASE_URL}:443
+    origin: http://localhost:3000
     methods: [GET, HEAD, PATCH, POST, PUT, DELETE]
     credentials: true
     Access-Control-Allow-Origin: '*'
@@ -34,9 +34,9 @@ backend:
     certificate:
       type: 'pem'
       key:
-          $file: ./etc/tls/tls.key  #When running a YARN build you will need to make this resolve to the correct path in this case add a . however that will need to change when you build the image for the actual mount point. Alternativley create a local app-config with this removed to run YARN builds.
+          $file: ../terraform/tls.key  #When running a YARN build you will need to make this resolve to the correct path in this case add a . however that will need to change when you build the image for the actual mount point. Alternativley create a local app-config with this removed to run YARN builds.
       cert: 
-          $file: ./etc/tls/tls.crt
+          $file: ../terraform/tls.crt 
   # This is for local development only, it is not recommended to use this in production
   # The production database configuration is stored in app-config.production.yaml
   database:

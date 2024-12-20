@@ -112,7 +112,7 @@ resource "azurerm_postgresql_flexible_server" "backstagedbserver" {
   name                = "backstage-postgresql-server"
   location            = var.location
   public_network_access_enabled = true
-  administrator_password = "secretPassword123!"
+  administrator_password = var.postgres_password
   resource_group_name = azurerm_resource_group.this.name
   administrator_login = "psqladminun"
   sku_name = "GP_Standard_D4s_v3"
@@ -354,6 +354,8 @@ echo "        \\_\\_____|______||_| \_\  |_|   "
 echo ""
 echo ""
 echo "Please grant admin consent on app registration now to avoid waiting for the 1 hour schedule post backstage chart deployment."
+echo "This can be done through the Azure portal at the following location: Entra - App registrations - Backstage - API Permissions - <click> Grant admin consent"
+echo " This can also be done using the CLI with the following command: az ad app permission admin-consent --id <ApplicationId>"
 EOT
   }
 }
@@ -467,22 +469,6 @@ resource "kubernetes_secret" "backstage_service_account_secret" {
   type                           = "kubernetes.io/service-account-token"
   wait_for_service_account_token = true
 }
-
-resource "null_resource" "get_cluster_info" {
-  provisioner "local-exec" {
-    command = "kubectl cluster-info | grep 'Kubernetes control plane is running at' | awk '{print $NF}' | tr -d '\n' > cluster_info.txt"
-    environment = {
-      KUBECONFIG = "${path.module}/kubeconfig"
-    }
-    interpreter = ["bash", "-c"]
-  }
-
-  triggers = {
-    always_run = "${timestamp()}"
-  }
-}
-
-
 
 ################################################################################
 # GitOps Bridge: Private ssh keys for git
