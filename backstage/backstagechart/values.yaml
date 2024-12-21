@@ -1,0 +1,111 @@
+# Default values for backstagechart.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+namespace: backstage
+env:
+  AZURE_TENANT_ID: "your-tenant-id"
+  AZURE_CLIENT_ID: "your-client-id"
+  AZURE_CLIENT_SECRET: "your-client-secret"
+  POSTGRES_HOST: "your-postgres-host"
+  POSTGRES_PORT: "your-postgres-port"
+  POSTGRES_USER: "your-postgres-user"
+  POSTGRES_PASSWORD: "your-postgres-password"
+  POSTGRES_DB: "your-postgres-db"
+  BASE_URL: "http://your-public-ip"
+  K8S_CLUSTER_NAME: "your-cluster-name"
+  K8S_CLUSTER_URL: "https://your-cluster-url"
+  K8S_SERVICE_ACCOUNT_TOKEN: "token"
+  GITHUB_TOKEN: "token"
+  GITOPS_REPO: "https://github.com/Azure-Samples/platform-engineering"
+  
+
+
+replicaCount: 1
+
+image:
+  repository: <oowcontainerimages.azurecr.io/backstage>
+  pullPolicy: Always
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: <tag>
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+podAnnotations: 
+  backstage.io/kubernetes-id: <cluster-name-component>
+
+labels:
+  kubernetesId: <your-cluster-name-component>
+
+podSecurityContext: {}
+  # fsGroup: 2000
+
+securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+
+service:
+  type: LoadBalancer
+  port: 80
+  targetPort: 7007
+  annotations: 
+    service.beta.kubernetes.io/azure-load-balancer-ipv4: <your-ipv4-address>
+    service.beta.kubernetes.io/azure-load-balancer-resource-group: <your-resource-group>
+
+deployment:
+  port: 7007
+
+ingress:
+  enabled: false
+  className: ""
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+  hosts:
+    - host: "example.domain.com"
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    - secretName: backstage-tls
+      hosts:
+        - "example.domain.com"
+
+
+resources: {}
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 100
+  targetCPUUtilizationPercentage: 80
+  # targetMemoryUtilizationPercentage: 80
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
