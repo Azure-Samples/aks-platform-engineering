@@ -95,3 +95,9 @@ extraObjects:
         - namespace: '*'
           name: '*'
           server: '*'
+
+global:
+  image:
+    repository: quay.io/argoproj/argocd
+    tag: v3.0.0-rc3
+    pullPolicy: IfNotPresent
