@@ -362,7 +362,7 @@ EOT
 
 # Output the necessary variables
 output "azure_client_id" {
-value = length(azuread_application.backstage-app) > 0 ? azuread_application.backstage-app[0].application_id : null
+value = length(azuread_application.backstage-app) > 0 ? azuread_application.backstage-app[0].client_id : null
 }
 
 output "azure_client_secret" {
