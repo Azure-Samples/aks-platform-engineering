@@ -330,7 +330,7 @@ resource "azuread_application_redirect_uris" "backstage_redirect_uri" {
 # Define the service principal
 resource "azuread_service_principal" "backstage-app-sp" {
   count = local.build_backstage ? 1 : 0
-  client_id = azuread_application.backstage-app[count.index].application_id
+  client_id = azuread_application.backstage-app[count.index].client_id
 }
 
 # Define the service principal password
