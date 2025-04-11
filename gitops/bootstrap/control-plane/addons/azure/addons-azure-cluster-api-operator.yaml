@@ -21,6 +21,12 @@ spec:
                   - key: enable_cluster_api_operator
                     operator: In
                     values: ['true']
+          - clusters:
+              selector:
+                matchLabels:
+                  environment: control-plane
+              values:
+                addonChartVersion: 0.18.1
   template:
     metadata:
       name: addon-{{name}}-capi-operator
