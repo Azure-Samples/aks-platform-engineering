@@ -11,28 +11,16 @@ spec:
         mergeKeys: [server]
         generators:
           - clusters:
-              # values:
-              #   addonChart: cluster-api-operator
-              #   addonChartNamespace: capi-operator-system
-              #   addonChartVersion: 0.11.0
-              #   addonChartRepository: https://kubernetes-sigs.github.io/cluster-api-operator
+              values:
+                addonChart: cluster-api-operator
+                addonChartNamespace: capi-operator-system
+                addonChartVersion: 0.18.1
+                addonChartRepository: https://kubernetes-sigs.github.io/cluster-api-operator
               selector:
                 matchExpressions:
                   - key: enable_cluster_api_operator
                     operator: In
                     values: ['true']
-          - clusters:
-              selector:
-                matchLabels:
-                  environment: staging
-          #     values:
-          #       addonChartVersion: 0.11.0
-          # - clusters:
-          #     selector:
-          #       matchLabels:
-          #         environment: prod
-          #     values:
-          #       addonChartVersion: 0.11.0
   template:
     metadata:
       name: addon-{{name}}-capi-operator
@@ -57,19 +45,17 @@ spec:
                 - op: replace
                   path: /spec/tenantID
                   value: '{{metadata.annotations.tenant_id}}'
-        - repoURL: '{{metadata.annotations.addons_repo_url}}' # Install CAPI-Operator via raw YAML manifest
-          targetRevision: '{{metadata.annotations.addons_repo_revision}}'
-          path: '{{metadata.annotations.addons_repo_basepath}}bootstrap/control-plane/temp'
-        # - chart: '{{values.addonChart}}'
-        #   repoURL: '{{values.addonChartRepository}}'
-        #   targetRevision: '{{values.addonChartVersion}}'
-        #   helm:
-        #     releaseName: '{{values.addonChart}}'
-        #     ignoreMissingValueFiles: true
-        #     valueFiles:
-        #       - $values/{{metadata.annotations.addons_repo_basepath}}environments/default/addons/{{values.addonChart}}/values.yaml
-        #       - $values/{{metadata.annotations.addons_repo_basepath}}environments/{{metadata.labels.environment}}/addons/{{values.addonChart}}/values.yaml
-        #       - $values/{{metadata.annotations.addons_repo_basepath}}environments/clusters/{{name}}/addons/{{values.addonChart}}/values.yaml
+        # - repoURL: '{{metadata.annotations.addons_repo_url}}' # Install CAPI-Operator via raw YAML manifest
+        #   targetRevision: '{{metadata.annotations.addons_repo_revision}}'
+        #   path: '{{metadata.annotations.addons_repo_basepath}}bootstrap/control-plane/temp'
+        - chart: '{{values.addonChart}}'
+          repoURL: '{{values.addonChartRepository}}'
+          targetRevision: '{{values.addonChartVersion}}'
+          helm:
+            releaseName: '{{values.addonChart}}'
+            ignoreMissingValueFiles: true
+            valueFiles:
+              - $values/{{metadata.annotations.addons_repo_basepath}}environments/default/addons/{{values.addonChart}}/values.yaml
       destination:
         namespace: 'capi-operator-system'
         name: '{{name}}'
