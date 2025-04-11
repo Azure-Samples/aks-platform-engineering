@@ -1,7 +1,3 @@
-global:
-  image:
-    tag: v3.0.0-rc3
-
 controller:
   replicas: 1 # Additional replicas will cause sharding of managed clusters across number of replicas.
   metrics:
@@ -102,6 +98,6 @@ extraObjects:
 
 global:
   image:
-    # repository: quay.io/argoproj/argocd
-    # tag: v3.0.0-rc3
+    repository: quay.io/argoproj/argocd
+    tag: v3.0.0-rc3
     pullPolicy: IfNotPresent
