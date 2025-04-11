@@ -144,7 +144,7 @@ resource "azurerm_postgresql_flexible_server_firewall_rule" "allow_all" {
 
 module "aks" {
   source                            = "Azure/aks/azurerm"
-  version                           = "9.1.0"
+  version                           = "9.4.1"
   resource_group_name               = azurerm_resource_group.this.name
   location                          = var.location
   kubernetes_version                = var.kubernetes_version
@@ -330,7 +330,7 @@ resource "azuread_application_redirect_uris" "backstage_redirect_uri" {
 # Define the service principal
 resource "azuread_service_principal" "backstage-app-sp" {
   count = local.build_backstage ? 1 : 0
-  client_id = azuread_application.backstage-app[count.index].application_id
+  client_id = azuread_application.backstage-app[count.index].client_id
 }
 
 # Define the service principal password
@@ -362,7 +362,7 @@ EOT
 
 # Output the necessary variables
 output "azure_client_id" {
-value = length(azuread_application.backstage-app) > 0 ? azuread_application.backstage-app[0].application_id : null
+value = length(azuread_application.backstage-app) > 0 ? azuread_application.backstage-app[0].client_id : null
 }
 
 output "azure_client_secret" {
