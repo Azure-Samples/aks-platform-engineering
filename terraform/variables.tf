@@ -4,6 +4,13 @@ variable "resource_group_name" {
   type        = string
 }
 
+variable "github_token" {
+  description = "Specifies the GitHub token for the GitHub repository."
+  type        = string
+  default     = ""
+  
+}
+
 variable "location" {
   description = "Specifies the the location for the Azure resources."
   type        = string
@@ -22,6 +29,18 @@ variable "kubernetes_version" {
   default     = null
 }
 
+variable "green_field_application_gateway_for_ingress"{ 
+  description = "Specifies the Application Gateway for Ingress Controller"
+  type        = any
+  default     = null
+}
+
+variable "create_role_assignments_for_application_gateway" {
+  description = "Specifies whether to create role assignments for Application Gateway"
+  type        = bool
+  default     = true
+}
+
 variable "infrastructure_provider" {
   description = "Specific the choice of infrastructure provider. crossplane or capz"
   type        = string
@@ -34,6 +53,20 @@ variable "addons" {
   default = {
     enable_argocd                            = true # installs argocd
   }
+}
+
+variable "addons_versions" {
+  description = "Specifies the Kubernetes addons to install on the hub cluster."
+  type        = list (object({
+    argocd_chart_version = string
+    argo_rollouts_chart_version = string
+    kargo_chart_version = string
+  }))
+  default = [{
+    argocd_chart_version                     = "7.6.10" # https://github.com/argoproj/argo-helm/blob/main/charts/argo-cd/Chart.yaml
+    argo_rollouts_chart_version              = "2.37.7" # https://github.com/argoproj/argo-helm/blob/main/charts/argo-rollouts/Chart.yaml
+    kargo_chart_version                      = "0.9.1" # https://github.com/akuity/kargo/releases
+  }]
 }
 
 variable "git_private_ssh_key" {
@@ -112,6 +145,12 @@ variable "os_disk_size_gb" {
   default     = 50
 }
 
+variable "os_sku" {
+  type        = string
+  default     = "AzureLinux"
+  description = "(Optional) Specifies the OS SKU used by the agent pool. Possible values are AzureLinux, Ubuntu, Windows2019 and Windows2022. If not specified, the default is Ubuntu if OSType=Linux or Windows2019 if OSType=Windows. And the default Windows OSSKU will be changed to Windows2022 after Windows2019 is deprecated. Changing this from AzureLinux or Ubuntu to AzureLinux or Ubuntu will not replace the resource, otherwise temporary_name_for_rotation must be specified when attempting a change."
+}
+
 variable "sku_tier" {
   description = "Specifies the SKU Tier that should be used for this AKS Cluster."
   type        = string
@@ -188,4 +227,16 @@ variable "net_profile_service_cidr" {
   description = "Specifies the service CIDR"
   default     = "10.0.0.0/16"
   type        = string
+}
+
+variable "build_backstage" {
+  description = "Flag to control whether Backstage-related components are built"
+  type        = bool
+  default     = false
+}
+
+variable "postgres_password" {
+  description = "Password for the Backstage Postgres database"
+  type        = string
+  default     = "secretPassword123!"
 }

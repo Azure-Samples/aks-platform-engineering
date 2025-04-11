@@ -1,0 +1,104 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "backstagechart.fullname" . }}
+  namespace: {{ .Values.namespace }} 
+  labels:
+    {{- include "backstagechart.labels" . | nindent 4 }}
+    backstage.io/kubernetes-id: {{ .Values.labels.kubernetesId }}
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "backstagechart.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "backstagechart.selectorLabels" . | nindent 8 }}
+        backstage.io/kubernetes-id: {{ .Values.labels.kubernetesId }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: backstage-service-account
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          env:
+            - name: AZURE_TENANT_ID
+              value: {{ .Values.env.AZURE_TENANT_ID | quote }}
+            - name: AZURE_CLIENT_ID
+              value: {{ .Values.env.AZURE_CLIENT_ID | quote }}
+            - name: AZURE_CLIENT_SECRET
+              value: {{ .Values.env.AZURE_CLIENT_SECRET | quote }}
+            - name: POSTGRES_HOST
+              value: {{ .Values.env.POSTGRES_HOST | quote }}
+            - name: POSTGRES_PORT
+              value: {{ .Values.env.POSTGRES_PORT | quote }}
+            - name: POSTGRES_USER
+              value: {{ .Values.env.POSTGRES_USER | quote }}
+            - name: POSTGRES_PASSWORD
+              value: {{ .Values.env.POSTGRES_PASSWORD | quote }}
+            - name: POSTGRES_DB
+              value: {{ .Values.env.POSTGRES_DB | quote }}
+            - name: BASE_URL
+              value: {{ .Values.env.BASE_URL | quote }}
+            - name: K8S_CLUSTER_NAME
+              value: {{ .Values.env.K8S_CLUSTER_NAME | quote }}
+            - name: K8S_CLUSTER_URL 
+              value: {{ .Values.env.K8S_CLUSTER_URL | quote }}
+            - name: K8S_SERVICE_ACCOUNT_TOKEN
+              value: {{ .Values.env.K8S_SERVICE_ACCOUNT_TOKEN | quote }}
+            - name: GITHUB_TOKEN
+              value: {{ .Values.env.GITHUB_TOKEN | quote }}
+            - name: GITOPS_REPO
+              value: {{ .Values.env.GITOPS_REPO | quote }}
+
+          ports:
+            - name: http
+              containerPort: {{ .Values.deployment.port }}
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 7007
+              scheme: HTTPS
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 7007
+              scheme: HTTPS
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          volumeMounts:
+            - name: tls-volume
+              mountPath: /etc/tls
+              readOnly: true
+      volumes:
+        - name: tls-volume
+          secret:
+            secretName: my-tls-secret
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

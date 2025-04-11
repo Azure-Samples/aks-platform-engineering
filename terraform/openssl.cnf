@@ -1,0 +1,18 @@
+[req]
+distinguished_name = req_distinguished_name
+x509_extensions = v3_req
+prompt = no
+
+[req_distinguished_name]
+CN = 51.145.113.94  # <REPLACE WITH YOUR IP> Common Name (CN) should match your public IP 
+
+
+[v3_req]
+keyUsage = keyEncipherment, dataEncipherment, digitalSignature
+extendedKeyUsage = serverAuth
+subjectAltName = @alt_names
+
+[alt_names]
+IP.1 = 51.145.113.94 # <REPLACE WITH YOUR IP>
+IP.2 = 127.0.0.1
+DNS.1 = localhost
