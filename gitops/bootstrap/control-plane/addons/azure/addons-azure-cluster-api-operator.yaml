@@ -67,7 +67,7 @@ spec:
         name: '{{name}}'
       syncPolicy:
         retry:
-          limit: 5 # number of failed sync attempt retries; unlimited number of attempts if less than 0
+          limit: -1 # number of failed sync attempt retries; unlimited number of attempts if less than 0
           backoff:
             duration: 5s # the amount to back off. Default unit is seconds, but could also be a duration (e.g. "2m", "1h")
             factor: 2 # a factor to multiply the base duration after each failed retry
@@ -77,11 +77,11 @@ spec:
           - CreateNamespace=true
           - ServerSideApply=true
         preserveResourcesOnDeletion: true #https://argo-cd.readthedocs.io/en/stable/operator-manual/applicationset/Controlling-Resource-Modification/#prevent-an-applications-child-resources-from-being-deleted-when-the-parent-application-is-deleted
-        terminate:
-          duration: 1m
-          resources:
-            - kind: Job
-              timeout: 1m # timeout for the resource
+        # terminate:
+        #   duration: 1m
+        #   resources:
+        #     - kind: Job
+        #       timeout: 1m # timeout for the resource
       ignoreDifferences:
       - group: apiextensions.k8s.io
         kind: CustomResourceDefinition
