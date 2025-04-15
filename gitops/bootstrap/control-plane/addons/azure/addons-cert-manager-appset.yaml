@@ -18,9 +18,6 @@ spec:
                 addonChartRepository: https://charts.jetstack.io
               selector:
                 matchExpressions:
-                  - key: akuity.io/argo-cd-cluster-name
-                    operator: NotIn
-                    values: [in-cluster]
                   - key: enable_cert_manager
                     operator: In
                     values: ['true']

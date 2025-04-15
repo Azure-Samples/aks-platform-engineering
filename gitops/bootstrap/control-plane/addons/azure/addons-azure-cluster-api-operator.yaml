@@ -1,0 +1,86 @@
+---
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: addons-cluster-api
+spec:
+  syncPolicy:
+    preserveResourcesOnDeletion: true
+  generators:
+    - merge:
+        mergeKeys: [server]
+        generators:
+          - clusters:
+              values:
+                addonChart: cluster-api-operator
+                addonChartNamespace: capi-operator-system
+                addonChartVersion: 0.18.1
+                addonChartRepository: https://kubernetes-sigs.github.io/cluster-api-operator
+              selector:
+                matchExpressions:
+                  - key: enable_cluster_api_operator
+                    operator: In
+                    values: ['true']
+          - clusters:
+              selector:
+                matchLabels:
+                  environment: control-plane
+              values:
+                addonChartVersion: 0.18.1
+  template:
+    metadata:
+      name: addon-{{name}}-capi-operator
+    spec:
+      project: default
+      sources:
+        - repoURL: '{{metadata.annotations.addons_repo_url}}'
+          targetRevision: '{{metadata.annotations.addons_repo_revision}}'
+          path: '{{metadata.annotations.addons_repo_basepath}}hooks/sleep'
+        - repoURL: '{{metadata.annotations.addons_repo_url}}'
+          targetRevision: '{{metadata.annotations.addons_repo_revision}}'
+          path: '{{metadata.annotations.addons_repo_basepath}}hooks/identity'
+          kustomize:
+            patches:
+            - target:
+                kind: AzureClusterIdentity
+                name: cluster-identity
+              patch: |-
+                - op: replace
+                  path: /spec/clientID
+                  value: '{{metadata.annotations.akspe_identity_id}}'
+                - op: replace
+                  path: /spec/tenantID
+                  value: '{{metadata.annotations.tenant_id}}'
+        - repoURL: '{{metadata.annotations.addons_repo_url}}'
+          targetRevision: '{{metadata.annotations.addons_repo_revision}}'
+          ref: values
+        - chart: '{{values.addonChart}}'
+          repoURL: '{{values.addonChartRepository}}'
+          targetRevision: '{{values.addonChartVersion}}'
+          helm:
+            releaseName: '{{values.addonChart}}'
+            ignoreMissingValueFiles: true
+            valueFiles:
+              - $values/{{metadata.annotations.addons_repo_basepath}}environments/default/addons/{{values.addonChart}}/values.yaml
+              - $values/{{metadata.annotations.addons_repo_basepath}}environments/{{metadata.labels.environment}}/addons/{{values.addonChart}}/values.yaml
+      destination:
+        namespace: 'capi-operator-system'
+        name: '{{name}}'
+      syncPolicy:
+        retry:
+          limit: -1 # number of failed sync attempt retries; unlimited number of attempts if less than 0
+          backoff:
+            duration: 5s # the amount to back off. Default unit is seconds, but could also be a duration (e.g. "2m", "1h")
+            factor: 2 # a factor to multiply the base duration after each failed retry
+            maxDuration: 3m # the maximum amount of time allowed for the backoff
+        automated: {}
+        syncOptions:
+          - CreateNamespace=true
+          - ServerSideApply=true
+        preserveResourcesOnDeletion: true #https://argo-cd.readthedocs.io/en/stable/operator-manual/applicationset/Controlling-Resource-Modification/#prevent-an-applications-child-resources-from-being-deleted-when-the-parent-application-is-deleted
+      ignoreDifferences:
+      - group: apiextensions.k8s.io
+        kind: CustomResourceDefinition
+        jqPathExpressions:
+          - '.spec.conversion.webhook.clientConfig.caBundle'
+
