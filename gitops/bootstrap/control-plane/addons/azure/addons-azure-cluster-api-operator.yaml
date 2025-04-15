@@ -51,9 +51,6 @@ spec:
                 - op: replace
                   path: /spec/tenantID
                   value: '{{metadata.annotations.tenant_id}}'
-        # - repoURL: '{{metadata.annotations.addons_repo_url}}' # Install CAPI-Operator via raw YAML manifest
-        #   targetRevision: '{{metadata.annotations.addons_repo_revision}}'
-        #   path: '{{metadata.annotations.addons_repo_basepath}}bootstrap/control-plane/temp'
         - repoURL: '{{metadata.annotations.addons_repo_url}}'
           targetRevision: '{{metadata.annotations.addons_repo_revision}}'
           ref: values
@@ -81,11 +78,6 @@ spec:
           - CreateNamespace=true
           - ServerSideApply=true
         preserveResourcesOnDeletion: true #https://argo-cd.readthedocs.io/en/stable/operator-manual/applicationset/Controlling-Resource-Modification/#prevent-an-applications-child-resources-from-being-deleted-when-the-parent-application-is-deleted
-        # terminate:
-        #   duration: 1m
-        #   resources:
-        #     - kind: Job
-        #       timeout: 1m # timeout for the resource
       ignoreDifferences:
       - group: apiextensions.k8s.io
         kind: CustomResourceDefinition

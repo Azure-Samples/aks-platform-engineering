@@ -39,7 +39,7 @@ This sample leverages the [GitOps Bridge Pattern](https://github.com/gitops-brid
 
 The control plane cluster will be configured with addons via ArgoCD using Terraform and then bootstrapped with tools needed for Day Two operations.  
 
-Choose Crossplane **or** Cluster API provider for Azure (CAPZ) to support deploying and managing clusters and Azure infrastructure for the application teams by changing the Terraform `infrastructure_provider` variable to either `crossplane` or `capz`.  [See this document](./docs/capz-or-crossplane.md) for further information on the comparison.  The default is `capz` if no value is specified.
+Choose Crossplane **or** Cluster API provider for Azure (CAPZ) to support deploying and managing clusters and Azure infrastructure for the application teams by changing the Terraform `infrastructure_provider` variable to either `crossplane` or `capz`.  [See this document](./docs/capz-or-crossplane.md) for further information on the comparison.  The default is `capz` if no value is specified. The Azure Service Operator (ASO) install which is a part of the CAPZ installation can be optionally customized with additional CRDs by editing the provided [values.yaml file](./gitops/environments/default/addons/cluster-api-provider-azure/values.yaml and pushing updates to your repository.
 
 ## Prerequisites
 
@@ -53,11 +53,11 @@ Choose Crossplane **or** Cluster API provider for Azure (CAPZ) to support deploy
 ### Provisioning the Control Plane Cluster
 
 - Fork the repo
-- Only if the repo is desired to be private, ArgoCD will need a ssh deploy key to access this repo. Follow these steps to enable: 
-    - Create a [read-only deploy ssh key](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/managing-deploy-keys#deploy-keys) on the fork
-    - Place the corresponding private key named `private_ssh_deploy_key` in the `terraform` directory
-    - Change the `gitops_addons_org` variable to `git@github.com:Azure-Samples` replacing Azure-Samples with your fork org/username versus the existing `https://` format
-    - Uncomment line 218 of the `main.tf` file: `# sshPrivateKey = file(pathexpand(var.git_private_ssh_key))`
+- Only if the repo is desired to be private, ArgoCD will need a ssh deploy key to access this repo. Follow these steps to enable:
+  - Create a [read-only deploy ssh key](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/managing-deploy-keys#deploy-keys) on the fork
+  - Place the corresponding private key named `private_ssh_deploy_key` in the `terraform` directory
+  - Change the `gitops_addons_org` variable to `git@github.com:Azure-Samples` replacing Azure-Samples with your fork org/username versus the existing `https://` format
+  - Uncomment line 218 of the `main.tf` file: `# sshPrivateKey = file(pathexpand(var.git_private_ssh_key))`
 
 Run Terraform:
 
@@ -68,7 +68,7 @@ terraform init -upgrade
 
 Choose the `infrastructure_provider` variable to be `capz` (default) or `crossplane`.
 
-> [!Important] 
+> [!Important]
 > Change `azure-samples` to your fork organization or GitHub user name in the commands below.
 
 Alternatively, consider changing the example `tvars` file to match your desired configuration versus using the `-var` switches below.
@@ -108,52 +108,6 @@ kubectl port-forward svc/argo-cd-argocd-server -n argocd 8080:443
 ```
 
 The username for the ArgoCD UI login is `admin`.
-
-### Install and configure CAPZ using Cluster-API operator
-
-The crossplane option will automatically install via ArgoCD when using the `var infrastructure_provider=crossplane`, but the CAPZ option will need to be installed manually.  Cert-manager was automatically installed via ArgoCD which is an install pre-requisite. Workload identity was also created and attached to the AKS management cluster.
-
-First verify that certificate manager is installed and pods are ready in the `cert-manager` namespace.
-
-```shell
-kubectl get pods -n cert-manager
-```
-
-```shell
-NAME                                       READY   STATUS    RESTARTS   AGE
-cert-manager-cainjector-57fd464d97-l89hs   1/1     Running   0          84s
-cert-manager-d548d744-ghmf9                1/1     Running   0          84s
-cert-manager-webhook-8656b957f-4rhr6       1/1     Running   0          84s
-```
-
-The following steps will install CAPZ via the Cluster-API operator which also includes Azure Service Operator (ASO) to the management cluster.
-
-```shell
-helm repo add capi-operator https://kubernetes-sigs.github.io/cluster-api-operator
-helm repo update
-helm install capi-operator capi-operator/cluster-api-operator --create-namespace -n capi-operator-system --wait --timeout 90s -f gitops/environments/default/addons/cluster-api-provider-azure/values.yaml
-``` 
-
-In order to install CAPI Operator with additional CRDs, `helm install` must use a `values.yaml` file since the commands cannot be passed on the command line.  documentdb and managedidentity CRDS are added by default in the provided [values.yaml file](./gitops/environments/default/addons/cluster-api-provider-azure/values.yaml) and can be optionally customized if desired.  For more information read the first section of [CAPZ versus Crossplane](./docs/capz-or-crossplane.md#cluster-api-provider-for-azure-capz-and-azure-service-operator-aso).
-
-This will take some time to install and can be verified it is complete by seeing two ready pods in the `azure-infrastructure-system` namespace.
-
-```shell
-kubectl get pods -n azure-infrastructure-system
-```
-
-```shell
-NAME                                                      READY   STATUS    RESTARTS       AGE
-azureserviceoperator-controller-manager-d9d69f497-h5cdm   1/1     Running   1 (115s ago)   2m24s
-capz-controller-manager-ff97799dd-8l5n2                   1/1     Running   0              2m23s
-```
-Now apply the credentials for CAPZ to be able to create resources using the Workload Identity created by Terraform.
-
-Add in the `clientID:` and `tenantID:` values from the `terraform apply` matching output values to the `gitops/hooks/identity/identity.yaml` file. Feel free to run `terraform apply` again if needed to get these output values.  Then apply the identity to the cluster.
-
-```shell
-kubectl apply -f ../gitops/hooks/identity/identity.yaml
-```
 
 ### Summary
 
