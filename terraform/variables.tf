@@ -63,9 +63,9 @@ variable "addons_versions" {
     kargo_chart_version = string
   }))
   default = [{
-    argocd_chart_version                     = "7.6.10" # https://github.com/argoproj/argo-helm/blob/main/charts/argo-cd/Chart.yaml
-    argo_rollouts_chart_version              = "2.37.7" # https://github.com/argoproj/argo-helm/blob/main/charts/argo-rollouts/Chart.yaml
-    kargo_chart_version                      = "0.9.1" # https://github.com/akuity/kargo/releases
+    argocd_chart_version                     = "7.8.25" # https://github.com/argoproj/argo-helm/blob/main/charts/argo-cd/Chart.yaml
+    argo_rollouts_chart_version              = "2.39.5" # https://github.com/argoproj/argo-helm/blob/main/charts/argo-rollouts/Chart.yaml
+    kargo_chart_version                      = "1.4.1" # https://github.com/akuity/kargo/releases
   }]
 }
 
