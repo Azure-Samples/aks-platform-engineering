@@ -39,7 +39,7 @@ This sample leverages the [GitOps Bridge Pattern](https://github.com/gitops-brid
 
 The control plane cluster will be configured with addons via ArgoCD using Terraform and then bootstrapped with tools needed for Day Two operations.  
 
-Choose Crossplane **or** Cluster API provider for Azure (CAPZ) to support deploying and managing clusters and Azure infrastructure for the application teams by changing the Terraform `infrastructure_provider` variable to either `crossplane` or `capz`.  [See this document](./docs/capz-or-crossplane.md) for further information on the comparison.  The default is `capz` if no value is specified. The Azure Service Operator (ASO) install which is a part of the CAPZ installation can be optionally customized with additional CRDs by editing the provided [values.yaml file](./gitops/environments/default/addons/cluster-api-provider-azure/values.yaml and pushing updates to your repository.
+Choose Crossplane **or** Cluster API provider for Azure (CAPZ) to support deploying and managing clusters and Azure infrastructure for the application teams by changing the Terraform `infrastructure_provider` variable to either `crossplane` or `capz`.  [See this document](./docs/capz-or-crossplane.md) for further information on the comparison.  The default is `capz` if no value is specified. The Azure Service Operator (ASO) install which is a part of the CAPZ installation can be optionally customized with additional CRDs by editing the provided [values.yaml file](./gitops/environments/default/addons/cluster-api-provider-azure/values.yaml) and pushing updates to your repository.
 
 ## Prerequisites
 
