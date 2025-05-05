@@ -4035,34 +4035,36 @@
     zen-observable "^0.10.0"
 
 "@backstage/plugin-catalog@^1.24.0":
-  version "1.24.0"
-  resolved "https://registry.yarnpkg.com/@backstage/plugin-catalog/-/plugin-catalog-1.24.0.tgz#e70675fbe941e672c2b19e3d3a01c7f46fb8695e"
-  integrity sha512-8SMAG0TFyXP/XkYaYc0DL0LzxwcetXecqsEu8OxcfPl6SaXvhfiAw3eodGTPuVrhBotCz7wHCZW4Y6gn8iJwxA==
+  version "1.29.0"
+  resolved "https://registry.yarnpkg.com/@backstage/plugin-catalog/-/plugin-catalog-1.29.0.tgz#98c1f0d6a0cd1d42c24381a33891ad28383c2977"
+  integrity sha512-ufPopD7cvuqZSSgq0429nLgfSSEzO6p4Km4XuecHbFbakFBM4ZlXDtbXU8xlzeQPgbsw8arkoafZcJuD4MrORg==
   dependencies:
-    "@backstage/catalog-client" "^1.7.1"
-    "@backstage/catalog-model" "^1.7.0"
-    "@backstage/core-compat-api" "^0.3.1"
-    "@backstage/core-components" "^0.15.1"
-    "@backstage/core-plugin-api" "^1.10.0"
-    "@backstage/errors" "^1.2.4"
-    "@backstage/frontend-plugin-api" "^0.9.0"
-    "@backstage/integration-react" "^1.2.0"
-    "@backstage/plugin-catalog-common" "^1.1.0"
-    "@backstage/plugin-catalog-react" "^1.14.0"
-    "@backstage/plugin-permission-react" "^0.4.27"
-    "@backstage/plugin-scaffolder-common" "^1.5.6"
-    "@backstage/plugin-search-common" "^1.2.14"
-    "@backstage/plugin-search-react" "^1.8.1"
-    "@backstage/types" "^1.1.1"
+    "@backstage/catalog-client" "^1.9.1"
+    "@backstage/catalog-model" "^1.7.3"
+    "@backstage/core-compat-api" "^0.4.1"
+    "@backstage/core-components" "^0.17.1"
+    "@backstage/core-plugin-api" "^1.10.6"
+    "@backstage/errors" "^1.2.7"
+    "@backstage/frontend-plugin-api" "^0.10.1"
+    "@backstage/integration-react" "^1.2.6"
+    "@backstage/plugin-catalog-common" "^1.1.3"
+    "@backstage/plugin-catalog-react" "^1.17.0"
+    "@backstage/plugin-permission-react" "^0.4.33"
+    "@backstage/plugin-scaffolder-common" "^1.5.10"
+    "@backstage/plugin-search-common" "^1.2.17"
+    "@backstage/plugin-search-react" "^1.8.8"
+    "@backstage/types" "^1.2.1"
+    "@backstage/version-bridge" "^1.0.11"
     "@material-ui/core" "^4.12.2"
     "@material-ui/icons" "^4.9.1"
     "@material-ui/lab" "4.0.0-alpha.61"
     "@mui/utils" "^5.14.15"
+    classnames "^2.3.1"
     dataloader "^2.0.0"
-    expiry-map "^2.0.0"
     history "^5.0.0"
     lodash "^4.17.21"
     pluralize "^8.0.0"
+    react-helmet "6.1.0"
     react-use "^17.2.4"
     zen-observable "^0.10.0"
 
@@ -10841,9 +10843,9 @@
   integrity sha512-hKormJbkJqzQGhziax5PItDUTMAM9uE2XXQmM37dyd4hVM+5aVl7oVxMVUiVQn2oCQFN/LKCZdvSM0pFRqbSmQ==
 
 "@types/react-dom@*", "@types/react-dom@^18", "@types/react-dom@^18.0.0":
-  version "18.3.6"
-  resolved "https://registry.yarnpkg.com/@types/react-dom/-/react-dom-18.3.6.tgz#fa59a5e9a33499a792af6c1130f55921ef49d268"
-  integrity sha512-nf22//wEbKXusP6E9pfOCDwFdHAX4u172eaJI4YkDRQEZiorm6KfYnSC2SWLDMVWUOWPERmJnN0ujeAfTBLvrw==
+  version "18.3.7"
+  resolved "https://registry.yarnpkg.com/@types/react-dom/-/react-dom-18.3.7.tgz#b89ddf2cd83b4feafcc4e2ea41afdfb95a0d194f"
+  integrity sha512-MEe3UeoENYVFXzoXEWsvcpg6ZvlrFNlOQ7EOsvhI3CfAXwzPfO8Qwuxd40nepsYKqyyVQnTdEfv68q91yLcKrQ==
 
 "@types/react-redux@^7.1.20":
   version "7.1.33"
@@ -15574,13 +15576,6 @@ expect@^29.0.0, expect@^29.7.0:
     jest-message-util "^29.7.0"
     jest-util "^29.7.0"
 
-expiry-map@^2.0.0:
-  version "2.0.0"
-  resolved "https://registry.yarnpkg.com/expiry-map/-/expiry-map-2.0.0.tgz#b441ee8e8865291ad9a542783076d33bae0f3582"
-  integrity sha512-K1I5wJe2fiqjyUZf/xhxwTpaopw3F+19DsO7Oggl20+3SVTXDIevVRJav0aBMfposQdkl2E4+gnuOKd3j2X0sA==
-  dependencies:
-    map-age-cleaner "^0.2.0"
-
 exponential-backoff@^3.1.1:
   version "3.1.1"
   resolved "https://registry.yarnpkg.com/exponential-backoff/-/exponential-backoff-3.1.1.tgz#64ac7526fe341ab18a39016cd22c787d01e00bf6"
@@ -19897,13 +19892,6 @@ makeerror@1.0.12:
   dependencies:
     tmpl "1.0.5"
 
-map-age-cleaner@^0.2.0:
-  version "0.2.0"
-  resolved "https://registry.yarnpkg.com/map-age-cleaner/-/map-age-cleaner-0.2.0.tgz#0196bc278f7244ddeb7ca0cb3df329b06241a44b"
-  integrity sha512-AvxTC6id0fzSf6OyNBTp1syyCuKO7nOJvHgYlhT0Qkkjvk40zZo+av3ayVgXlxnF/DxEzEfY9mMdd7FHsd+wKQ==
-  dependencies:
-    p-defer "^1.0.0"
-
 map-obj@^1.0.0:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/map-obj/-/map-obj-1.0.1.tgz#d933ceb9205d82bdcf4886f6742bdc2b4dea146d"
@@ -21775,11 +21763,6 @@ p-cancelable@^2.0.0:
   version "2.1.1"
   resolved "https://registry.yarnpkg.com/p-cancelable/-/p-cancelable-2.1.1.tgz#aab7fbd416582fa32a3db49859c122487c5ed2cf"
   integrity sha512-BZOr3nRQHOntUjTrH8+Lh54smKHoHyur8We1V8DSMVrl5A2malOOwuJRnKRDjSnkoeBh4at6BwEnb5I7Jl31wg==
-
-p-defer@^1.0.0:
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/p-defer/-/p-defer-1.0.0.tgz#9f6eb182f6c9aa8cd743004a7d4f96b196b0fb0c"
-  integrity sha512-wB3wfAxZpk2AzOfUMJNL+d36xothRSyj8EXOa4f6GMqYDN9BJaaSISbsk+wS9abmnebVw95C2Kb5t85UmpCxuw==
 
 p-finally@^1.0.0:
   version "1.0.0"
