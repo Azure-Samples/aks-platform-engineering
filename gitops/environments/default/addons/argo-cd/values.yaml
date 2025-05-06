@@ -99,5 +99,5 @@ extraObjects:
 global:
   image:
     repository: quay.io/argoproj/argocd
-    tag: v3.0.0-rc4
+    tag: v3.0.0
     pullPolicy: IfNotPresent
