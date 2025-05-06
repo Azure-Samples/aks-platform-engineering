@@ -157,12 +157,6 @@ variable "sku_tier" {
   default     = "Standard"
 }
 
-variable "private_cluster_enabled" {
-  description = "Specifies wether the AKS cluster be private or not."
-  default     = false
-  type        = bool
-}
-
 variable "enable_auto_scaling" {
   description = "Specifies whether to enable auto-scaler. Defaults to false."
   type        = bool

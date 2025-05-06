@@ -144,20 +144,19 @@ resource "azurerm_postgresql_flexible_server_firewall_rule" "allow_all" {
 
 module "aks" {
   source                            = "Azure/aks/azurerm"
-  version                           = "9.4.1"
+  version                           = "10.0.0"
   resource_group_name               = azurerm_resource_group.this.name
   location                          = var.location
   kubernetes_version                = var.kubernetes_version
   orchestrator_version              = var.kubernetes_version
   role_based_access_control_enabled = var.role_based_access_control_enabled
   rbac_aad                          = var.rbac_aad
+  rbac_aad_azure_rbac_enabled       = true
   prefix                            = var.prefix
   network_plugin                    = var.network_plugin
-  vnet_subnet_id                    = lookup(module.network.vnet_subnets_name_id, "aks")
   os_disk_size_gb                   = var.os_disk_size_gb
   os_sku                            = var.os_sku
   sku_tier                          = var.sku_tier
-  private_cluster_enabled           = var.private_cluster_enabled
   enable_auto_scaling               = var.enable_auto_scaling
   enable_host_encryption            = var.enable_host_encryption
   log_analytics_workspace_enabled   = var.log_analytics_workspace_enabled
